@@ -1,0 +1,67 @@
+name: analyzer
+version: "1.0"
+author: Javier Cabrera <javierca@kth.se>
+about: Process Wasm binaries. This is a compound of slumps tools, all migrated to a Rust implementation
+subcommands:
+    - extract:
+        about: Extract metadata information from the binaries
+        args:
+        - folder:
+            required: true
+            help: "Folder containing the binaries"
+            value_name: "folder"
+        - reset:
+            short: r
+            help: "Clean out database before starting the extraction of metadatas"
+
+    - export:
+        about: Export database data as a JSON file
+        args:
+          - out:
+              takes_value: true
+              required: true
+              help: Output file
+          - csv:
+                short: c
+                help: "Export as CSV"
+            
+    
+    - clean:
+        about: Hard reset the database
+    
+    - reduce:
+        about: Reduce binary to its minimal expression according to wasm-mutate implementation
+
+    - diversify:
+        about: Diversify source code, input C/C++, Wasm or LLVM
+        args:
+          - out:
+              help: Out file, type of output is decided by file extension
+args:
+  - dbpass:
+      required: true
+      help: "Mongo db pass" 
+      value_name: "pass"
+      takes_value: true
+  - dbuser:
+      required: true 
+      value_name: "user"
+      help: "Mongo db username"
+      takes_value: true
+  - dbconn:
+      default_value: "mongodb://localhost:27017"
+      help: "Mongo db connection string"
+      value_name: "dbconn"
+      takes_value: true
+  - dbname:
+      default_value: "obfuscator"
+      required: false
+      takes_value: true
+      value_name: dbname
+      
+  - collection_name:
+      default_value: "wasms"
+      required: false
+      takes_value: true
+      value_name: collection_name
+    
