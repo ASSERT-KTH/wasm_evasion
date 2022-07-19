@@ -11,6 +11,7 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 clap = { version = "~2.27.0", features = ["yaml"] }
 thiserror = "1.0"
 wasmparser = "0.80.0"
+csv = "1.1.6"
 
 # To save data
 [dependencies.mongodb]

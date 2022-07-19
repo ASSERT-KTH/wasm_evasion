@@ -4,7 +4,6 @@ use info::InfoExtractor;
 use std::{
     borrow::{Borrow, BorrowMut},
     fs,
-    io::Read,
     path::PathBuf,
     process,
     rc::Rc,
@@ -12,7 +11,7 @@ use std::{
         atomic::{AtomicU32, Ordering},
         Arc,
     },
-    thread::spawn, time,
+    thread::spawn, time, io::{Write, Read},
 };
 
 use mongodb::options::{ClientOptions, Credential};
@@ -44,7 +43,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
-        file.by_ref().read_exact(&mut buf)?;
+        &file.read_exact(&mut buf)?;
 
         match &buf {
             b"\0asm" => {
@@ -255,7 +254,35 @@ pub fn main() -> Result<(), errors::CliError> {
             extract(Arc::new(state), arg_or_error!(args, "folder"))?;
         }
         ("export", Some(args)) => {
-            println!("Exporting")
+            println!("Exporting");
+            let collection = dbclient
+            .database(&arg_or_error!(matches, "dbname"))
+            .collection::<Meta>(&arg_or_error!(matches, "collection_name"));
+
+            let records = collection.find(None, None).unwrap();
+            let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
+
+            if args.is_present("csv") {
+
+                let mut writer = csv::Writer::from_writer(outfile);
+
+                for record in records {
+                    writer.serialize(record.unwrap()).unwrap();
+                }
+
+                writer.flush().unwrap()
+            } else {
+                let mut all = vec![];
+
+                for record in records {
+                    all.push(record.unwrap());
+                }
+
+                outfile.write_all(
+                    serde_json::to_string_pretty(&all).unwrap().as_bytes()
+                ).unwrap();
+
+            }
         }
         ("clean", Some(_)) => {
             println!("Reseting ");
@@ -280,6 +307,7 @@ pub mod tests {
     use mongodb::options::{ClientOptions, Credential};
     use mongodb::sync::Client;
 
+    use crate::meta::Meta;
     use crate::{extract, State};
 
     //#[test]
@@ -331,5 +359,17 @@ pub mod tests {
         for db_name in client.list_database_names(None, None).unwrap() {
             println!("{}", db_name);
         }
+    }
+
+    #[test]
+    pub fn test_csv(){
+
+        let mut writer = csv::Writer::from_writer(std::io::stdout());
+        let m = Meta::new();
+
+        // writer.write_record(&["a"]).unwrap();
+
+        writer.serialize(m).unwrap();
+        writer.flush().unwrap();
     }
 }

@@ -24,6 +24,7 @@ pub struct Meta {
     pub tag_section: bool,
 
     // custom data info
+    #[serde(skip)]
     pub custom_sections: HashMap<String, u32>,
     pub custom_sections_count: u32,
 
@@ -51,7 +52,9 @@ impl Meta {
             unknown_section: false,
             version: 1,
             tag_section: false,
+            
             custom_sections: HashMap::new(),
+
             custom_sections_count: 0,
             num_instructions: 0,
         }
