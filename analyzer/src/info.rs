@@ -103,7 +103,7 @@ impl InfoExtractor {
                     meta.custom_sections_count += 1;
                     let name = reader.name();
                     let data = reader.data();
-                    meta.custom_sections.insert(name.to_string(), data.len() as u32);
+                    meta.custom_sections.insert(name.to_string(), (0, data.len() as u32));
                 }
                 Payload::UnknownSection {
                     id,

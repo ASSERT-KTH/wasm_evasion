@@ -75,8 +75,7 @@ pub struct Meta {
     pub tag_section: Option<Range<usize>>,
 
     // custom data info
-    #[serde(skip)]
-    pub custom_sections: HashMap<String, u32>,
+    pub custom_sections: HashMap<String, (u32, u32)>,
     pub custom_sections_count: u32,
 
     // code data aggregation
