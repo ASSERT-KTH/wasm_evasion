@@ -59,8 +59,10 @@ impl InfoExtractor {
                 Payload::DataSection(reader) => {
                     meta.data_section = true;
                 }
-                Payload::CustomSection { name, data, .. } => {
+                Payload::CustomSection (reader) => {
                     meta.custom_sections_count += 1;
+                    let name = reader.name();
+                    let data = reader.data();
                     meta.custom_sections.insert(name.to_string(), data.len() as u32);
                 }
                 Payload::UnknownSection {
@@ -86,7 +88,7 @@ impl InfoExtractor {
                 Payload::TagSection(..) => {
                     meta.tag_section = true;
                 }
-                Payload::End => {
+                Payload::End { .. } => {
                     break;
                 }
                 _ => todo!("{:?} not implemented", payload),

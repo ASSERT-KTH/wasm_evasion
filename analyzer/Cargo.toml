@@ -10,8 +10,9 @@ serde = { version = "1.0.139", features = ["derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 clap = { version = "~2.27.0", features = ["yaml"] }
 thiserror = "1.0"
-wasmparser = "0.80.0"
+wasmparser = { path="../wasm-tools/crates/wasmparser" }
 csv = "1.1.6"
+wasm-mutate = { path="../wasm-tools/crates/wasm-mutate" }
 
 # To save data
 [dependencies.mongodb]
