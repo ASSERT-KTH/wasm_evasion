@@ -1,14 +1,15 @@
 use std::{path::PathBuf, rc::Rc, ops::Range};
 
-use wasm_mutate::{WasmMutate, mutators::{Mutator,  custom::CustomSectionMutator, peephole::PeepholeMutator, remove_export::RemoveExportMutator, rename_export::RenameExportMutator, snip_function::SnipMutator}};
+use wasm_mutate::{WasmMutate, mutators::{Mutator,  custom::CustomSectionMutator, peephole::PeepholeMutator, remove_export::RemoveExportMutator, rename_export::RenameExportMutator, snip_function::SnipMutator, function_body_unreachable::FunctionBodyUnreachable, add_function::AddFunctionMutator, modify_init_exprs::InitExpressionMutator, Item, add_type::AddTypeMutator, remove_section::RemoveSection}};
 use wasmparser::{Chunk, Parser, Payload};
 use std::collections::HashMap;
 use crate::meta::{Meta, MutationInfo, MutationMap as MM, MutationType};
-
+use wasm_mutate::mutators::remove_item::RemoveItemMutator;
+use wasm_mutate::mutators::codemotion::CodemotionMutator;
 pub struct InfoExtractor;
 
 macro_rules! get_info {
-    ($mutation: expr, $config: ident, $meta: ident, $prettyname: literal, $description: literal, $reduce: literal, $tpe: expr) => {
+    ($mutation: expr, $config: ident, $meta: ident, $prettyname: literal, $description: literal, $reduce: literal, $tpe: expr, $affects_execution: literal) => {
         { if $mutation.can_mutate(&$config) {
 
             let info = $mutation.get_mutation_info(&$config);
@@ -38,7 +39,7 @@ macro_rules! get_info {
             }
             
             $meta.mutations.push(
-                MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: idxsmap, can_reduce: $reduce, tpe: $tpe.get_val() }
+                MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: idxsmap, can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution }
             );
         }
     }
@@ -146,15 +147,37 @@ impl InfoExtractor {
         let Edit = MutationType::Edit;
         let Delete = MutationType::Delete;
 
-        get_info!(PeepholeMutator::new(2), config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Add|Edit|Delete);
+        get_info!(PeepholeMutator::new(2), config, meta, "Apply a peephole mutation", "Changes a function to the peephole level. It uses an egraphs to create the mutations", true, Add|Edit|Delete, true);
+        get_info!(RemoveExportMutator, config, meta, "Remove an export", "Remove an export", true, Delete, true);
+        get_info!(RenameExportMutator{ max_name_size: 100 }, config, meta, "Rename an export", "Renames an export", true, Edit, false);
+        get_info!(SnipMutator, config, meta, "Snip a function body", "Removes the body of a function and replaces its body by a default value given the type of the function", true, Delete, true);
+        get_info!(CodemotionMutator, config, meta, "Code motion mutator", "Changes the cfg of the function body", false, Edit, true);
+        get_info!(FunctionBodyUnreachable, config, meta, "Set function to unreachable", "Replaces a function body by unreachable", true, Delete|Edit, true);
+        get_info!(AddTypeMutator {
+            max_params: 20,
+            max_results: 20,
+        }, config, meta, "Add type", "Adds a new random type declaration to the binary", false, Add, false);
 
-        get_info!(RemoveExportMutator, config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Add|Edit|Delete);
+        get_info!(AddFunctionMutator, config, meta, "Add function", "Adds a custom random created function to the binary", false, Add, false);
+        get_info!(RemoveSection::Custom, config, meta, "Remove custom section", "Removes a custom section", true, Delete, false);
+        get_info!(RemoveSection::Empty, config, meta, "Remove empty section", "Removes empty section", true, Delete, false);
 
-        get_info!(RenameExportMutator{ max_name_size: 100 }, config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Add|Edit|Delete);
+        get_info!(InitExpressionMutator::Global, config, meta, "Init expression mutator", "Mutates the initial expression of a global", true, Edit, true);
 
-        get_info!(SnipMutator, config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Add|Edit|Delete);
+        get_info!(InitExpressionMutator::ElementOffset, config, meta, "Element offset mutation", "Mutate the init expression of the element offset", true, Edit, true);
 
-        get_info!(CustomSectionMutator, config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Add|Edit|Delete);
+        get_info!(InitExpressionMutator::ElementFunc, config, meta, "Element func mutation", "Mutate the init expression of the element func", true, Edit, true);
+
+        get_info!(RemoveItemMutator(Item::Function), config, meta, "Removes function", "Removes a ramdon function", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Global), config, meta, "Remove global", "Removes a random global", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Memory), config, meta, "Remove memory", "Removes a memory element", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Table), config, meta, "Remove table", "Removes a table", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Type), config, meta, "Remove type", "Removes a type", true, Delete, false);
+        get_info!(RemoveItemMutator(Item::Data), config, meta, "Remove data", "Remove data segment", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Element), config, meta, "Remove elemen", "Removes element", true, Delete, true);
+        get_info!(RemoveItemMutator(Item::Tag), config, meta, "Remove tahg", "Remove tag", true, Delete, true);
+
+        get_info!(CustomSectionMutator, config, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Edit, false);
 
 
         Ok(meta.clone())

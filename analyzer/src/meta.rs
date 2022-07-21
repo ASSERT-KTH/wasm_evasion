@@ -49,6 +49,7 @@ pub struct MutationInfo {
     pub desccription: String,
     pub map: HashMap<String, Vec<MutationMap>>,
     pub can_reduce: bool,
+    pub affects_execution: bool,
     pub tpe: u8
 }
 
