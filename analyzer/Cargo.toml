@@ -13,6 +13,7 @@ thiserror = "1.0"
 wasmparser = { path="../wasm-tools/crates/wasmparser" }
 csv = "1.1.6"
 wasm-mutate = { path="../wasm-tools/crates/wasm-mutate" }
+bitflags = "1.3.2"
 
 # To save data
 [dependencies.mongodb]

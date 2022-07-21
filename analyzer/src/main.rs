@@ -1,6 +1,7 @@
 use clap::{load_yaml, value_t, App};
 use errors::{AResult, CliError};
 use info::InfoExtractor;
+use wasm_mutate::WasmMutate;
 use std::{
     borrow::{Borrow, BorrowMut},
     fs,
@@ -18,6 +19,7 @@ use mongodb::options::{ClientOptions, Credential};
 use mongodb::sync::Client;
 
 use crate::meta::Meta;
+
 
 mod errors;
 pub mod info;
@@ -57,9 +59,10 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
                 // Parse Wasm to get more info
                 let bindata = fs::read(f)?;
+                let cp = bindata.clone();
 
                 let info =
-                    std::panic::catch_unwind(move || InfoExtractor::get_info(&bindata, &mut meta));
+                    std::panic::catch_unwind(move || InfoExtractor::get_info(&cp, &mut meta));
 
                 match info {
                     Err(e) => {
@@ -83,7 +86,10 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                     }
                 }
 
+
                 let info = info.map_err(|x| CliError::Any(format!("{:#?}", x)))?;
+                
+                
 
                 match info {
                     Err(e) => {
@@ -106,15 +112,38 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
                 // Get mutation info, TODO
 
-                // Save meta to mongodb
 
-                if let Some(client) = &state.dbclient {
-                    let db = client.database(&state.dbname);
-                    let collection = db.collection::<Meta>(&state.collection_name);
+                let mut config = WasmMutate::default();
+                config.setup(&bindata).map_err(|x| CliError::Any(format!("{:#?}", x)))?;
+                config.preserve_semantics(true);
 
-                    let docs = vec![info?];
+                let mut cp= info?.clone();
 
-                    collection.insert_many(docs, None)?;
+                let info =InfoExtractor::get_mutable_info(&mut cp, config);
+                
+                match info {
+                    Ok(info) => {
+                        // Save meta to_string mongodb
+
+                        if let Some(client) = &state.dbclient {
+                            let db = client.database(&state.dbname);
+                            let collection = db.collection::<Meta>(&state.collection_name);
+
+                            let docs = vec![info];
+
+                            match collection.insert_many(docs, None) {
+                                Ok(_) => {
+
+                                },
+                                Err(e) => {
+                                    println!("{:?}", e)
+                                }
+                            }
+                        }
+                    },
+                    Err(e) => {
+                        println!("{:?}", e)
+                    }
                 }
             }
             _ => {
@@ -149,7 +178,9 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>) -> Result<Vec<Path
         .map(|(_, x)| {
             let t = state.clone();
 
-            spawn(move || get_wasm_info(t, x))
+            spawn(move || {
+                get_wasm_info(t, x)
+            })
         })
         .collect::<Vec<_>>();
 
