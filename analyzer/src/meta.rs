@@ -23,9 +23,8 @@ pub struct MutationMap {
     pub many: i64,
 
     /// Display of the target, None if it is not relevant
-    pub display: Option<String>
+    pub display: Option<String>,
 }
-
 
 bitflags! {
 
@@ -37,8 +36,8 @@ bitflags! {
 }
 
 impl MutationType {
-    pub fn get_val(&self) ->u8 {
-        return u8::from(self.bits)
+    pub fn get_val(&self) -> u8 {
+        return u8::from(self.bits);
     }
 }
 
@@ -50,14 +49,18 @@ pub struct MutationInfo {
     pub map: HashMap<String, Vec<MutationMap>>,
     pub can_reduce: bool,
     pub affects_execution: bool,
-    pub tpe: u8
+    pub tpe: u8,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Meta {
-    pub id: String, // TODO sha256 hash
+    pub id: String, 
     pub size: usize,
     pub tpe: String,
+    pub hash: String,
+    pub parent: Option<String>,
+    pub description: String,
+    pub logs: String,
 
     // Static info
     pub tpe_section: Option<Range<usize>>,
@@ -82,7 +85,7 @@ pub struct Meta {
     pub num_instructions: u32,
 
     // mutation info
-    pub mutations: Vec<MutationInfo>
+    pub mutations: Vec<MutationInfo>,
 }
 
 impl Meta {
@@ -91,8 +94,12 @@ impl Meta {
             id: "unset".to_string(),
             size: 0,
             tpe: "original".to_string(),
+            hash: "".to_string(),
+            description: "".to_string(),
+            logs: "".to_string(),
 
             tpe_section: None,
+            parent: None,
             import_section: None,
             export_section: None,
             function_count: 0,
@@ -105,12 +112,12 @@ impl Meta {
             unknown_section: None,
             version: 1,
             tag_section: None,
-            
+
             custom_sections: HashMap::new(),
 
             custom_sections_count: 0,
             num_instructions: 0,
-            mutations: vec![]
+            mutations: vec![],
         }
     }
 }

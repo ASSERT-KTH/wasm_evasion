@@ -5,3 +5,5 @@ mongodb
 *.pdf
 *.json
 *.csv
+*.log
+reduced
