@@ -54,7 +54,7 @@ pub struct MutationInfo {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Meta {
-    pub id: String, 
+    pub id: String,
     pub size: usize,
     pub tpe: String,
     pub hash: String,
