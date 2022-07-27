@@ -14,7 +14,7 @@ pub struct MutationMap {
     pub is_indexed: bool,
 
     /// Index of the element, if indexed, otherwise its offset in the binary
-    pub idx: usize,
+    pub idx: Vec<u8>,
 
     /// Natural description of how the mutation can be applide, e.g. for the custom, if it is the name or the data part
     pub how: String,
@@ -24,6 +24,8 @@ pub struct MutationMap {
 
     /// Display of the target, None if it is not relevant
     pub display: Option<String>,
+    /// Map for arbitrary metadata information
+    pub meta: Option<HashMap<String,String>>,
 }
 
 bitflags! {

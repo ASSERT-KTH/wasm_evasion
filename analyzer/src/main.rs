@@ -217,7 +217,7 @@ pub fn main() -> Result<(), errors::CliError> {
 
 #[cfg(test)]
 pub mod tests {
-    use std::sync::atomic::AtomicU32;
+    use std::sync::atomic::{AtomicU32, AtomicBool};
     use std::sync::Arc;
     use std::time::Duration;
 
