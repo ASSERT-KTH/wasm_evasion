@@ -7,6 +7,7 @@ on:
     paths:
       - analyzer/**
       - wasm-tools
+      - .github/**
 
 jobs:
   build:
