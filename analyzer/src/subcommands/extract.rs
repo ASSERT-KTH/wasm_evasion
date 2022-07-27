@@ -9,6 +9,7 @@ use std::{
     time,
 };
 
+use mongodb::bson::Document;
 use wasm_mutate::WasmMutate;
 
 use crate::{
@@ -23,9 +24,48 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
         return Ok(vec![]);
     }
 
-    for f in chunk.iter() {
+    let dbclient = state.dbclient.as_ref().unwrap().clone();
+    let dbname = state.dbname.clone();
+    let collection_name = state.collection_name.clone();
+
+    'iter: for f in chunk.iter() {
         let mut file = fs::File::open(f)?;
 
+        let name = f.file_name().unwrap().to_str().unwrap().to_string();
+
+        // Check if it in the DB, continue if Some
+        let db = dbclient.database(&dbname);
+        let collection = db.collection::<Meta>(&collection_name);
+        let mut filter = Document::new();
+        filter.insert("parent", name.clone());
+
+        let entry = collection.find_one(filter, None);
+
+        match entry {
+            Err(e) => {
+                println!("{}", e);
+            }
+            Ok(d) => {
+                match d {
+                    Some(_) => {
+                        print!("\rSkipping {}", name);
+                        if state
+                            .process
+                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                            % 99
+                            == 0
+                        {
+                            println!("\n{} processed", state.process.load(Ordering::Relaxed));
+                        }
+                        continue 'iter;
+                    }
+                    None => {
+                        print!("\nReducing {} ", name);
+                    }
+                }
+                
+            }
+        }
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
         file.read_exact(&mut buf).unwrap();
@@ -35,7 +75,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                 //println!("Wasm !");
 
                 let mut meta = meta::Meta::new();
-                meta.id = f.file_name().unwrap().to_str().unwrap().to_string();
+                meta.id = name;
                 // Get size of the file
                 let fileinfo = fs::metadata(f)?;
                 meta.size = fileinfo.len() as usize;

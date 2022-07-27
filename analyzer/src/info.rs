@@ -22,7 +22,7 @@ macro_rules! get_info {
         { if $config.is_some() && $mutation.can_mutate(&$config) {
 
             // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
-            let info = $mutation.get_mutation_info(&$config, 2);
+            let info = $mutation.get_mutation_info(&$config, 3);
 
             let mut idxsmap: HashMap<String, Vec<MM>> = HashMap::new();
 
@@ -51,6 +51,7 @@ macro_rules! get_info {
                 }
             }
 
+            // TODO, save idxsmap to filesystem to avoid overhead in the database and possible errors for too big document :(
             $meta.mutations.push(
                 MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: idxsmap, can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution }
             );
