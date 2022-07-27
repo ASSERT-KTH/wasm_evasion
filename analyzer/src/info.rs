@@ -22,7 +22,7 @@ macro_rules! get_info {
         { if $config.is_some() && $mutation.can_mutate(&$config) {
 
             // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
-            let info = $mutation.get_mutation_info(&$config, 3);
+            let info = $mutation.get_mutation_info(&$config, 2);
 
             let mut idxsmap: HashMap<String, Vec<MM>> = HashMap::new();
 
