@@ -39,7 +39,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
         let db = dbclient.database(&dbname);
         let collection = db.collection::<Meta>(&collection_name);
         let mut filter = Document::new();
-        filter.insert("parent", name.clone());
+        filter.insert("id", name.clone());
 
         let entry = collection.find_one(filter, None);
 
