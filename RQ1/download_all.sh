@@ -1,5 +1,5 @@
 
-if [ test -f filtered-binaries-metadata.7z ] 
+if [ -f filtered-binaries-metadata.7z ] 
 then
     echo "Exist"
 else
@@ -7,7 +7,7 @@ else
 fi
 
 
-if [ test -f all-binaries-metadata.7z ] 
+if [ -f all-binaries-metadata.7z ] 
 then
     echo "Exist"
 else
