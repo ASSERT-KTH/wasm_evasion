@@ -61,7 +61,17 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
         }
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
-        file.read_exact(&mut buf).unwrap();
+        let r = file.read_exact(&mut buf);
+
+        match r {
+            Err(e) => {
+                println!("{}", e);
+                continue 'iter;
+            },
+            Ok(_) => {
+
+            }
+        }
 
         match &buf {
             b"\0asm" => {
