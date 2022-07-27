@@ -19,7 +19,7 @@ use crate::{
 };
 
 pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<PathBuf>> {
-    if chunk.len() == 0 {
+    if chunk.is_empty() {
         return Ok(vec![]);
     }
 
@@ -28,7 +28,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
-        &file.read_exact(&mut buf).unwrap();
+        file.read_exact(&mut buf).unwrap();
 
         match &buf {
             b"\0asm" => {
@@ -98,7 +98,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                     .map_err(|x| CliError::Any(format!("{:#?}", x)));
 
                 match stinfo {
-                    Err(e) => {
+                    Err(_e) => {
                         if state
                             .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
@@ -181,7 +181,7 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>) -> Result<Vec<Path
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    println!("");
+    println!();
     println!("{} processed", state.process.load(Ordering::Relaxed));
     println!(
         "{} parsing errors!",

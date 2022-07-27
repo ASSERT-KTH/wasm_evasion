@@ -5,10 +5,11 @@ use std::{
     path::PathBuf,
     str::FromStr,
     sync::{atomic::Ordering, Arc},
-    time,
+    time, borrow::Borrow, rc::Rc,
 };
 
 use anyhow::Context;
+use mongodb::bson::Document;
 use tempfile::NamedTempFile;
 use wasm_shrink::{IsInteresting, WasmShrink};
 
@@ -42,7 +43,48 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
     let collection_name = state.collection_name.clone();
 
     'iter: for f in chunk.iter() {
+
+        println!("{:?}", state.finish.load(Ordering::Relaxed));
+        if state.finish.load(Ordering::Relaxed) {
+            break;
+        }
         let mut file = fs::File::open(f)?;
+
+        let name = f.file_name().unwrap().to_str().unwrap().to_string();
+
+        // Check if it in the DB, continue if so
+        let db = dbclient.database(&dbname);
+        let collection = db.collection::<Meta>(&collection_name);
+        let mut filter = Document::new();
+        filter.insert("parent", name.clone());
+
+        let entry = collection.find_one(filter, None);
+        
+        match entry {
+            Err(e) => {
+                println!("{}", e);
+            }
+            Ok(d) => {
+                match d {
+                    Some(_) => {
+                        print!("\rSkipping {}", name);
+                        if state
+                            .process
+                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                            % 99
+                            == 0
+                        {
+                            println!("\n{} processed", state.process.load(Ordering::Relaxed));
+                        }
+                        continue 'iter;
+                    }
+                    None => {
+                        print!("\nReducing {} ", name);
+                    }
+                }
+                
+            }
+        }
 
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
@@ -52,8 +94,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
             // Filter first the header to check for Wasm
             b"\0asm" => {
                 let mut meta = meta::Meta::new();
-                meta.id = f.file_name().unwrap().to_str().unwrap().to_string();
-                let name = f.file_name().unwrap().to_str().unwrap().to_string();
+                meta.id = name.clone();
                 // Get size of the file
                 let fileinfo = fs::metadata(f)?;
                 meta.size = fileinfo.len() as usize;
@@ -73,9 +114,6 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 // copy the original in the folder to get it as the new shrunked binary
 
                 std::fs::write(output.clone(), bindata.clone()).unwrap();
-
-                //let predicate = PathBuf::from_str(&format!("{}/{}.shrunken.predicate", outfolder, name)).unwrap();
-                //let wat_path = PathBuf::from_str(&format!("{}/{}.shrunken.wat", outfolder, name)).unwrap();
 
                 log::debug!("Start =========== {}", name);
 
@@ -105,9 +143,24 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                     })))
                     .run(cp, move |wasm| Ok(Interesting(wasm.len() > 8)));
 
-                let logs = match r {
+                match r {
                     Err(e) => {
-                        eprintln!("\t\t Error {e}");
+                        log::debug!("Error {}", e);
+                        if state.save_logs {
+
+                            println!("Saving logs");
+                            let name = std::thread::current();
+                            let name  = name.name().unwrap();
+                            let log_file = format!("output{}.log", name);
+                            let r = std::fs::rename(log_file, logs.clone());
+
+                            match r {
+                                Err(e) => println!("{}", e),
+                                Ok(_) => {
+
+                                }
+                            }
+                        }
                         if state
                             .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
@@ -119,12 +172,22 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                         continue 'iter;
                     }
                     Ok(_i) => {
-                        let name = std::thread::current();
-                        let name = name.name().unwrap();
-                        let name = format!("output{}.log", name);
-                        let content = std::fs::read(name).unwrap();
+                        // Save logs if flag is set
+                        if state.save_logs {
 
-                        String::from_utf8(content).unwrap()
+                            println!("Saving logs");
+                            let name = std::thread::current();
+                            let name  = name.name().unwrap();
+                            let log_file = format!("output{}.log", name);
+                            let r = std::fs::rename(log_file, logs.clone());
+
+                            match r {
+                                Err(e) => println!("{}", e),
+                                Ok(_) => {
+
+                                }
+                            }
+                        }
                     }
                 };
 
@@ -148,13 +211,13 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 meta.hash = bindata.to_vec().hash256().fmt1();
                 meta.parent = Some(name.clone());
                 meta.size = bindata.len();
+                meta.logs = logs.display().to_string();
                 meta.description = format!(
                     "seed: {}, fuel: {}, ratio {}",
                     0,
                     1000,
                     bindata.len() as f32 / initial_size as f32
                 );
-                meta.logs = logs;
 
                 let db = dbclient.database(&dbname);
                 let collection = db.collection::<Meta>(&collection_name);
@@ -164,7 +227,8 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 match collection.insert_many(docs, None) {
                     Ok(_) => {}
                     Err(e) => {
-                        panic!(e)
+                        println!("{}", e);
+                        std::panic::panic_any(e)
                     }
                 }
             }
@@ -200,16 +264,26 @@ pub fn reduce_binaries(state: Arc<State>, files: &Vec<PathBuf>) -> Result<(), Cl
             let t = state.clone();
             std::thread::Builder::new()
                 .name(format!("t{}", i))
+                .stack_size(32 * 1024 * 1024 * 1024) // 320 MB
                 .spawn(move || reduce_single_binary(t, x))
                 .unwrap()
         })
         .collect::<Vec<_>>();
 
+
+    let t = state.clone();
+    // Capture ctrl-c signal
+    ctrlc::set_handler(move|| {
+        println!("received Ctrl+C! Finishing up");
+        t.finish.store(true,Ordering::SeqCst);
+    })
+    .expect("Error setting Ctrl-C handler");
+
     for j in jobs {
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    println!("");
+    println!();
     println!("{} processed", state.process.load(Ordering::Relaxed));
     println!(
         "{} parsing errors!",
@@ -225,6 +299,7 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
 
     let outf = &state.out_folder;
     let outf = outf.as_ref().unwrap();
+
 
     std::fs::create_dir(outf.clone()); // Ignore if error since it's already created
 
@@ -257,6 +332,6 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
     println!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
-    let filtered = reduce_binaries(state, &files)?;
+    reduce_binaries(state, &files)?;
     Ok(())
 }

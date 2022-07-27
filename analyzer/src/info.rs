@@ -1,4 +1,4 @@
-use std::{ops::Range, path::PathBuf, rc::Rc};
+use std::{ops::Range};
 
 use crate::meta::{Meta, MutationInfo, MutationMap as MM, MutationType};
 use std::collections::HashMap;
@@ -71,7 +71,7 @@ impl InfoExtractor {
             match payload {
                 Payload::CodeSectionStart {
                     count: _,
-                    range,
+                    range: _,
                     size: _,
                 } => {
                     //parser.skip_section();
@@ -79,55 +79,55 @@ impl InfoExtractor {
                     //wasm = &binary_data[range.end..];
                     //continue;
                 }
-                Payload::TypeSection(mut reader) => {
+                Payload::TypeSection(_reader) => {
                     meta.tpe_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::ImportSection(mut reader) => {
+                Payload::ImportSection(_reader) => {
                     meta.import_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::FunctionSection(mut reader) => {
+                Payload::FunctionSection(reader) => {
                     meta.function_count = reader.get_count();
                 }
-                Payload::TableSection(mut reader) => {
+                Payload::TableSection(_reader) => {
                     meta.table_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::MemorySection(mut reader) => {
+                Payload::MemorySection(reader) => {
                     meta.memory_count = reader.get_count();
                 }
-                Payload::GlobalSection(mut reader) => {
+                Payload::GlobalSection(_reader) => {
                     meta.global_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::ExportSection(mut reader) => {
+                Payload::ExportSection(_reader) => {
                     meta.export_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::StartSection { func, range } => {
+                Payload::StartSection { func: _, range: _ } => {
                     meta.start_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::ElementSection(reader) => {
+                Payload::ElementSection(_reader) => {
                     meta.element_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::DataSection(reader) => {
+                Payload::DataSection(_reader) => {
                     meta.data_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
@@ -141,16 +141,16 @@ impl InfoExtractor {
                         .insert(name.to_string(), (0, data.len() as u32));
                 }
                 Payload::UnknownSection {
-                    id,
+                    id: _,
                     contents: _,
-                    range,
+                    range: _,
                 } => {
                     meta.unknown_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
                 }
-                Payload::DataCountSection { count: _, range } => {
+                Payload::DataCountSection { count: _, range: _ } => {
                     meta.data_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
@@ -410,7 +410,7 @@ impl InfoExtractor {
 #[cfg(test)]
 pub mod tests {
 
-    use std::{fs, rc::Rc};
+    use std::{fs};
 
     use crate::meta::Meta;
 
@@ -420,6 +420,6 @@ pub mod tests {
     pub fn test_parsing() {
         let content = fs::read("tests/1.wasm").unwrap();
 
-        let info = InfoExtractor::get_info(&content, &mut Meta::new());
+        let _info = InfoExtractor::get_info(&content, &mut Meta::new());
     }
 }

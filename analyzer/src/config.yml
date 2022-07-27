@@ -19,11 +19,10 @@ subcommands:
         args:
           - out:
               takes_value: true
-              required: true
               help: Output file
-          - csv:
-                short: c
-                help: "Export as CSV"
+          - list:
+                short: l
+                help: "List collections"
             
     - reduce:
         about: Takes a folder of Wasm binaries and apply the reduction implementation of wasm-mutate. It saves the new binary in the out directory and creates an entry in the db with the canonical representation of the original binary
@@ -42,6 +41,14 @@ subcommands:
                 value_name: "out"
                 short: o
                 long: out
+            - reset:
+                short: r
+                help: "Clean out database before starting the extraction of metadatas"
+            - save_logs:
+                required: false
+                short: s
+                long: save-logs
+                help: "Save reduction logs from wasm-shrink"
     - clean:
         about: Hard reset the database
     

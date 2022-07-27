@@ -17,6 +17,7 @@ wasmprinter = { path = "../wasm-tools/crates/wasmprinter" }
 sha2 = "0.10.2"
 env_logger = "0.9"
 log = "0.4"
+ctrlc = "3.2.2"
 
 tempfile = "3.1"
 anyhow = "1.0"

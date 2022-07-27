@@ -37,7 +37,7 @@ bitflags! {
 
 impl MutationType {
     pub fn get_val(&self) -> u8 {
-        return u8::from(self.bits);
+        self.bits
     }
 }
 
