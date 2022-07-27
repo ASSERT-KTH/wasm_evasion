@@ -88,7 +88,17 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
 
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
-        let _ = &file.read_exact(&mut buf)?;
+        let r = &file.read_exact(&mut buf);
+
+        match r {
+            Err(e) => {
+                println!("{}", e);
+                continue 'iter;
+            },
+            Ok(_) => {
+
+            }
+        }
 
         match &buf {
             // Filter first the header to check for Wasm
