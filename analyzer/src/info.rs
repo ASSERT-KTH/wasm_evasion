@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::hash::Hash;
 use std::{ops::Range};
 
 use crate::State;
@@ -20,11 +21,10 @@ use wasmparser::{Chunk, Parser, Payload};
 pub struct InfoExtractor;
 
 macro_rules! get_info {
-    ($mutation: expr, $config: ident, $state: ident, $meta: ident, $prettyname: literal, $description: literal, $reduce: literal, $tpe: expr, $affects_execution: literal) => {
+    ($mutation: expr, $config: ident, $state: ident, $meta: ident, $prettyname: literal, $description: literal, $reduce: literal, $tpe: expr, $affects_execution: literal, $rs: ident) => {
         { if $config.is_some() && $mutation.can_mutate(&$config) {
 
             let mut idxsmap: HashMap<String, Vec<MM>> = HashMap::new();
-
             if $state > 0 {
                 // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
                 let info = $mutation.get_mutation_info(&$config, $state);
@@ -56,9 +56,8 @@ macro_rules! get_info {
                 }
             }
 
-            // TODO, save idxsmap to filesystem to avoid overhead in the database and possible errors for too big document :(
-            $meta.mutations.push(
-                MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: idxsmap, can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution }
+            $rs.push(
+                (MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: "".into(), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution }, idxsmap)
             );
         }
     }
@@ -191,12 +190,12 @@ impl InfoExtractor {
         Ok(meta.clone())
     }
 
-    pub fn get_mutable_info(meta: &mut Meta, config: WasmMutate, state: u32) -> crate::errors::AResult<Meta> {
+    pub fn get_mutable_info(meta: &mut Meta, config: WasmMutate, state: u32) -> crate::errors::AResult<(Meta, Vec<(MutationInfo, HashMap<String, Vec<MM>>)>)> {
         // Check all mutators `can_mutate`, if true, creates a new entry for that mutator and where it can be applied
         let Add = MutationType::Add;
         let Edit = MutationType::Edit;
         let Delete = MutationType::Delete;
-
+        let mut rs = vec![];
         get_info!(
             PeepholeMutator::new(2),
             config,
@@ -206,7 +205,7 @@ impl InfoExtractor {
             "Changes a function to the peephole level. It uses an egraphs to create the mutations",
             true,
             Add | Edit | Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveExportMutator,
@@ -217,7 +216,7 @@ impl InfoExtractor {
             "Remove an export",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RenameExportMutator { max_name_size: 100 },
@@ -228,10 +227,10 @@ impl InfoExtractor {
             "Renames an export",
             true,
             Edit,
-            false
+            false, rs
         );
         get_info!(SnipMutator, config,
-            state, meta, "Snip a function body", "Removes the body of a function and replaces its body by a default value given the type of the function", true, Delete, true);
+            state, meta, "Snip a function body", "Removes the body of a function and replaces its body by a default value given the type of the function", true, Delete, true, rs);
 
         // Split into the two types of current mutators
         get_info!(
@@ -243,7 +242,7 @@ impl InfoExtractor {
             "Changes the cfg of the function body",
             false,
             Edit,
-            true
+            true, rs
         );
 
         get_info!(
@@ -255,7 +254,7 @@ impl InfoExtractor {
             "Replaces a function body by unreachable",
             true,
             Delete | Edit,
-            true
+            true, rs
         );
         get_info!(
             AddTypeMutator {
@@ -269,7 +268,7 @@ impl InfoExtractor {
             "Adds a new random type declaration to the binary",
             false,
             Add,
-            false
+            false, rs
         );
 
         get_info!(
@@ -281,7 +280,7 @@ impl InfoExtractor {
             "Adds a custom random created function to the binary",
             false,
             Add,
-            false
+            false, rs
         );
         get_info!(
             RemoveSection::Custom,
@@ -292,7 +291,7 @@ impl InfoExtractor {
             "Removes a custom section",
             true,
             Delete,
-            false
+            false, rs
         );
         get_info!(
             RemoveSection::Empty,
@@ -303,7 +302,7 @@ impl InfoExtractor {
             "Removes empty section",
             true,
             Delete,
-            false
+            false, rs
         );
 
         get_info!(
@@ -315,7 +314,7 @@ impl InfoExtractor {
             "Mutates the initial expression of a global",
             true,
             Edit,
-            true
+            true, rs
         );
 
         get_info!(
@@ -327,7 +326,7 @@ impl InfoExtractor {
             "Mutate the init expression of the element offset",
             true,
             Edit,
-            true
+            true, rs
         );
 
         get_info!(
@@ -339,7 +338,7 @@ impl InfoExtractor {
             "Mutate the init expression of the element func",
             true,
             Edit,
-            true
+            true, rs
         );
 
         get_info!(
@@ -351,7 +350,7 @@ impl InfoExtractor {
             "Removes a ramdon function",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Global),
@@ -362,7 +361,7 @@ impl InfoExtractor {
             "Removes a random global",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Memory),
@@ -373,7 +372,7 @@ impl InfoExtractor {
             "Removes a memory element",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Table),
@@ -384,7 +383,7 @@ impl InfoExtractor {
             "Removes a table",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Type),
@@ -395,7 +394,7 @@ impl InfoExtractor {
             "Removes a type",
             true,
             Delete,
-            false
+            false, rs
         );
         get_info!(
             RemoveItemMutator(Item::Data),
@@ -406,7 +405,7 @@ impl InfoExtractor {
             "Remove data segment",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Element),
@@ -417,7 +416,7 @@ impl InfoExtractor {
             "Removes element",
             true,
             Delete,
-            true
+            true, rs
         );
         get_info!(
             RemoveItemMutator(Item::Tag),
@@ -428,13 +427,13 @@ impl InfoExtractor {
             "Remove tag",
             true,
             Delete,
-            true
+            true, rs
         );
 
         get_info!(CustomSectionMutator, config,
-            state, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Edit, false);
+            state, meta, "Change custom section", "Changes a custom section. It can be applied ot any custom section in the binary. Usually they are only used to store debug info, such as function names. This mutator can mutate the section name or the data of the section", true, Edit, false, rs);
 
-        Ok(meta.clone())
+        Ok((meta.clone(), rs))
     }
 }
 

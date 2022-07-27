@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build document
+    name: Build binaries
     # This job runs on Linux
     runs-on: ubuntu-20.04
     steps:

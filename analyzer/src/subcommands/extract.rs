@@ -6,7 +6,7 @@ use std::{
     path::PathBuf,
     sync::{atomic::{Ordering, AtomicU32, AtomicBool}, Arc},
     thread::spawn,
-    time, cell::RefCell,
+    time, cell::RefCell, collections::HashMap, borrow::Borrow,
 };
 
 use mongodb::bson::Document;
@@ -27,7 +27,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
     let dbclient = state.borrow().dbclient.as_ref().unwrap().clone();
     let dbname = state.borrow().dbname.clone();
     let collection_name = state.borrow().collection_name.clone();
-
+    let outfolder = state.borrow().out_folder.clone().unwrap_or("metas".into());
     let br = state.borrow();
 
     'iter: for f in chunk.iter() {
@@ -53,7 +53,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                         continue 'iter;
                     }
                     None => {
-                        print!("\nReducing {} ", name);
+                        print!("\nExtracting {} ", name);
                     }
                 }
                 
@@ -145,13 +145,34 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                 let info = InfoExtractor::get_mutable_info(&mut cp, config, br.depth);
 
                 match info {
-                    Ok(info) => {
+                    Ok((mut info, mut mutations)) => {
                         // Save meta to_string mongodb
                         if let Some(client) = &state.borrow().dbclient {
                             let db = client.database(&state.borrow().dbname);
                             let collection = db.collection::<Meta>(&state.borrow().collection_name);
+                            // Add mutations but send mutations map to a file :)
+                            for (m, map) in mutations.iter_mut() {
+
+                                let dirname = format!("{}", outfolder);
+                                std::fs::create_dir(dirname.clone());
+
+
+                                let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
+                                std::fs::write(
+                                    filename.clone(),
+                                    serde_json::to_vec_pretty(map).unwrap()
+                                ).unwrap();
+
+                                m.map = filename.into();
+
+                                info.mutations.push(
+                                    m.clone()
+                                );
+                            }
 
                             let docs = vec![info];
+
+                            
 
                             match collection.insert_many(docs, None) {
                                 Ok(_) => {}
