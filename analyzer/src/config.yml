@@ -79,6 +79,8 @@ args:
       help: "Mongo db username"
       takes_value: true
   - dbconn:
+      short: n
+      long: dbconn
       default_value: "mongodb://localhost:27017"
       help: "Mongo db connection string"
       value_name: "dbconn"
