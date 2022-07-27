@@ -4,9 +4,9 @@ use std::{
     fs,
     io::Read,
     path::PathBuf,
-    sync::{atomic::Ordering, Arc},
+    sync::{atomic::{Ordering, AtomicU32, AtomicBool}, Arc},
     thread::spawn,
-    time,
+    time, cell::RefCell,
 };
 
 use mongodb::bson::Document;
@@ -19,14 +19,16 @@ use crate::{
     State, NO_WORKERS,
 };
 
-pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<PathBuf>> {
+pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<PathBuf>> {
     if chunk.is_empty() {
         return Ok(vec![]);
     }
 
-    let dbclient = state.dbclient.as_ref().unwrap().clone();
-    let dbname = state.dbname.clone();
-    let collection_name = state.collection_name.clone();
+    let dbclient = state.borrow().dbclient.as_ref().unwrap().clone();
+    let dbname = state.borrow().dbname.clone();
+    let collection_name = state.borrow().collection_name.clone();
+
+    let br = state.borrow();
 
     'iter: for f in chunk.iter() {
         let mut file = fs::File::open(f)?;
@@ -48,15 +50,6 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
             Ok(d) => {
                 match d {
                     Some(_) => {
-                        print!("\rSkipping {}", name);
-                        if state
-                            .process
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 99
-                            == 0
-                        {
-                            println!("\n{} processed", state.process.load(Ordering::Relaxed));
-                        }
                         continue 'iter;
                     }
                     None => {
@@ -91,7 +84,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                     Err(e) => {
                         println!("{:#?}               Parsing error {:?}", f, e);
 
-                        if state
+                        if state.borrow()
                             .parsing_error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 9
@@ -99,7 +92,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                         {
                             println!(
                                 "{} parsing errors!",
-                                state.parsing_error.load(Ordering::Relaxed)
+                                state.borrow().parsing_error.load(Ordering::Relaxed)
                             );
                         }
                         continue;
@@ -116,12 +109,12 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
                         println!("{:#?}               Error {:?}", f, e);
 
                         if state
-                            .error
+                        .borrow().error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 9
                             == 0
                         {
-                            println!("{} errors!", state.error.load(Ordering::Relaxed));
+                            println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
                         }
                         continue;
                     }
@@ -139,14 +132,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
                 match stinfo {
                     Err(_e) => {
-                        if state
-                            .error
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 9
-                            == 0
-                        {
-                            println!("{} errors!", state.error.load(Ordering::Relaxed));
-                        }
+                        
                         continue;
                     }
                     Ok(_) => {}
@@ -156,14 +142,14 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
 
                 let mut cp = info?.clone();
 
-                let info = InfoExtractor::get_mutable_info(&mut cp, config);
+                let info = InfoExtractor::get_mutable_info(&mut cp, config, br.depth);
 
                 match info {
                     Ok(info) => {
                         // Save meta to_string mongodb
-                        if let Some(client) = &state.dbclient {
-                            let db = client.database(&state.dbname);
-                            let collection = db.collection::<Meta>(&state.collection_name);
+                        if let Some(client) = &state.borrow().dbclient {
+                            let db = client.database(&state.borrow().dbname);
+                            let collection = db.collection::<Meta>(&state.borrow().collection_name);
 
                             let docs = vec![info];
 
@@ -187,20 +173,20 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<Vec<Path
             }
         }
 
-        if state
+        if state.borrow()
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
             % 99
             == 0
         {
-            println!("{} processed", state.process.load(Ordering::Relaxed));
+            println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
         }
     }
 
     Ok(vec![])
 }
 
-pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>) -> Result<Vec<PathBuf>, CliError> {
+pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<PathBuf>, CliError> {
     let mut workers = vec![vec![]; NO_WORKERS];
 
     for (idx, file) in files.iter().enumerate() {
@@ -211,9 +197,22 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>) -> Result<Vec<Path
         .into_iter()
         .enumerate()
         .map(|(_, x)| {
-            let t = state.clone();
+            let br = state.borrow();
 
-            spawn(move || get_wasm_info(t, x))
+            let t = State {
+                dbclient: br.dbclient.clone(),
+                collection_name: br.collection_name.clone(),
+                dbname: br.dbname.clone(),
+                process: AtomicU32::new(0),
+                error: AtomicU32::new(0),
+                parsing_error: AtomicU32::new(0),
+                out_folder: br.out_folder.clone(),
+                save_logs: br.save_logs.clone(),
+                finish: AtomicBool::new(false),
+                depth: br.depth.clone(),
+            };
+
+            spawn(move || get_wasm_info(RefCell::new(t), x))
         })
         .collect::<Vec<_>>();
 
@@ -222,17 +221,17 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>) -> Result<Vec<Path
     }
 
     println!();
-    println!("{} processed", state.process.load(Ordering::Relaxed));
+    println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
     println!(
         "{} parsing errors!",
-        state.parsing_error.load(Ordering::Relaxed)
+        state.borrow().parsing_error.load(Ordering::Relaxed)
     );
-    println!("{} errors!", state.error.load(Ordering::Relaxed));
+    println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
 
     Ok(vec![])
 }
 
-pub fn extract(state: Arc<State>, path: String) -> Result<Vec<PathBuf>, CliError> {
+pub fn extract(state: RefCell<State>, path: String) -> Result<Vec<PathBuf>, CliError> {
     let mut files = vec![];
 
     let mut count = 0;

@@ -1,6 +1,6 @@
 #![feature(internal_output_capture)]
 
-use clap::{load_yaml, App};
+use clap::{load_yaml, App, value_t};
 use env_logger::{Builder, Env};
 use errors::{CliError};
 
@@ -11,7 +11,7 @@ use std::{
     sync::{
         atomic::{AtomicU32, AtomicBool},
         Arc,
-    }, fs::OpenOptions, time::{SystemTime, UNIX_EPOCH},
+    }, fs::OpenOptions, time::{SystemTime, UNIX_EPOCH}, cell::RefCell,
 };
 
 
@@ -72,7 +72,8 @@ pub struct State {
     parsing_error: AtomicU32,
     out_folder: Option<String>,
     save_logs: bool,
-    finish: AtomicBool
+    finish: AtomicBool,
+    depth: u32
 }
 
 macro_rules! arge {
@@ -113,7 +114,8 @@ pub fn main() -> Result<(), errors::CliError> {
         dbname: arg_or_error!(matches, "dbname"),
         out_folder: None,
         save_logs: false,
-        finish: AtomicBool::new(false)
+        finish: AtomicBool::new(false),
+        depth: 0
     };
 
     match matches.subcommand() {
@@ -127,7 +129,12 @@ pub fn main() -> Result<(), errors::CliError> {
                     .drop(None)?;
             }
             println!("Extracting...");
-            extract(Arc::new(state), arg_or_error!(args, "folder"))?;
+
+            if args.is_present("depth") {
+                state.depth = value_t!(args.value_of("depth"), u32).unwrap();
+            }
+
+            extract(RefCell::new(state), arg_or_error!(args, "folder"))?;
         }
         ("reduce", Some(args)) => {
             let reset = args.is_present("reset");
@@ -166,7 +173,7 @@ pub fn main() -> Result<(), errors::CliError> {
 
             println!("Reducing...");
             state.out_folder = Some(arg_or_error!(args, "out"));
-            reduce(Arc::new(state), arg_or_error!(args, "folder"))?;
+            reduce(RefCell::new(state), arg_or_error!(args, "folder"))?;
         }
         ("export", Some(args)) => {
             
@@ -217,6 +224,7 @@ pub fn main() -> Result<(), errors::CliError> {
 
 #[cfg(test)]
 pub mod tests {
+    use std::cell::RefCell;
     use std::sync::atomic::{AtomicU32, AtomicBool};
     use std::sync::Arc;
     use std::time::Duration;
@@ -238,10 +246,11 @@ pub mod tests {
             dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
-            finish: AtomicBool::new(false)
+            finish: AtomicBool::new(false),
+            depth: 0
         };
         extract(
-            Arc::new(state),
+            RefCell::new(state),
             "../RQ1/all-binaries-metadata/all".to_string(),
         )
         .unwrap();
@@ -258,9 +267,10 @@ pub mod tests {
             dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
-            finish: AtomicBool::new(false)
+            finish: AtomicBool::new(false),
+            depth: 0
         };
-        extract(Arc::new(state), "./".to_string()).unwrap();
+        extract(RefCell::new(state), "./".to_string()).unwrap();
     }
 
     pub fn test_db() {

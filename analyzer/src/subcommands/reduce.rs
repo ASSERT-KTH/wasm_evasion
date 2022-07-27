@@ -4,8 +4,8 @@ use std::{
     io::Read,
     path::PathBuf,
     str::FromStr,
-    sync::{atomic::Ordering, Arc},
-    time, borrow::Borrow, rc::Rc,
+    sync::{atomic::{Ordering, AtomicU32, AtomicBool}, Arc},
+    time, borrow::Borrow, rc::Rc, cell::RefCell,
 };
 
 use anyhow::Context;
@@ -34,18 +34,18 @@ impl IsInteresting for Interesting {
     }
 }
 
-pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<()> {
+pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<()> {
     println!("reducing {} binaries", chunk.len());
 
-    let outfolder = state.out_folder.as_ref().unwrap().clone();
-    let dbclient = state.dbclient.as_ref().unwrap().clone();
-    let dbname = state.dbname.clone();
-    let collection_name = state.collection_name.clone();
+    let outfolder = state.borrow().out_folder.as_ref().unwrap().clone();
+    let dbclient = state.borrow().dbclient.as_ref().unwrap().clone();
+    let dbname = state.borrow().dbname.clone();
+    let collection_name = state.borrow().collection_name.clone();
 
     'iter: for f in chunk.iter() {
 
-        println!("{:?}", state.finish.load(Ordering::Relaxed));
-        if state.finish.load(Ordering::Relaxed) {
+        println!("{:?}", state.borrow().finish.load(Ordering::Relaxed));
+        if state.borrow().finish.load(Ordering::Relaxed) {
             break;
         }
         let mut file = fs::File::open(f)?;
@@ -68,13 +68,13 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 match d {
                     Some(_) => {
                         print!("\rSkipping {}", name);
-                        if state
+                        if state.borrow()
                             .process
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 99
                             == 0
                         {
-                            println!("\n{} processed", state.process.load(Ordering::Relaxed));
+                            println!("\n{} processed", state.borrow().process.load(Ordering::Relaxed));
                         }
                         continue 'iter;
                     }
@@ -146,7 +146,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 match r {
                     Err(e) => {
                         log::debug!("Error {}", e);
-                        if state.save_logs {
+                        if state.borrow().save_logs {
 
                             println!("Saving logs");
                             let name = std::thread::current();
@@ -161,19 +161,19 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                                 }
                             }
                         }
-                        if state
+                        if state.borrow()
                             .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 9
                             == 0
                         {
-                            println!("{} errors!", state.error.load(Ordering::Relaxed));
+                            println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
                         }
                         continue 'iter;
                     }
                     Ok(_i) => {
                         // Save logs if flag is set
-                        if state.save_logs {
+                        if state.borrow().save_logs {
 
                             println!("Saving logs");
                             let name = std::thread::current();
@@ -237,20 +237,20 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
             }
         }
 
-        if state
+        if state.borrow()
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
             % 99
             == 0
         {
-            println!("{} processed", state.process.load(Ordering::Relaxed));
+            println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
         }
     }
 
     Ok(())
 }
 
-pub fn reduce_binaries(state: Arc<State>, files: &Vec<PathBuf>) -> Result<(), CliError> {
+pub fn reduce_binaries(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<(), CliError> {
     let mut workers = vec![vec![]; NO_WORKERS];
 
     for (idx, file) in files.iter().enumerate() {
@@ -261,43 +261,57 @@ pub fn reduce_binaries(state: Arc<State>, files: &Vec<PathBuf>) -> Result<(), Cl
         .into_iter()
         .enumerate()
         .map(|(i, x)| {
-            let t = state.clone();
+            let br = state.borrow();
+
+            let t = State {
+                dbclient: br.dbclient.clone(),
+                collection_name: br.collection_name.clone(),
+                dbname: br.dbname.clone(),
+                process: AtomicU32::new(0),
+                error: AtomicU32::new(0),
+                parsing_error: AtomicU32::new(0),
+                out_folder: br.out_folder.clone(),
+                save_logs: br.save_logs.clone(),
+                finish: AtomicBool::new(false),
+                depth: br.depth.clone(),
+            };
+
             std::thread::Builder::new()
                 .name(format!("t{}", i))
                 .stack_size(32 * 1024 * 1024 * 1024) // 320 MB
-                .spawn(move || reduce_single_binary(t, x))
+                .spawn(move || reduce_single_binary(RefCell::new(t), x))
                 .unwrap()
         })
         .collect::<Vec<_>>();
 
 
-    let t = state.clone();
     // Capture ctrl-c signal
+    /* 
     ctrlc::set_handler(move|| {
         println!("received Ctrl+C! Finishing up");
-        t.finish.store(true,Ordering::SeqCst);
+        t.borrow().finish.store(true,Ordering::SeqCst);
     })
-    .expect("Error setting Ctrl-C handler");
+    .expect("Error setting Ctrl-C handler");*/
 
     for j in jobs {
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
     println!();
-    println!("{} processed", state.process.load(Ordering::Relaxed));
+    println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
     println!(
         "{} parsing errors!",
-        state.parsing_error.load(Ordering::Relaxed)
+        state.borrow().parsing_error.load(Ordering::Relaxed)
     );
-    println!("{} errors!", state.error.load(Ordering::Relaxed));
+    println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
 
     Ok(())
 }
 
-pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
+pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
     println!("Creating folder if it doesn't exist");
 
-    let outf = &state.out_folder;
+    let outf = &state.borrow().out_folder;
     let outf = outf.as_ref().unwrap();
 
 
@@ -332,6 +346,20 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
     println!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
-    reduce_binaries(state, &files)?;
+    let br = state.borrow();
+
+    let t = State {
+        dbclient: br.dbclient.clone(),
+        collection_name: br.collection_name.clone(),
+        dbname: br.dbname.clone(),
+        process: AtomicU32::new(0),
+        error: AtomicU32::new(0),
+        parsing_error: AtomicU32::new(0),
+        out_folder: br.out_folder.clone(),
+        save_logs: br.save_logs.clone(),
+        finish: AtomicBool::new(false),
+        depth: br.depth.clone(),
+    };
+    reduce_binaries(RefCell::new(t), &files)?;
     Ok(())
 }

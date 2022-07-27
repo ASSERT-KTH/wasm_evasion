@@ -13,6 +13,13 @@ subcommands:
         - reset:
             short: r
             help: "Clean out database before starting the extraction of metadatas"
+        - depth:
+            short: d
+            required: false
+            takes_value: true
+            value_name: "depth"
+            long: depth
+            help: "How deep the extraction should go (0 for the minimum)"
 
     - export:
         about: Export database data as a JSON file
