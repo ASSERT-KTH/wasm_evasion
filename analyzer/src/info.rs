@@ -23,33 +23,36 @@ macro_rules! get_info {
     ($mutation: expr, $config: ident, $state: ident, $meta: ident, $prettyname: literal, $description: literal, $reduce: literal, $tpe: expr, $affects_execution: literal) => {
         { if $config.is_some() && $mutation.can_mutate(&$config) {
 
-            // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
-            let info = $mutation.get_mutation_info(&$config, $state);
-
             let mut idxsmap: HashMap<String, Vec<MM>> = HashMap::new();
 
-            // TODO, get the seed to reach a mutation over the specific target
+            if $state > 0 {
+                // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
+                let info = $mutation.get_mutation_info(&$config, $state);
 
-            if let Some(info) = info {
 
-                for origm in info.iter() {
-                    // Group by idx
-                    let k = format!("{}", &origm.idx);
-                    if !idxsmap.contains_key(&k) {
-                        idxsmap.insert(k.clone(), vec![]);
+                // TODO, get the seed to reach a mutation over the specific target
+
+                if let Some(info) = info {
+
+                    for origm in info.iter() {
+                        // Group by idx
+                        let k = format!("{}", &origm.idx);
+                        if !idxsmap.contains_key(&k) {
+                            idxsmap.insert(k.clone(), vec![]);
+                        }
+                        let mdto = MM {
+                            section: origm.section.into(),
+                            is_indexed: origm.is_indexed,
+                            idx: origm.idx.to_be_bytes().to_vec(),
+                            how: origm.how.clone(),
+                            many: origm.many,
+                            display: origm.display.clone(),
+                            meta: origm.meta.clone()
+                        };
+
+
+                        idxsmap.get_mut(&k).unwrap().push(mdto);
                     }
-                    let mdto = MM {
-                        section: origm.section.into(),
-                        is_indexed: origm.is_indexed,
-                        idx: origm.idx.to_be_bytes().to_vec(),
-                        how: origm.how.clone(),
-                        many: origm.many,
-                        display: origm.display.clone(),
-                        meta: origm.meta.clone()
-                    };
-
-
-                    idxsmap.get_mut(&k).unwrap().push(mdto);
                 }
             }
 
