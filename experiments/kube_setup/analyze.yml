@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-collect-metadata-
+spec:
+  entrypoint: obfuscator-distributed
+  parallelism: 20
+  arguments:
+    parameters:
+    - name: dbconn
+    - name: dbpass
+    - name: dbuser
+  templates:
+  - name: obfuscator-distributed
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: folder
+            value: "{{item.folder}}"
+          - name: url
+            value: "{{item.url}}"
+        withItems:
+          - { folder: "test", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/test.zip" }
+        continueOn:
+          failed: true
+ 
+  - name: analyzer-template
+    inputs:
+      parameters:
+      - name: url
+      - name: folder
+    #outputs:
+    #  artifacts:
+    #  - name: logs
+    #    path: /out
+    #  - name: logs
+    #    path: /slumps/crow/logs
+    script:
+      image: ubuntu:20.04
+      command: [bash]
+      source: |
+         apt-get update
+         apt-get install -y wget curl unzip
+         wget https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/analyzer
+         echo "======="
+         echo "======="
+
+         ls analyzer 
+         chmod +x analyzer
+         
+         wget -O {{inputs.parameters.folder}}.zip {{inputs.parameters.url}}
+         echo "======="
+         echo "======="
+         ls .
+
+         unzip {{inputs.parameters.folder}}.zip -d {{inputs.parameters.folder}}
+         
+         ./analyzer "{{workflow.parameters.dbuser}}" "{{workflow.parameters.dbpass}}" --dbconn "{{workflow.parameters.dbconn}}" extract -d 1  "{{inputs.parameters.folder}}"
+
