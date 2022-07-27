@@ -1,0 +1,43 @@
+name: Build and deploy
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - analyzer/**
+      - wasm-tools
+
+jobs:
+  build:
+    name: Build document
+    # This job runs on Linux
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - name: Install deps
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+      - name: Set nightly
+        run: |
+          rustup default nightly
+
+      - name: Build binaries
+        run: |
+          cd analyzer
+          cargo build --release
+
+      
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: analyzer/target/release/analyzer
+          asset_name: analyzer
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "Analyzer binary for linux"
+
