@@ -58,12 +58,6 @@ spec:
       - name: url
       - name: folder
       - name: path
-    #outputs:
-    #  artifacts:
-    #  - name: logs
-    #    path: /out
-    #  - name: logs
-    #    path: /slumps/crow/logs
     script:
       image: ubuntu:20.04
       command: [bash]

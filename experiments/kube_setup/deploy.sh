@@ -25,5 +25,3 @@ kubectl logs $(kubectl get po -n argo | grep 'workflow-controller' | awk '{print
 
 kubectl create secret generic argo-artifacts --from-literal=accesskey="minio" --from-literal=secretkey="minio123"
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
-
-kubectl port-forward -n minio service/minio-service 3434
