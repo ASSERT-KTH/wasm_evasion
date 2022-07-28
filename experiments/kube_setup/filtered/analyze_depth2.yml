@@ -4,7 +4,7 @@ metadata:
   generateName: obfuscator-collect-metadata-filtered-
 spec:
   entrypoint: obfuscator-distributed
-  parallelism: 8
+  parallelism: 5
   arguments:
     parameters:
     - name: dbconn
@@ -146,5 +146,5 @@ spec:
 
          unzip {{inputs.parameters.folder}}.zip -d {{inputs.parameters.folder}}
          
-         ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name filtered_{{workflow.parameters.collection}}d2 --dbconn "{{workflow.parameters.dbconn}}" extract -d 2  "{{inputs.parameters.path}}" || true
+         ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name filtered_{{workflow.parameters.collection}}d2 --dbconn "{{workflow.parameters.dbconn}}" extract -d 2 -m muts_d2 "{{inputs.parameters.path}}" || true
 

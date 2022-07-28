@@ -146,5 +146,5 @@ spec:
 
          unzip {{inputs.parameters.folder}}.zip -d {{inputs.parameters.folder}}
          
-         ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name filtered_{{workflow.parameters.collection}}d1 --dbconn "{{workflow.parameters.dbconn}}" extract -d 1  "{{inputs.parameters.path}}" || true
+         ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name filtered_{{workflow.parameters.collection}}d1 --dbconn "{{workflow.parameters.dbconn}}" extract -d 1 -m muts_d1  "{{inputs.parameters.path}}" || true
 
