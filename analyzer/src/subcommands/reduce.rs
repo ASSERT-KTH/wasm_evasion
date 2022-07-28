@@ -113,7 +113,8 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
                 let bindata = fs::read(f)?;
                 let cp = bindata.clone();
 
-                let reducer = WasmShrink::default();
+                let mut reducer = WasmShrink::default();
+                let reducer = reducer.attempts(10000);
                 //let reducer = reducer.allow_empty(true);
 
                 let output =
