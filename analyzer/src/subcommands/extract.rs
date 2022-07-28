@@ -165,7 +165,6 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
                                 let dirname = format!("{}", outfolder);
                                 std::fs::create_dir(dirname.clone());
-
                                 let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
                                 std::fs::write(
                                     filename.clone(),
