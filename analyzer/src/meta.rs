@@ -49,7 +49,7 @@ pub struct MutationInfo {
     pub class_name: String,
     pub pretty_name: String,
     pub desccription: String,
-    pub map: Vec<String>,
+    pub map: (usize, String),
     pub can_reduce: bool,
     pub affects_execution: bool,
     pub tpe: u8,
