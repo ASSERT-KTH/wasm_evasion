@@ -277,6 +277,7 @@ pub fn reduce_binaries(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<()
             let t = State {
                 dbclient: br.dbclient.clone(),
                 collection_name: br.collection_name.clone(),
+                mutation_cl_name: br.mutation_cl_name.clone(),
                 dbname: br.dbname.clone(),
                 process: AtomicU32::new(0),
                 error: AtomicU32::new(0),
@@ -362,6 +363,7 @@ pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
     let t = State {
         dbclient: br.dbclient.clone(),
         collection_name: br.collection_name.clone(),
+        mutation_cl_name: br.mutation_cl_name.clone(),
         dbname: br.dbname.clone(),
         process: AtomicU32::new(0),
         error: AtomicU32::new(0),

@@ -9,7 +9,7 @@ use std::{
     time, cell::RefCell, collections::HashMap, borrow::Borrow,
 };
 
-use mongodb::bson::Document;
+use mongodb::bson::{Document, doc, Bson};
 use wasm_mutate::WasmMutate;
 
 use crate::{
@@ -160,20 +160,32 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                         if let Some(client) = &state.borrow().dbclient {
                             let db = client.database(&state.borrow().dbname);
                             let collection = db.collection::<Meta>(&state.borrow().collection_name);
+                            let mutation_collection = db.collection::<Document>(&state.borrow().mutation_cl_name);
                             // Add mutations but send mutations map to a file :)
                             for (m, map) in mutations.iter_mut() {
 
-                                let dirname = format!("{}", outfolder);
-                                std::fs::create_dir(dirname.clone());
+                                let mut ids = vec![];
+                                
+                                for (target, mutation) in map {
+                                    for (midx, m) in mutation.iter().enumerate() {
+                                        // Insert a document in the db
+                                        let newid = format!("{}:{}", target, midx);
+                                        let r = mutation_collection.insert_one(
+                                            doc! { "id": newid.clone(), "map": serde_json::to_string(m).unwrap() }
+                                        , None);
 
+                                        match r {
+                                            Ok(r) => {
+                                                ids.push(newid);
+                                            }
+                                            Err(e) => {
+                                                println!("Error inserting meta {e}")
+                                            }
+                                        }
+                                    }
+                                }
 
-                                let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
-                                std::fs::write(
-                                    filename.clone(),
-                                    serde_json::to_vec_pretty(map).unwrap()
-                                ).unwrap();
-
-                                m.map = filename.into();
+                                m.map = ids; // filename.into();
 
                                 info.mutations.push(
                                     m.clone()
@@ -241,6 +253,7 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<
                 save_logs: br.save_logs.clone(),
                 finish: AtomicBool::new(false),
                 depth: br.depth.clone(),
+                mutation_cl_name: br.mutation_cl_name.clone(),
             };
 
             spawn(move || get_wasm_info(RefCell::new(t), x))

@@ -66,6 +66,7 @@ impl Printable for Vec<u8> {
 pub struct State {
     dbclient: Option<Client>,
     collection_name: String,
+    mutation_cl_name: String,
     dbname: String,
     process: AtomicU32,
     error: AtomicU32,
@@ -107,6 +108,7 @@ pub fn main() -> Result<(), errors::CliError> {
     let dbclient = Client::with_options(dbclientoptions)?;
     let mut state = State {
         dbclient: Some(dbclient.clone()),
+        mutation_cl_name: "muts".into(),
         process: AtomicU32::new(0),
         error: AtomicU32::new(0),
         parsing_error: AtomicU32::new(0),
@@ -129,6 +131,10 @@ pub fn main() -> Result<(), errors::CliError> {
                     .drop(None)?;
             }
             println!("Extracting...");
+
+            if args.is_present("mutation_cl_name") {
+                state.mutation_cl_name = args.value_of("mutation_cl_name").unwrap().into();
+            }
 
             if args.is_present("depth") {
                 state.depth = value_t!(args.value_of("depth"), u32).unwrap();
@@ -239,6 +245,7 @@ pub mod tests {
     pub fn test_extract() {
         let state = State {
             dbclient: None,
+            mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
@@ -260,6 +267,7 @@ pub mod tests {
     pub fn test_extract2() {
         let state = State {
             dbclient: None,
+            mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
