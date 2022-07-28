@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-collect-metadata-
+spec:
+  entrypoint: obfuscator-distributed
+  parallelism: 8
+  arguments:
+    parameters:
+    - name: dbconn
+    - name: dbpass
+    - name: dbuser
+    - name: collection
+  templates:
+  - name: obfuscator-distributed
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: folder
+            value: "{{item.folder}}"
+          - name: url
+            value: "{{item.url}}"
+          - name: path
+            value: "{{item.path}}"
+        withItems:
+          - { folder: "all1", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all1.zip", path: "all1/all-binaries-metadata/all1" }
+          - { folder: "all2", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all2.zip", path: "all2/all-binaries-metadata/all2" }
+          - { folder: "all3", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all3.zip", path: "all3/all-binaries-metadata/all3" }
+          - { folder: "all4", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all4.zip", path: "all4/all-binaries-metadata/all4" }
+          - { folder: "all5", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all5.zip", path: "all5/all-binaries-metadata/all5" }
+          - { folder: "all6", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all6.zip", path: "all6/all-binaries-metadata/all6" }
+          - { folder: "all7", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all7.zip", path: "all7/all-binaries-metadata/all7" }
+          - { folder: "all8", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all8.zip", path: "all8/all-binaries-metadata/all8" }
+          - { folder: "all9", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all9.zip", path: "all9/all-binaries-metadata/all9" }
+          - { folder: "all10", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all10.zip", path: "all10/all-binaries-metadata/all10" }
+          - { folder: "all11", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all11.zip", path: "all11/all-binaries-metadata/all11" }
+          - { folder: "all12", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all12.zip", path: "all12/all-binaries-metadata/all12" }
+          - { folder: "all13", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all13.zip", path: "all13/all-binaries-metadata/all13" }
+          - { folder: "all14", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all14.zip", path: "all14/all-binaries-metadata/all14" }
+          - { folder: "all15", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all15.zip", path: "all15/all-binaries-metadata/all15" }
+          - { folder: "all16", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all16.zip", path: "all16/all-binaries-metadata/all16" }
+          - { folder: "all17", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all17.zip", path: "all17/all-binaries-metadata/all17" }
+          - { folder: "all18", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all18.zip", path: "all18/all-binaries-metadata/all18" }
+          - { folder: "all19", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all19.zip", path: "all19/all-binaries-metadata/all19" }
+          - { folder: "all20", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all20.zip", path: "all20/all-binaries-metadata/all20" }
+          - { folder: "all21", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all21.zip", path: "all21/all-binaries-metadata/all21" }
+          - { folder: "all22", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all22.zip", path: "all22/all-binaries-metadata/all22" }
+          - { folder: "all23", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all23.zip", path: "all23/all-binaries-metadata/all23" }
+          - { folder: "all24", url: "https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/all24.zip", path: "all24/all-binaries-metadata/all24" }
+        continueOn:
+          failed: true
+ 
+  - name: analyzer-template
+    inputs:
+      parameters:
+      - name: url
+      - name: folder
+      - name: path
+    outputs:
+      artifacts:
+      - name: metas
+        path: /metas
+      - name: reduced
+        path: /reduced
+    script:
+      image: ubuntu:20.04
+      command: [bash]
+      source: |
+         mkdir -p reduced
+         mkdir -p metas
+
+         apt-get update
+         apt-get install -y wget curl unzip
+         wget https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/analyzer
+         echo "======="
+         echo "======="
+
+         ls analyzer 
+         chmod +x analyzer
+         
+         wget -O {{inputs.parameters.folder}}.zip {{inputs.parameters.url}}
+         echo "======="
+         echo "======="
+         ls .
+
+         unzip {{inputs.parameters.folder}}.zip -d {{inputs.parameters.folder}}
+         
+         RUST_LOG=wasm_mutate,analyzer,wasm_shrink=debug ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name {{workflow.parameters.collection}}_reduce --dbconn "{{workflow.parameters.dbconn}}" reduce -s  -f "{{inputs.parameters.path}}" -o reduced
+
