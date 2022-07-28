@@ -197,7 +197,7 @@ impl InfoExtractor {
         let Delete = MutationType::Delete;
         let mut rs = vec![];
         get_info!(
-            PeepholeMutator::new(2),
+            PeepholeMutator::new(10),
             config,
             state,
             meta,
