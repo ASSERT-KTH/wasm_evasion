@@ -4,7 +4,7 @@ metadata:
   generateName: obfuscator-collect-metadata-filtered-
 spec:
   entrypoint: obfuscator-distributed
-  parallelism: 8
+  parallelism: 12
   arguments:
     parameters:
     - name: dbconn

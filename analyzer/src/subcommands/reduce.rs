@@ -286,6 +286,8 @@ pub fn reduce_binaries(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<()
                 save_logs: br.save_logs.clone(),
                 finish: AtomicBool::new(false),
                 depth: br.depth.clone(),
+                seed: br.seed.clone(),
+                sample_ratio: br.sample_ratio.clone(),
             };
 
             std::thread::Builder::new()
@@ -372,6 +374,8 @@ pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
         save_logs: br.save_logs.clone(),
         finish: AtomicBool::new(false),
         depth: br.depth.clone(),
+        seed: br.seed.clone(),
+        sample_ratio: br.sample_ratio.clone(),
     };
     reduce_binaries(RefCell::new(t), &files)?;
     Ok(())

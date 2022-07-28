@@ -74,7 +74,9 @@ pub struct State {
     out_folder: Option<String>,
     save_logs: bool,
     finish: AtomicBool,
-    depth: u32
+    depth: u32,
+    seed: u64,
+    sample_ratio: u32
 }
 
 macro_rules! arge {
@@ -117,7 +119,9 @@ pub fn main() -> Result<(), errors::CliError> {
         out_folder: None,
         save_logs: false,
         finish: AtomicBool::new(false),
-        depth: 0
+        depth: 0,
+        sample_ratio: 1,
+        seed: 0
     };
 
     match matches.subcommand() {
@@ -138,6 +142,15 @@ pub fn main() -> Result<(), errors::CliError> {
 
             if args.is_present("depth") {
                 state.depth = value_t!(args.value_of("depth"), u32).unwrap();
+            }
+
+            if args.is_present("seed") {
+                state.seed = value_t!(args.value_of("seed"), u64).unwrap();
+            }
+
+
+            if args.is_present("sample") {
+                state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
             }
 
             extract(RefCell::new(state), arg_or_error!(args, "folder"))?;
@@ -254,7 +267,9 @@ pub mod tests {
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),
-            depth: 0
+            depth: 0,
+            sample_ratio: 1,
+            seed: 0
         };
         extract(
             RefCell::new(state),
@@ -276,7 +291,9 @@ pub mod tests {
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),
-            depth: 0
+            depth: 0,
+            sample_ratio: 1,
+            seed: 0
         };
         extract(RefCell::new(state), "./".to_string()).unwrap();
     }

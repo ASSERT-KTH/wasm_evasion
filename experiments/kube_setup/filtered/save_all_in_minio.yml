@@ -1,16 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: obfuscator-collect-metadata-filtered-
+  generateName: save-files-to-minio-
 spec:
   entrypoint: obfuscator-distributed
-  parallelism: 12
-  arguments:
-    parameters:
-    - name: dbconn
-    - name: dbpass
-    - name: dbuser
-    - name: collection
+  parallelism: 8
   templates:
   - name: obfuscator-distributed
     steps:
@@ -25,8 +19,6 @@ spec:
           - name: path
             value: "{{item.path}}"
         withItems:
-          
-          
           - { folder: filtered1, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered1.zip, path: filtered1/filtered-binaries-metadata/filtered1 }
           - { folder: filtered2, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered2.zip, path: filtered2/filtered-binaries-metadata/filtered2 }
           - { folder: filtered3, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered3.zip, path: filtered3/filtered-binaries-metadata/filtered3 }
@@ -70,43 +62,9 @@ spec:
           - { folder: filtered41, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered41.zip, path: filtered41/filtered-binaries-metadata/filtered41 }
           - { folder: filtered42, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered42.zip, path: filtered42/filtered-binaries-metadata/filtered42 }
           - { folder: filtered43, url: https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/filtered43.zip, path: filtered43/filtered-binaries-metadata/filtered43 }
-          
         continueOn:
           failed: true
-    - - name: collect-metas
-        template: collect-metas-template
-  - name: collect-metas-template
-    inputs:
-      artifacts:
-      - name: metas
-        path: /tmp/
-        s3:
-          bucket: my-bucket
-          endpoint: minio-service.minio:3434
-          insecure: true
-          key: "my-artifacts\
-            /{{workflow.creationTimestamp.Y}}\
-            /{{workflow.creationTimestamp.m}}\
-            /{{workflow.creationTimestamp.d}}\
-            /{{workflow.name}}"
-          accessKeySecret:
-            name: argo-artifacts
-            key: accesskey
-          secretKeySecret:
-            name: argo-artifacts
-            key: secretkey
-    outputs:
-      artifacts:
-        - name: all-metas
-          path: /all
-          archive:
-            none: {}
-    script:
-      image: ubuntu:20.04
-      command: [bash]
-      source: |
-        mkdir /all
-        find /tmp -type f -exec bash -c "cp --backup=t {} /all/" \;
+ 
   - name: analyzer-template
     inputs:
       parameters:
@@ -115,30 +73,32 @@ spec:
       - name: path
     outputs:
       artifacts:
-      - name: metas
-        path: /metas
+      - name: wasms
+        path: /wasms
         archive:
           none: {}
-      - name: reduced
-        path: /reduced
-        archive:
-          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          key: "my-artifacts/filtered"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
     script:
-      image: ubuntu:20.04
+      image: jacarte/obf-image:latest4
       command: [bash]
       source: |
-         mkdir -p reduced
-         mkdir -p metas
-
-         apt-get update
-         apt-get install -y wget curl unzip
-         wget https://github.com/Jacarte/obfuscation_wasm/releases/download/analyzer/analyzer
          echo "======="
          echo "======="
 
          ls analyzer 
          chmod +x analyzer
-         
+        
+         mkdir -p /wasms
          wget -O {{inputs.parameters.folder}}.zip {{inputs.parameters.url}}
          echo "======="
          echo "======="
@@ -146,5 +106,4 @@ spec:
 
          unzip {{inputs.parameters.folder}}.zip -d {{inputs.parameters.folder}}
          
-         ./analyzer  "{{workflow.parameters.dbpass}}" "{{workflow.parameters.dbuser}}" --collection_name filtered_{{workflow.parameters.collection}}d2 --dbconn "{{workflow.parameters.dbconn}}" extract -d 2 -m muts_d2 "{{inputs.parameters.path}}" || true
-
+         find {{inputs.parameters.folder}} -type f -exec bash -c "cp {} /wasms/" \;

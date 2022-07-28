@@ -153,7 +153,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
                 let mut cp = info?.clone();
 
-                let info = InfoExtractor::get_mutable_info(&mut cp, config, br.depth);
+                let info = InfoExtractor::get_mutable_info(&mut cp, config, br.depth, br.seed, br.sample_ratio);
 
                 match info {
                     Ok((mut info, mut mutations)) => {
@@ -243,6 +243,8 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<
                 finish: AtomicBool::new(false),
                 depth: br.depth.clone(),
                 mutation_cl_name: br.mutation_cl_name.clone(),
+                seed: br.seed.clone(),
+                sample_ratio: br.sample_ratio.clone(),
             };
 
             spawn(move || get_wasm_info(RefCell::new(t), x))

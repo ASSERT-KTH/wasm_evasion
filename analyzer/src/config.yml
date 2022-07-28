@@ -28,6 +28,22 @@ subcommands:
             long: mutation_cl_name
             default_value: "muts"
             help: "Collection in which the mutation infor is stored"
+        - sample:
+            short: s
+            required: false
+            takes_value: true
+            value_name: "sample_ratio"
+            long: sample
+            default_value: "1" # 1/x prob of taking that instruction
+            help: "This option is only used to inspect the graph for instructions. The size of all options is huge, so we need to sample the instructions"
+        
+        - seed:
+            required: false
+            takes_value: true
+            value_name: "seed"
+            long: seed
+            default_value: "0"
+            help: "Seed of the instruction sampling"
 
     - export:
         about: Export database data as a JSON file
