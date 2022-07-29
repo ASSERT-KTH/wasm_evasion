@@ -164,21 +164,20 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                             // Add mutations but send mutations map to a file :)
                             for (m, map) in mutations.iter_mut() {
 
-                                if depth > 0 {
-                                    let dirname = format!("{}", outfolder);
-                                    std::fs::create_dir(dirname.clone());
-                                    let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
-                                    std::fs::write(
-                                        filename.clone(),
-                                        serde_json::to_vec_pretty(map).unwrap()
-                                    ).unwrap();
+                                let dirname = format!("{}", outfolder);
+                                std::fs::create_dir(dirname.clone());
+                                let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
+                                std::fs::write(
+                                    filename.clone(),
+                                    serde_json::to_vec_pretty(map).unwrap()
+                                ).unwrap();
 
-                                    m.map = (map.len(), filename.into());
+                                m.map = (map.len(), filename.into());
 
-                                    info.mutations.push(
-                                        m.clone()
-                                    );
-                                }
+                                info.mutations.push(
+                                    m.clone()
+                                );
+                                
                             }
 
                             let docs = vec![info];

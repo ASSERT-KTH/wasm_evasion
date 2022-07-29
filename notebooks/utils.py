@@ -110,5 +110,5 @@ def load_sets(name, find_mutation_info=False):
    
     for k, v in sets.items():
         print(k, len(v))
-    return list(zip(sets.keys(), sets.values())), len(data[:upto])
+    return list(zip(sets.keys(), sets.values())), len(data[:upto]), data[:upto]
 

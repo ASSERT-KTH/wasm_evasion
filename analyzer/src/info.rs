@@ -55,7 +55,6 @@ macro_rules! get_info {
                     }
                 }
             }
-
             $rs.push(
                 (MutationInfo{ class_name: format!("{}",stringify!($mutation)), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: (0, "".into()), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution }, idxsmap)
             );
@@ -166,7 +165,8 @@ impl InfoExtractor {
                 }
                 Payload::CodeSectionEntry(r) => {
                     // TODO, add mutation info
-                    meta.num_instructions += r.get_operators_reader().into_iter().count() as u32;
+                    let reader = r.get_operators_reader()?;
+                    meta.num_instructions += reader.into_iter().count() as u32;
                 }
                 Payload::Version { num, .. } => {
                     meta.version = num;
@@ -197,7 +197,7 @@ impl InfoExtractor {
         let Delete = MutationType::Delete;
         let mut rs = vec![];
         get_info!(
-            PeepholeMutator::new(10),
+            PeepholeMutator::new(1), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
             config,
             state,
             meta,
