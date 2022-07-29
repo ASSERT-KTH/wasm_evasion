@@ -1,3 +1,5 @@
+import json
+
 def get_node_sets(nodes, total, operator="+"):
         
         
@@ -69,3 +71,44 @@ def get_node_sets(nodes, total, operator="+"):
         alledges += edges
         
     return allnodes, alledges
+
+
+def load_sets(name, find_mutation_info=False):
+    a = open(name, 'r').read()
+    data = json.loads(a)
+    
+    sets = {}
+    
+    upto=-1
+        
+    for i, t in enumerate(data[:upto]):
+        name = t['id']
+        mutations = t['mutations']
+        
+        
+        for m in mutations:            
+            if find_mutation_info:
+                try:
+                    r = []
+                    count, file = m['map']
+                    # load file
+                    f = open(file, "r").read()
+                    f = json.loads(f)
+                    m['map'] = f
+                        
+                    if ('Peephole' in m['class_name'] or 'Codemotion' in m['class_name']) and len(m['map']) == 0:
+                        continue
+                        
+                except Exception as e:
+                    print(e)
+                    break
+            
+            if m['class_name'] not in sets:
+                sets[m['class_name']] = []
+            sets[m['class_name']].append(t)
+
+   
+    for k, v in sets.items():
+        print(k, len(v))
+    return list(zip(sets.keys(), sets.values())), len(data[:upto])
+
