@@ -128,13 +128,13 @@ pub fn main() -> Result<(), errors::CliError> {
         ("extract", Some(args)) => {
             let reset = args.is_present("reset");
             if reset {
-                println!("Reseting ");
+                log::debug!("Reseting ");
                 dbclient
                     .database(&arg_or_error!(matches, "dbname"))
                     .collection::<Meta>(&arg_or_error!(matches, "collection_name"))
                     .drop(None)?;
             }
-            println!("Extracting...");
+            log::debug!("Extracting...");
 
             if args.is_present("mutation_cl_name") {
                 state.mutation_cl_name = args.value_of("mutation_cl_name").unwrap().into();
@@ -158,7 +158,7 @@ pub fn main() -> Result<(), errors::CliError> {
         ("reduce", Some(args)) => {
             let reset = args.is_present("reset");
             if reset {
-                println!("Reseting ");
+                log::debug!("Reseting ");
                 dbclient
                     .database(&arg_or_error!(matches, "dbname"))
                     .collection::<Meta>(&arg_or_error!(matches, "collection_name"))
@@ -190,7 +190,7 @@ pub fn main() -> Result<(), errors::CliError> {
                 state.save_logs = true;
             } 
 
-            println!("Reducing...");
+            log::debug!("Reducing...");
             state.out_folder = Some(arg_or_error!(args, "out"));
             reduce(RefCell::new(state), arg_or_error!(args, "folder"))?;
         }
@@ -208,7 +208,7 @@ pub fn main() -> Result<(), errors::CliError> {
                }
 
             } else {
-                println!("Exporting");
+                log::debug!("Exporting");
                 let collection = dbclient
                     .database(&arg_or_error!(matches, "dbname"))
                     .collection::<Bson>(&arg_or_error!(matches, "collection_name"));
@@ -228,7 +228,7 @@ pub fn main() -> Result<(), errors::CliError> {
             }
         }
         ("clean", Some(_)) => {
-            println!("Reseting ");
+            log::debug!("Reseting ");
             dbclient
                 .database(&arg_or_error!(matches, "dbname"))
                 .collection::<Meta>(&arg_or_error!(matches, "collection_name"))

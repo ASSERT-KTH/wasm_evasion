@@ -46,7 +46,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
         match entry {
             Err(e) => {
-                println!("{}", e);
+                log::error!("{}", e);
             }
             Ok(d) => {
                 match d {
@@ -54,7 +54,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                         continue 'iter;
                     }
                     None => {
-                        print!("\nExtracting {} ", name);
+                        log::debug!("\nExtracting {} ", name);
                     }
                 }
                 
@@ -66,7 +66,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
         match r {
             Err(e) => {
-                println!("{}", e);
+                log::error!("{}", e);
                 continue 'iter;
             },
             Ok(_) => {
@@ -93,7 +93,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
                 match info {
                     Err(e) => {
-                        println!("{:#?}               Parsing error {:?}", f, e);
+                        log::error!("{:#?}               Parsing error {:?}", f, e);
 
                         if state.borrow()
                             .parsing_error
@@ -101,7 +101,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                             % 9
                             == 0
                         {
-                            println!(
+                            log::error!(
                                 "{} parsing errors!",
                                 state.borrow().parsing_error.load(Ordering::Relaxed)
                             );
@@ -117,7 +117,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
 
                 match info {
                     Err(e) => {
-                        println!("{:#?}               Error {:?}", f, e);
+                        log::error!("{:#?}               Error {:?}", f, e);
 
                         if state
                         .borrow().error
@@ -125,7 +125,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                             % 9
                             == 0
                         {
-                            println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+                            log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
                         }
                         continue;
                     }
@@ -187,20 +187,20 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                             match collection.insert_many(docs, None) {
                                 Ok(_) => {}
                                 Err(e) => {
-                                    println!("{:?}", e)
+                                    log::error!("{:?}", e)
                                 }
                             }
                         } else {
-                            println!("Where is the client")
+                            log::error!("Where is the client")
                         }
                     }
                     Err(e) => {
-                        println!("{:?}", e)
+                        log::error!("{:?}", e)
                     }
                 }
             }
             _ => {
-                eprintln!("\nJust discard {:?}\n", f);
+                log::error!("\nJust discard {:?}\n", f);
             }
         }
 
@@ -210,7 +210,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
             % 99
             == 0
         {
-            println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+            log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
         }
     }
 
@@ -254,13 +254,12 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    println!();
-    println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
-    println!(
+    log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+    log::error!(
         "{} parsing errors!",
         state.borrow().parsing_error.load(Ordering::Relaxed)
     );
-    println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+    log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
 
     Ok(vec![])
 }
@@ -284,14 +283,14 @@ pub fn extract(state: RefCell<State>, path: String) -> Result<Vec<PathBuf>, CliE
         if count % 999 == 0 {
             let elapsed = start.elapsed();
 
-            println!("Files count {} in {}ms", count, elapsed.as_millis());
+            log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
             start = time::Instant::now();
         }
 
         count += 1;
     }
 
-    println!("Final files count {}", count);
+    log::debug!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
     let filtered = get_only_wasm(state, &files)?;

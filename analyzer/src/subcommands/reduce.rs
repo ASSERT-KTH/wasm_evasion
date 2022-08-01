@@ -35,7 +35,7 @@ impl IsInteresting for Interesting {
 }
 
 pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<()> {
-    println!("reducing {} binaries", chunk.len());
+    log::debug!("reducing {} binaries", chunk.len());
 
     let outfolder = state.borrow().out_folder.as_ref().unwrap().clone();
     let dbclient = state.borrow().dbclient.as_ref().unwrap().clone();
@@ -44,7 +44,7 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
 
     'iter: for f in chunk.iter() {
 
-        println!("{:?}", state.borrow().finish.load(Ordering::Relaxed));
+        log::debug!("{:?}", state.borrow().finish.load(Ordering::Relaxed));
         if state.borrow().finish.load(Ordering::Relaxed) {
             break;
         }
@@ -62,24 +62,24 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
         
         match entry {
             Err(e) => {
-                println!("{}", e);
+                log::error!("{}", e);
             }
             Ok(d) => {
                 match d {
                     Some(_) => {
-                        print!("\rSkipping {}", name);
+                        log::debug!("\rSkipping {}", name);
                         if state.borrow()
                             .process
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 99
                             == 0
                         {
-                            println!("\n{} processed", state.borrow().process.load(Ordering::Relaxed));
+                            log::debug!("\n{} processed", state.borrow().process.load(Ordering::Relaxed));
                         }
                         continue 'iter;
                     }
                     None => {
-                        print!("\nReducing {} ", name);
+                        log::debug!("\nReducing {} ", name);
                     }
                 }
                 
@@ -92,7 +92,7 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
 
         match r {
             Err(e) => {
-                println!("{}", e);
+                log::error!("{}", e);
                 continue 'iter;
             },
             Ok(_) => {
@@ -159,14 +159,14 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
                         log::debug!("Error {}", e);
                         if state.borrow().save_logs {
 
-                            println!("Saving logs");
+                            log::debug!("Saving logs");
                             let name = std::thread::current();
                             let name  = name.name().unwrap();
                             let log_file = format!("output{}.log", name);
                             let r = std::fs::rename(log_file, logs.clone());
 
                             match r {
-                                Err(e) => println!("{}", e),
+                                Err(e) => log::error!("{}", e),
                                 Ok(_) => {
 
                                 }
@@ -178,7 +178,7 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
                             % 9
                             == 0
                         {
-                            println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+                            log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
                         }
                         continue 'iter;
                     }
@@ -186,14 +186,14 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
                         // Save logs if flag is set
                         if state.borrow().save_logs {
 
-                            println!("Saving logs");
+                            log::debug!("Saving logs");
                             let name = std::thread::current();
                             let name  = name.name().unwrap();
                             let log_file = format!("output{}.log", name);
                             let r = std::fs::rename(log_file, logs.clone());
 
                             match r {
-                                Err(e) => println!("{}", e),
+                                Err(e) => log::error!("{}", e),
                                 Ok(_) => {
 
                                 }
@@ -210,7 +210,7 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
 
                     match bindata {
                         Err(e) => {
-                            println!("{}", e);
+                            log::error!("{}", e);
                             continue 'iter;
                         }
                         Ok(r) => break r,
@@ -238,13 +238,13 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
                 match collection.insert_many(docs, None) {
                     Ok(_) => {}
                     Err(e) => {
-                        println!("{}", e);
+                        log::error!("{}", e);
                         std::panic::panic_any(e)
                     }
                 }
             }
             _ => {
-                eprintln!("\nJust discard {:?}\n", f);
+                log::error!("\nJust discard {:?}\n", f);
             }
         }
 
@@ -254,7 +254,7 @@ pub fn reduce_single_binary(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResu
             % 99
             == 0
         {
-            println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+            log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
         }
     }
 
@@ -311,19 +311,18 @@ pub fn reduce_binaries(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<()
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    println!();
-    println!("{} processed", state.borrow().process.load(Ordering::Relaxed));
-    println!(
+    log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+    log::error!(
         "{} parsing errors!",
         state.borrow().parsing_error.load(Ordering::Relaxed)
     );
-    println!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+    log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
 
     Ok(())
 }
 
 pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
-    println!("Creating folder if it doesn't exist");
+    log::debug!("Creating folder if it doesn't exist");
 
     let outf = &state.borrow().out_folder;
     let outf = outf.as_ref().unwrap();
@@ -350,14 +349,14 @@ pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
         if count % 999 == 0 {
             let elapsed = start.elapsed();
 
-            println!("Files count {} in {}ms", count, elapsed.as_millis());
+            log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
             start = time::Instant::now();
         }
 
         count += 1;
     }
 
-    println!("Final files count {}", count);
+    log::debug!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
     let br = state.borrow();
