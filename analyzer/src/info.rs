@@ -196,17 +196,38 @@ impl InfoExtractor {
         let Edit = MutationType::Edit;
         let Delete = MutationType::Delete;
         let mut rs = vec![];
-        get_info!(
-            PeepholeMutator::new(1), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
-            config,
-            state,
-            meta,
-            "Apply a peephole mutation",
-            "Changes a function to the peephole level. It uses an egraphs to create the mutations",
-            true,
-            Add | Edit | Delete,
-            true, rs, seed, sample_ratio
-        );
+
+        // iterate through the heights if depth > 5 
+        
+        if state > 4{
+            for d in 1..=state {
+                get_info!(
+                    PeepholeMutator::new(d), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
+                    config,
+                    state,
+                    meta,
+                    "Apply a peephole mutation",
+                    "Changes a function to the peephole level. It uses an egraphs to create the mutations",
+                    true,
+                    Add | Edit | Delete,
+                    true, rs, seed, sample_ratio
+                );
+            }    
+        } else {
+
+            get_info!(
+                PeepholeMutator::new(1), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
+                config,
+                state,
+                meta,
+                "Apply a peephole mutation",
+                "Changes a function to the peephole level. It uses an egraphs to create the mutations",
+                true,
+                Add | Edit | Delete,
+                true, rs, seed, sample_ratio
+            );
+        }
+        
         get_info!(
             RemoveExportMutator,
             config,
