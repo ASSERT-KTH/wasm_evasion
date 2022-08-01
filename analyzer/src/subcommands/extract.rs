@@ -188,7 +188,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                                 
                                 if map.len() > 0 {
                                     m.generic_map = Some(map.clone());
-
+                                    
                                     info.mutations.push(
                                         m.clone()
                                     );

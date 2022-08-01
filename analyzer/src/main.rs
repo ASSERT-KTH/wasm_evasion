@@ -14,7 +14,7 @@ use std::{
     }, fs::OpenOptions, time::{SystemTime, UNIX_EPOCH}, cell::RefCell,
 };
 
-
+use std::collections::HashMap;
 use crate::meta::Meta;
 use mongodb::{options::{ClientOptions, Credential}, bson::Bson};
 use mongodb::sync::Client;
@@ -216,23 +216,81 @@ pub fn main() -> Result<(), errors::CliError> {
 
             } else {
                 log::debug!("Exporting");
-                let collection = dbclient
+
+                // If JSON do this
+                if args.is_present("csv") {
+
+                    let collection = dbclient
+                    .database(&arg_or_error!(matches, "dbname"))
+                    .collection::<Meta>(&arg_or_error!(matches, "collection_name"));
+
+                    let records = collection.find(None, None).unwrap();
+
+                    let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
+                    // Write headers
+                    outfile.write_all(
+                       "id,mutable_count\n".as_bytes()
+                    ).unwrap();
+
+                    let mut c = 0;
+                    let mut mutators:HashMap<String, bool> = HashMap::new();
+                    for record in records {
+                        let item = record.unwrap();
+                        outfile.write_all(
+                            format!("{}", item.id).as_bytes()
+                        ).unwrap();
+
+                        let level = value_t!(args.value_of("level"), u32).unwrap();
+
+                        match level {
+                            1 => {
+
+                               if item.mutations.len() > 0 {
+            
+                                    outfile.write_all(
+                                        format!(",1\n").as_bytes()
+                                    ).unwrap();
+                                } else{
+
+                                    outfile.write_all(
+                                        format!(",0\n").as_bytes()
+                                    ).unwrap();
+                                }
+        
+                            }
+                            _ => {
+                                todo!("Level above 1 is not implemented yet")
+                            }
+                        }
+                        c += 1;
+                        //all.push(record.unwrap());
+
+                        if c % 99 == 0 {
+                            print!("\r{} saved", c)
+                        }
+                    }
+
+
+                } else {
+
+                    let collection = dbclient
                     .database(&arg_or_error!(matches, "dbname"))
                     .collection::<Bson>(&arg_or_error!(matches, "collection_name"));
 
-                let records = collection.find(None, None).unwrap();
-                let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
+                        let records = collection.find(None, None).unwrap();
+                        let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
 
-                let mut all = vec![];
+                        let mut all = vec![];
 
-                for record in records {
-                    all.push(record.unwrap());
+                        for record in records {
+                            all.push(record.unwrap());
+                        }
+
+                        outfile
+                            .write_all(serde_json::to_string_pretty(&all).unwrap().as_bytes())
+                            .unwrap();
+                    }
                 }
-
-                outfile
-                    .write_all(serde_json::to_string_pretty(&all).unwrap().as_bytes())
-                    .unwrap();
-            }
         }
         ("clean", Some(_)) => {
             log::debug!("Reseting ");

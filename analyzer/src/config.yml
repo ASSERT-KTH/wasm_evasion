@@ -56,6 +56,18 @@ subcommands:
           - list:
                 short: l
                 help: "List collections"
+          - csv:
+                short: c
+                long: csv
+                required: false
+                help: "Export as csv"
+          - level:
+                long: level
+                required: false
+                default_value: "1"
+                takes_value: true
+                help: "Level of the exported data (1 the minimum, only level 1 can be exported to csv)"
+                value_name: "level"    
             
     - reduce:
         about: Takes a folder of Wasm binaries and apply the reduction implementation of wasm-mutate. It saves the new binary in the out directory and creates an entry in the db with the canonical representation of the original binary

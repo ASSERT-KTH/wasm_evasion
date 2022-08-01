@@ -16,6 +16,7 @@ pub struct MutationMap {
 
     /// Index of the element, if indexed, otherwise its offset in the binary
     #[serde(skip_serializing)]
+    #[serde(default)]
     pub idx: Vec<u8>,
 
     /// Natural description of how the mutation can be applide, e.g. for the custom, if it is the name or the data part
