@@ -2,7 +2,7 @@
 
 use bitflags::bitflags;
 use mongodb::bson::Bson;
-use std::{collections::HashMap, ops::Range};
+use std::{collections::HashMap, ops::Range, hash::Hash};
 
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +15,7 @@ pub struct MutationMap {
     pub is_indexed: bool,
 
     /// Index of the element, if indexed, otherwise its offset in the binary
+    #[serde(skip_serializing)]
     pub idx: Vec<u8>,
 
     /// Natural description of how the mutation can be applide, e.g. for the custom, if it is the name or the data part
@@ -50,6 +51,7 @@ pub struct MutationInfo {
     pub pretty_name: String,
     pub desccription: String,
     pub map: (usize, String),
+    pub generic_map: Option<HashMap<String, Vec<MutationMap>>>,
     pub can_reduce: bool,
     pub affects_execution: bool,
     pub tpe: u8,

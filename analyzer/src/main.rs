@@ -93,6 +93,13 @@ macro_rules! arg_or_error {
 
 pub fn main() -> Result<(), errors::CliError> {
     
+    let env = Env::default()
+    //.filter_or("LOG_LEVEL", "trace")
+    .filter("RUST_LOG")
+    .write_style_or("LOG_STYLE", "always");
+
+    Builder::from_env(env)
+        .init();
 
     let yaml = load_yaml!("config.yml");
     let matches = App::from_yaml(yaml).get_matches();
@@ -153,7 +160,7 @@ pub fn main() -> Result<(), errors::CliError> {
                 state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
             }
 
-            extract(RefCell::new(state), arg_or_error!(args, "folder"))?;
+            extract(RefCell::new(state), arg_or_error!(args, "input"))?;
         }
         ("reduce", Some(args)) => {
             let reset = args.is_present("reset");
@@ -192,7 +199,7 @@ pub fn main() -> Result<(), errors::CliError> {
 
             log::debug!("Reducing...");
             state.out_folder = Some(arg_or_error!(args, "out"));
-            reduce(RefCell::new(state), arg_or_error!(args, "folder"))?;
+            reduce(RefCell::new(state), arg_or_error!(args, "input"))?;
         }
         ("export", Some(args)) => {
             

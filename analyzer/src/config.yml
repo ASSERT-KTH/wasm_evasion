@@ -6,10 +6,12 @@ subcommands:
     - extract:
         about: Extract metadata information from the binaries
         args:
-        - folder:
+        - input:
             required: true
+            short: f
+            long: input
             help: "Folder containing the binaries"
-            value_name: "folder"
+            value_name: "file|folder"
         - reset:
             short: r
             help: "Clean out database before starting the extraction of metadatas"
@@ -58,13 +60,13 @@ subcommands:
     - reduce:
         about: Takes a folder of Wasm binaries and apply the reduction implementation of wasm-mutate. It saves the new binary in the out directory and creates an entry in the db with the canonical representation of the original binary
         args:
-            - folder:
+            - input:
                 required: true
                 help: "Folder containing the binaries"
-                value_name: "folder"
+                value_name: "file|folder"
                 takes_value: true
                 short: f
-                long: folder
+                long: input
             - out:
                 required: true
                 help: "Folder containing the canonical representation"

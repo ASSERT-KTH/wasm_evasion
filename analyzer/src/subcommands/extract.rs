@@ -16,10 +16,10 @@ use crate::{
     errors::{AResult, CliError},
     info::InfoExtractor,
     meta::{self, Meta},
-    State, NO_WORKERS,
+    State, NO_WORKERS
 };
 
-pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<PathBuf>> {
+pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: bool) -> AResult<Vec<PathBuf>> {
     if chunk.is_empty() {
         return Ok(vec![]);
     }
@@ -162,30 +162,51 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
                             let db = client.database(&state.borrow().dbname);
                             let collection = db.collection::<Meta>(&state.borrow().collection_name);
                             // Add mutations but send mutations map to a file :)
-                            for (m, map) in mutations.iter_mut() {
+                            if ! print_meta {
+                                for (m, map) in mutations.iter_mut() {
 
-                                let dirname = format!("{}", outfolder);
-                                std::fs::create_dir(dirname.clone());
-                                let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
-                                std::fs::write(
-                                    filename.clone(),
-                                    serde_json::to_vec_pretty(map).unwrap()
-                                ).unwrap();
+                                    let dirname = format!("{}", outfolder);
+                                    std::fs::create_dir(dirname.clone());
+                                    let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
+                                    std::fs::write(
+                                        filename.clone(),
+                                        serde_json::to_vec_pretty(map)?
+                                    ).unwrap();
 
-                                m.map = (map.len(), filename.into());
+                                    m.map = (map.len(), filename.into());
 
-                                info.mutations.push(
-                                    m.clone()
-                                );
-                                
+                                    info.mutations.push(
+                                        m.clone()
+                                    );
+                                    
+                                }
+                            } 
+                            
+                            if print_meta{
+
+                                let mut cp = info.clone();
+
+                                for (m, map) in mutations.iter_mut() {
+                                    
+                                   
+                                    m.generic_map = Some(map.clone());
+
+                                    cp.mutations.push(
+                                        m.clone()
+                                    );
+                                }
+
+                                println!("{}", serde_json::to_string_pretty(&cp)?)
+
                             }
 
-                            let docs = vec![info];
+                            let docs = vec![info.clone()];
 
                             
 
                             match collection.insert_many(docs, None) {
-                                Ok(_) => {}
+                                Ok(_) => {
+                                }
                                 Err(e) => {
                                     log::error!("{:?}", e)
                                 }
@@ -217,7 +238,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>) -> AResult<Vec<
     Ok(vec![])
 }
 
-pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<PathBuf>, CliError> {
+pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>, print_meta: bool) -> Result<Vec<PathBuf>, CliError> {
     let mut workers = vec![vec![]; NO_WORKERS];
 
     for (idx, file) in files.iter().enumerate() {
@@ -246,7 +267,7 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>) -> Result<Vec<
                 sample_ratio: br.sample_ratio.clone(),
             };
 
-            spawn(move || get_wasm_info(RefCell::new(t), x))
+            spawn(move || get_wasm_info(RefCell::new(t), x, print_meta))
         })
         .collect::<Vec<_>>();
 
@@ -269,30 +290,41 @@ pub fn extract(state: RefCell<State>, path: String) -> Result<Vec<PathBuf>, CliE
 
     let mut count = 0;
     let mut start = time::Instant::now();
-    for entry in fs::read_dir(path)? {
-        let entry = entry?;
-        let path = entry.path();
+    let meta = fs::metadata(path.clone())?;
+    let mut print_meta = false;
 
-        let metadata = entry.metadata()?;
-
-        if !metadata.is_dir() {
-            // get files only
-            files.push(path);
-        }
-
-        if count % 999 == 0 {
-            let elapsed = start.elapsed();
-
-            log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
-            start = time::Instant::now();
-        }
-
+    if meta.is_file() {
+        files.push(PathBuf::from(path.clone()));
+        print_meta = true;
         count += 1;
+    } 
+    else {
+
+        for entry in fs::read_dir(path)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            let metadata = entry.metadata()?;
+
+            if !metadata.is_dir() {
+                // get files only
+                files.push(path);
+            }
+
+            if count % 999 == 0 {
+                let elapsed = start.elapsed();
+
+                log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
+                start = time::Instant::now();
+            }
+
+            count += 1;
+        }
     }
 
     log::debug!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
-    let filtered = get_only_wasm(state, &files)?;
+    let filtered = get_only_wasm(state, &files, print_meta)?;
     Ok(filtered)
 }

@@ -14,6 +14,9 @@ pub enum CliError {
     #[error("mongodb error")]
     Mongo(#[from] mongodb::error::Error),
 
+    #[error("serde error")]
+    Serde(#[from] serde_json::error::Error),
+
     #[error("Wasmparser error")]
     Parser(#[from] BinaryReaderError),
 }

@@ -335,25 +335,32 @@ pub fn reduce(state: RefCell<State>, path: String) -> AResult<()> {
     let mut count = 0;
     let mut start = time::Instant::now();
 
-    for entry in fs::read_dir(path)? {
-        let entry = entry?;
-        let path = entry.path();
+    let meta = fs::metadata(path.clone())?;
 
-        let metadata = entry.metadata()?;
-
-        if !metadata.is_dir() {
-            // get files only
-            files.push(path);
-        }
-
-        if count % 999 == 0 {
-            let elapsed = start.elapsed();
-
-            log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
-            start = time::Instant::now();
-        }
-
+    if meta.is_file() {
+        files.push(PathBuf::from(path.clone()));
         count += 1;
+    } else {
+        for entry in fs::read_dir(path)? {
+            let entry = entry?;
+            let path = entry.path();
+
+            let metadata = entry.metadata()?;
+
+            if !metadata.is_dir() {
+                // get files only
+                files.push(path);
+            }
+
+            if count % 999 == 0 {
+                let elapsed = start.elapsed();
+
+                log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
+                start = time::Instant::now();
+            }
+
+            count += 1;
+        }
     }
 
     log::debug!("Final files count {}", count);
