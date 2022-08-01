@@ -162,7 +162,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                             let db = client.database(&state.borrow().dbname);
                             let collection = db.collection::<Meta>(&state.borrow().collection_name);
                             // Add mutations but send mutations map to a file :)
-                            if ! print_meta {
+                            /*if ! print_meta {
                                 for (m, map) in mutations.iter_mut() {
 
                                     let dirname = format!("{}", outfolder);
@@ -180,29 +180,22 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                                     );
                                     
                                 }
-                            } 
-                            
-                            if print_meta{
+                            } */
 
-                                let mut cp = info.clone();
 
-                                for (m, map) in mutations.iter_mut() {
-                                    
-                                   
+                            for (m, map) in mutations.iter_mut() {
+                                
+                                
+                                if map.len() > 0 {
                                     m.generic_map = Some(map.clone());
 
-                                    cp.mutations.push(
+                                    info.mutations.push(
                                         m.clone()
                                     );
                                 }
-
-                                println!("{}", serde_json::to_string_pretty(&cp)?)
-
                             }
 
                             let docs = vec![info.clone()];
-
-                            
 
                             match collection.insert_many(docs, None) {
                                 Ok(_) => {
