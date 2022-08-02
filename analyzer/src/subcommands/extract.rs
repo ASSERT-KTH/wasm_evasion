@@ -9,7 +9,7 @@ use std::{
     time, cell::RefCell, collections::HashMap, borrow::Borrow,
 };
 
-use mongodb::bson::Document;
+use mongodb::bson::{Document, Bson, doc};
 use wasm_mutate::WasmMutate;
 
 use crate::{
@@ -18,6 +18,7 @@ use crate::{
     meta::{self, Meta},
     State, NO_WORKERS
 };
+
 
 pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: bool) -> AResult<Vec<PathBuf>> {
     if chunk.is_empty() {
@@ -30,6 +31,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
     let depth = state.borrow().depth.clone();
     let outfolder = state.borrow().out_folder.clone().unwrap_or("metas".into());
     let br = state.borrow();
+    let patch = state.borrow().patch_metadata;
 
     'iter: for f in chunk.iter() {
         let mut file = fs::File::open(f)?;
@@ -38,11 +40,11 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
 
         // Check if it in the DB, continue if Some
         let db = dbclient.database(&dbname);
-        let collection = db.collection::<Meta>(&collection_name);
+        let collection = db.collection::<Document>(&collection_name);
         let mut filter = Document::new();
         filter.insert("id", name.clone());
 
-        let entry = collection.find_one(filter, None);
+        let entry = collection.find_one(filter.clone(), None);
 
         match entry {
             Err(e) => {
@@ -50,7 +52,87 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
             }
             Ok(d) => {
                 match d {
-                    Some(_) => {
+                    Some(m) => {
+                        log::debug!("Patching {:?}", patch);
+                        if patch {
+                            // Get the static info
+                            // Filter first the header to check for Wasm
+                            let mut buf = [0; 4];
+                            let r = file.read_exact(&mut buf);
+
+                            match r {
+                                Err(e) => {
+                                    log::error!("{}", e);
+                                    continue 'iter;
+                                },
+                                Ok(_) => {
+
+                                }
+                            }
+
+                            match &buf {
+                                b"\0asm" => {
+                                    //println!("Wasm !");
+
+                                    let mut meta = meta::Meta::new();
+                                    meta.id = name;
+                                    // Get size of the file
+                                    let fileinfo = fs::metadata(f)?;
+                                    meta.size = fileinfo.len() as usize;
+
+                                    // Parse Wasm to get more info
+                                    let bindata = fs::read(f)?;
+                                    let cp = bindata.clone();
+
+                                    let info =
+                                        std::panic::catch_unwind(move || InfoExtractor::get_info(&cp, &mut meta));
+
+                                    match info {
+                                        Err(e) => {
+                                            log::error!("{:#?}               Parsing error {:?}", f, e);
+
+                                            // Patch metadata
+                                        }
+                                        Ok(metadata) => {
+                                            // continue
+                                            //let mut patch = Document::new();
+                                            let collection = db.collection::<Document>(&collection_name);
+                                            
+
+                                            match metadata {
+                                                Err(e) => log::error!("{}", e),
+                                                Ok(metadata) => {
+                                                    let patch  = doc!{"$set" : 
+                                                        {
+                                                            "num_tags": metadata.num_tags,
+                                                            "num_globals": metadata.num_globals,
+                                                            "num_types": metadata.num_tpes,
+                                                            "num_tables": metadata.num_tables,
+                                                            "num_elements": metadata.num_elements,
+                                                            "num_data": metadata.num_data,
+                                                            "num_data_segments": metadata.num_data_segments,
+                                                            "num_imports": metadata.num_imports,
+                                                            "num_exports": metadata.num_exports
+                                                        } 
+                                                    };
+                                                    //patch.insert("num_tags", metadata.num_tags);
+                                                    let updater = collection.update_one(
+                                                        m.clone() , patch, None);
+
+                                                    match updater {
+                                                        Err(e) => log::error!("{} m {:?}", e, m),
+                                                        Ok(_) => {}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                _ => {
+                                 
+                                }
+                            }
+                        }
                         continue 'iter;
                     }
                     None => {
@@ -257,6 +339,7 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>, print_meta: bo
                 depth: br.depth.clone(),
                 mutation_cl_name: br.mutation_cl_name.clone(),
                 seed: br.seed.clone(),
+                patch_metadata: br.patch_metadata.clone(),
                 sample_ratio: br.sample_ratio.clone(),
             };
 

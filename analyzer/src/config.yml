@@ -15,6 +15,10 @@ subcommands:
         - reset:
             short: r
             help: "Clean out database before starting the extraction of metadatas"
+        - patch:
+            short: p
+            required: false
+            help: "Do not get deep info. Instead, it wil read the static info and will patch the metadata already saved"
         - depth:
             short: d
             required: false

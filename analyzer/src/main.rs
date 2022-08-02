@@ -73,6 +73,7 @@ pub struct State {
     parsing_error: AtomicU32,
     out_folder: Option<String>,
     save_logs: bool,
+    patch_metadata: bool,
     finish: AtomicBool,
     depth: u32,
     seed: u64,
@@ -127,6 +128,7 @@ pub fn main() -> Result<(), errors::CliError> {
         save_logs: false,
         finish: AtomicBool::new(false),
         depth: 0,
+        patch_metadata: false,
         sample_ratio: 1,
         seed: 0
     };
@@ -145,6 +147,10 @@ pub fn main() -> Result<(), errors::CliError> {
 
             if args.is_present("mutation_cl_name") {
                 state.mutation_cl_name = args.value_of("mutation_cl_name").unwrap().into();
+            }
+
+            if args.is_present("patch") {
+                state.patch_metadata = true;
             }
 
             if args.is_present("depth") {
@@ -240,7 +246,7 @@ pub fn main() -> Result<(), errors::CliError> {
                         2 => {
 
                             outfile.write_all(
-                                "id,num_instructions,mutable_count\n".as_bytes()
+                                "id, num_instructions,mutable_count\n".as_bytes()
                              ).unwrap();
                         }
                         _ => {
@@ -372,6 +378,7 @@ pub mod tests {
             finish: AtomicBool::new(false),
             depth: 0,
             sample_ratio: 1,
+            patch_metadata: false,
             seed: 0
         };
         extract(
@@ -393,6 +400,7 @@ pub mod tests {
             dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
+            patch_metadata: false,
             finish: AtomicBool::new(false),
             depth: 0,
             sample_ratio: 1,
