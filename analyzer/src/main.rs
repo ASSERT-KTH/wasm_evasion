@@ -6,6 +6,7 @@ use errors::{CliError};
 
 
 use sha2::{Digest, Sha256};
+use subcommands::export;
 use std::{
     io::{Write},
     sync::{
@@ -30,11 +31,12 @@ pub mod subcommands;
 
 use crate::subcommands::extract::extract;
 use crate::subcommands::reduce::reduce;
+use crate::subcommands::export::export;
 
 
 
 
-pub const NO_WORKERS: usize = 20;
+pub const NO_WORKERS: usize = 12;
 
 pub trait Hasheable {
     fn hash256(&self) -> Vec<u8>;
@@ -79,13 +81,14 @@ pub struct State {
     seed: u64,
     sample_ratio: u32
 }
-
+#[macro_export]
 macro_rules! arge {
     ($str: literal) => {
         CliError::Arg($str.to_string())
     };
 }
 
+#[macro_export]
 macro_rules! arg_or_error {
     ($matches: ident,$arg: literal) => {
         $matches.value_of($arg).ok_or(arge!($arg))?.to_string()
@@ -208,133 +211,7 @@ pub fn main() -> Result<(), errors::CliError> {
             reduce(RefCell::new(state), arg_or_error!(args, "input"))?;
         }
         ("export", Some(args)) => {
-            
-
-            if args.is_present("list") {
-                let collection = dbclient
-                    .database(&arg_or_error!(matches, "dbname"));
-
-                println!("Collections");
-
-               for l in  collection.list_collection_names(None).unwrap() {
-                    println!("\t{}", l);
-               }
-
-            } else {
-                log::debug!("Exporting");
-
-                // If JSON do this
-                if args.is_present("csv") {
-
-                    let collection = dbclient
-                    .database(&arg_or_error!(matches, "dbname"))
-                    .collection::<Meta>(&arg_or_error!(matches, "collection_name"));
-
-                    let records = collection.find(None, None).unwrap();
-
-                    let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
-                    // Write headers
-
-                    let level = value_t!(args.value_of("level"), u32).unwrap();
-                    match level {
-                        1 => {
-
-                            outfile.write_all(
-                                "id,mutable_count\n".as_bytes()
-                             ).unwrap();
-                        }
-                        2 => {
-
-                            outfile.write_all(
-                                "id, num_instructions,mutable_count\n".as_bytes()
-                             ).unwrap();
-                        }
-                        _ => {
-
-                            todo!("Level above 1 is not implemented yet")
-                        }
-                    }
-
-                    let mut c = 0;
-                    let mut mutators:HashMap<String, bool> = HashMap::new();
-                    for record in records {
-                        let item = record.unwrap();
-                        outfile.write_all(
-                            format!("{}", item.id).as_bytes()
-                        ).unwrap();
-
-
-                        match level {
-                            1 => {
-
-                               if item.mutations.len() > 0 {
-            
-                                    outfile.write_all(
-                                        format!(",1\n").as_bytes()
-                                    ).unwrap();
-                                } else{
-
-                                    outfile.write_all(
-                                        format!(",0\n").as_bytes()
-                                    ).unwrap();
-                                }
-        
-                            }
-                            2 => {
-
-                                outfile.write_all(
-                                    format!(",{}", item.num_instructions).as_bytes()
-                                ).unwrap();
-                                if item.mutations.len() > 0 {
-            
-                                    let first = item.mutations.get(0).unwrap();
-
-                                    if item.mutations.len() > 1 {
-                                        log::warn!("More than one possible mutator, check this {}", item.mutations.len())
-                                    }
-                                    outfile.write_all(
-                                        format!(",{}\n", first.generic_map.as_ref().unwrap().len()).as_bytes()
-                                    ).unwrap();
-                                } else{
-
-                                    outfile.write_all(
-                                        format!(",0\n").as_bytes()
-                                    ).unwrap();
-                                }
-                            }
-                            _ => {
-                                todo!("Level above 1 is not implemented yet")
-                            }
-                        }
-                        c += 1;
-                        //all.push(record.unwrap());
-
-                        if c % 99 == 0 {
-                            print!("\r{} saved", c)
-                        }
-                    }
-
-
-                } else {
-
-                    let collection = dbclient
-                    .database(&arg_or_error!(matches, "dbname"))
-                    .collection::<Bson>(&arg_or_error!(matches, "collection_name"));
-
-                        let records = collection.find(None, None).unwrap();
-                        let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
-
-                        let mut all = vec![];
-
-                        for record in records {
-                            all.push(record.unwrap());
-                        }
-
-                        outfile
-                            .write_all(serde_json::to_string_pretty(&all).unwrap().as_bytes())
-                            .unwrap();
-                    }
-                }
+            export(&matches, args, dbclient)?;
         }
         ("clean", Some(_)) => {
             log::debug!("Reseting ");

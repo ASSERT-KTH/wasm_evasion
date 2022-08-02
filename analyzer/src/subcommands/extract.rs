@@ -49,6 +49,9 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
         match entry {
             Err(e) => {
                 log::error!("{}", e);
+                if patch {
+                    continue 'iter;
+                }
             }
             Ok(d) => {
                 match d {
