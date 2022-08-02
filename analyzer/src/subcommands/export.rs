@@ -77,7 +77,7 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
         }
 
         let c = counter.fetch_add(1, Ordering::SeqCst);
-        if c % 99 == 0 {
+        if c % 100 == 99 {
             log::debug!("{}", c)
         }
     }
@@ -96,9 +96,7 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: DB<'static>) ->
         // TODO
 
     } else {
-        log::debug!("Exporting {}", &arg_or_error!(matches, "collection_name"));
-
-
+        log::debug!("Exporting {}", &arg_or_error!(matches, "dbconn"));
 
         // If JSON do this
         if args.is_present("csv") {

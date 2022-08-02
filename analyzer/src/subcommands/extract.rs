@@ -31,6 +31,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
     let outfolder = state.out_folder.clone().unwrap_or("metas".into());
     let patch = state.patch_metadata;
 
+    let mut time = time::Instant::now();
     'iter: for f in chunk.iter() {
         let mut file = fs::File::open(f)?;
 
@@ -85,8 +86,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                         if state
                             .parsing_error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 9
-                            == 0
+                            % 10 == 9 
                         {
                             log::error!(
                                 "{} parsing errors!",
@@ -108,8 +108,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
                         if state.error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 9
-                            == 0
+                            % 10 == 9 
                         {
                             log::error!("{} errors!", state.error.load(Ordering::Relaxed));
                         }
@@ -147,7 +146,6 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                             
                             for (m, map) in mutations.iter_mut() {
                                 
-                                
                                 if map.len() > 0 {
                                     m.generic_map = Some(map.clone());
                                     
@@ -156,8 +154,6 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                                     );
                                 }
                             }
-
-                            let docs = vec![info.clone()];
 
                             match dbclient.set(&info.id.clone(), info) {
                                 Ok(_) => {
@@ -185,10 +181,10 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
         if state
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-            % 99
-            == 0
+            % 100 == 99 
         {
-            log::debug!("{} processed", state.process.load(Ordering::Relaxed));
+            log::debug!("{} processed {} in {}ms", state.process.load(Ordering::Relaxed), dbclient.f, time.elapsed().as_millis());
+            time = time::Instant::now();
         }
     }
 
@@ -216,7 +212,7 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>, print_meta: bool) 
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    log::debug!("{} processed", state.process.load(Ordering::Relaxed));
+    log::debug!("{} processed {}", state.process.load(Ordering::Relaxed), state.dbclient.as_ref().unwrap().f);
     log::error!(
         "{} parsing errors!",
         state.parsing_error.load(Ordering::Relaxed)
@@ -252,7 +248,7 @@ pub fn extract(state: Arc<State>, path: String) -> Result<Vec<PathBuf>, CliError
                 files.push(path);
             }
 
-            if count % 999 == 0 {
+            if count % 100 == 99  {
                 let elapsed = start.elapsed();
 
                 log::debug!("Files count {} in {}ms", count, elapsed.as_millis());

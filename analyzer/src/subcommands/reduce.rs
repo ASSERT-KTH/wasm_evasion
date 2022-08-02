@@ -60,8 +60,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                 if state
                     .process
                     .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                    % 99
-                    == 0
+                    % 100 == 99 
                 {
                     log::debug!("\n{} processed", state.process.load(Ordering::Relaxed));
                 }
@@ -158,8 +157,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                         if state
                             .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 9
-                            == 0
+                            % 10 == 9 
                         {
                             log::error!("{} errors!", state.error.load(Ordering::Relaxed));
                         }
@@ -229,8 +227,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
         if state
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-            % 99
-            == 0
+            % 100 == 99 
         {
             log::debug!("{} processed", state.process.load(Ordering::Relaxed));
         }
@@ -314,7 +311,7 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
                 files.push(path);
             }
 
-            if count % 999 == 0 {
+            if count % 100 == 99  {
                 let elapsed = start.elapsed();
 
                 log::debug!("Files count {} in {}ms", count, elapsed.as_millis());

@@ -134,7 +134,7 @@ pub fn main() -> Result<(), errors::CliError> {
             let reset = args.is_present("reset");
             if reset {
                 log::debug!("Reseting ");
-                std::fs::remove_dir_all(dbconn);
+                std::fs::remove_dir_all(dbconn.clone());
             }
             log::debug!("Extracting...");
 
@@ -159,6 +159,7 @@ pub fn main() -> Result<(), errors::CliError> {
                 state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
             }
 
+            log::debug!("Extracting to {}", dbconn.clone());
             extract(Arc::new(state), arg_or_error!(args, "input"))?;
         }
         ("reduce", Some(args)) => {
