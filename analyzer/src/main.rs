@@ -199,7 +199,7 @@ pub fn main() -> Result<(), errors::CliError> {
             reduce(Arc::new(state), arg_or_error!(args, "input"))?;
         }
         ("export", Some(args)) => {
-            export(&matches, args, dbclient)?;
+            export(&matches, args, dbclient, Arc::new(state))?;
         }
         ("clean", Some(_)) => {
             log::debug!("Reseting ");
