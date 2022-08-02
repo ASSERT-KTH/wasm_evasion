@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io::Write, sync::{atomic::{AtomicU32, Ordering}, Arc}};
+use std::{collections::HashMap, io::Write, sync::{atomic::{AtomicU32, Ordering, AtomicBool}, Arc}, fs::File};
 
 use clap::{ArgMatches, value_t};
 use mongodb::{sync::Client, bson::Bson};
@@ -6,7 +6,7 @@ use mongodb::{sync::Client, bson::Bson};
 use crate::{State, errors::CliError, meta::Meta, arg_or_error, arge, NO_WORKERS};
 
 
-pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>) -> Vec<u8> {
+pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, file_locker: Arc<AtomicBool>, file: &mut File) -> () {
 
     let mut str_result = String::new();
 
@@ -79,11 +79,16 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>) -> 
 
         let c = counter.fetch_add(1, Ordering::SeqCst);
         if c % 99 == 0 {
-            println!("{}", c)
+            log::debug!("{}", c)
         }
     }
     
-    str_result.clone().into_bytes()
+
+    log::debug!("Appending to file");
+    let lock = file_locker.load(Ordering::Acquire);
+    file.write_all(str_result.as_bytes());
+    let lock = file_locker.store(true, Ordering::Release);
+    
 }
 
 pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Result<(), CliError> {
@@ -113,7 +118,7 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
        }
 
     } else {
-        log::debug!("Exporting");
+        log::debug!("Exporting {}", &arg_or_error!(matches, "collection_name"));
 
 
 
@@ -157,15 +162,19 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
 
             let mut jobs = vec![];
             let counter = Arc::new(AtomicU32::new(0));
+            let locker = Arc::new(AtomicBool::new(true));
             for i in 0..NO_WORKERS {
                 
                 let pc = workers[i].clone();
                 let countercp = counter.clone();
+                let mut outcp = outfile.try_clone()?;
+                let lockercp = locker.clone();
+
                 let th = std::thread::Builder::new()
                     .name(format!("exporter{}", i))
                     .stack_size(32 * 1024 * 1024 * 1024) // 320 MB
                     .spawn(move || {
-                        create_chunk(pc, level, countercp)
+                        create_chunk(pc, level, countercp, lockercp, &mut outcp);
                     }
                     )?;
             
@@ -174,9 +183,11 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
 
             for j in jobs {
                 let r = j.join().unwrap();
-                outfile.write_all(r.as_ref());
             }
 
+
+            let c = counter.fetch_add(1, Ordering::SeqCst);
+            println!("Done {} records", c);
 
             // Call workers and then append return to CSV file
 
