@@ -60,7 +60,7 @@ subcommands:
                 short: c
                 long: csv
                 required: false
-                help: "Export as csv"
+                help: "Export as csv. This option is a little bit faster than exporting all the collection as a JSON."
           - level:
                 long: level
                 required: false

@@ -228,9 +228,26 @@ pub fn main() -> Result<(), errors::CliError> {
 
                     let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
                     // Write headers
-                    outfile.write_all(
-                       "id,mutable_count\n".as_bytes()
-                    ).unwrap();
+
+                    let level = value_t!(args.value_of("level"), u32).unwrap();
+                    match level {
+                        1 => {
+
+                            outfile.write_all(
+                                "id,mutable_count\n".as_bytes()
+                             ).unwrap();
+                        }
+                        2 => {
+
+                            outfile.write_all(
+                                "id,num_instructions,mutable_count\n".as_bytes()
+                             ).unwrap();
+                        }
+                        _ => {
+
+                            todo!("Level above 1 is not implemented yet")
+                        }
+                    }
 
                     let mut c = 0;
                     let mut mutators:HashMap<String, bool> = HashMap::new();
@@ -240,7 +257,6 @@ pub fn main() -> Result<(), errors::CliError> {
                             format!("{}", item.id).as_bytes()
                         ).unwrap();
 
-                        let level = value_t!(args.value_of("level"), u32).unwrap();
 
                         match level {
                             1 => {
@@ -257,6 +273,28 @@ pub fn main() -> Result<(), errors::CliError> {
                                     ).unwrap();
                                 }
         
+                            }
+                            2 => {
+
+                                outfile.write_all(
+                                    format!(",{}", item.num_instructions).as_bytes()
+                                ).unwrap();
+                                if item.mutations.len() > 0 {
+            
+                                    let first = item.mutations.get(0).unwrap();
+
+                                    if item.mutations.len() > 1 {
+                                        log::warn!("More than one possible mutator, check this {}", item.mutations.len())
+                                    }
+                                    outfile.write_all(
+                                        format!(",{}\n", first.generic_map.as_ref().unwrap().len()).as_bytes()
+                                    ).unwrap();
+                                } else{
+
+                                    outfile.write_all(
+                                        format!(",0\n").as_bytes()
+                                    ).unwrap();
+                                }
                             }
                             _ => {
                                 todo!("Level above 1 is not implemented yet")
