@@ -86,41 +86,46 @@ impl InfoExtractor {
                     //wasm = &binary_data[range.end..];
                     //continue;
                 }
-                Payload::TypeSection(_reader) => {
+                Payload::TypeSection(reader) => {
                     meta.tpe_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_tpes = reader.get_count();
                 }
-                Payload::ImportSection(_reader) => {
+                Payload::ImportSection(reader) => {
                     meta.import_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_imports = reader.get_count();
                 }
                 Payload::FunctionSection(reader) => {
                     meta.function_count = reader.get_count();
                 }
-                Payload::TableSection(_reader) => {
+                Payload::TableSection(reader) => {
                     meta.table_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_tables = reader.get_count();
                 }
                 Payload::MemorySection(reader) => {
                     meta.memory_count = reader.get_count();
                 }
-                Payload::GlobalSection(_reader) => {
+                Payload::GlobalSection(reader) => {
                     meta.global_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_globals = reader.get_count();
                 }
-                Payload::ExportSection(_reader) => {
+                Payload::ExportSection(reader) => {
                     meta.export_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_exports = reader.get_count();
                 }
                 Payload::StartSection { func: _, range: _ } => {
                     meta.start_section = Some(Range {
@@ -128,17 +133,19 @@ impl InfoExtractor {
                         end: prev + consumed,
                     });
                 }
-                Payload::ElementSection(_reader) => {
+                Payload::ElementSection(reader) => {
                     meta.element_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_elements = reader.get_count();
                 }
-                Payload::DataSection(_reader) => {
+                Payload::DataSection(reader) => {
                     meta.data_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_data_segments = reader.get_count();
                 }
                 Payload::CustomSection(reader) => {
                     meta.custom_sections_count += 1;
@@ -157,11 +164,13 @@ impl InfoExtractor {
                         end: prev + consumed,
                     });
                 }
-                Payload::DataCountSection { count: _, range: _ } => {
+                Payload::DataCountSection { count: c, range: _ } => {
                     meta.data_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+
+                    meta.num_data = c;
                 }
                 Payload::CodeSectionEntry(r) => {
                     // TODO, add mutation info
@@ -172,11 +181,12 @@ impl InfoExtractor {
                     meta.version = num;
                 }
                 Payload::InstanceSection(_) => {}
-                Payload::TagSection(..) => {
+                Payload::TagSection(reader) => {
                     meta.tag_section = Some(Range {
                         start: prev,
                         end: prev + consumed,
                     });
+                    meta.num_tags = reader.get_count();
                 }
                 Payload::End { .. } => {
                     break;

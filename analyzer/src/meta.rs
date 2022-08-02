@@ -88,6 +88,26 @@ pub struct Meta {
     pub unknown_section: Option<Range<usize>>,
     pub version: u32,
     pub tag_section: Option<Range<usize>>,
+    // Add here some counters
+    // Number of functions, number of globals, number of data sections, number of tags, number of elements, number of exports, number of types, number of tables
+    #[serde(default)]
+    pub num_tpes: u32,
+    #[serde(default)]
+    pub num_imports: u32,
+    #[serde(default)]
+    pub num_exports: u32,
+    #[serde(default)]
+    pub num_tables: u32,
+    #[serde(default)]
+    pub num_globals: u32,   
+    #[serde(default)]
+    pub num_elements: u32,
+    #[serde(default)]
+    pub num_data: u32,
+    #[serde(default)]
+    pub num_data_segments: u32,
+    #[serde(default)]
+    pub num_tags: u32,
 
     // custom data info
     pub custom_sections: HashMap<String, (u32, u32)>,
@@ -130,6 +150,15 @@ impl Meta {
             custom_sections_count: 0,
             num_instructions: 0,
             mutations: vec![],
+            num_tpes: 0,
+            num_imports: 0,
+            num_exports: 0,
+            num_tables: 0,
+            num_globals: 0,
+            num_elements: 0,
+            num_data: 0,
+            num_data_segments: 0,
+            num_tags: 0
         }
     }
 }
