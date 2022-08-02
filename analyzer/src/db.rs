@@ -66,16 +66,16 @@ impl<'a> DB<'a> {
         Ok(kv)
     }
 
-    pub fn get_all<T>(&self) -> AResult<Vec<T>>
+    pub fn get_all<T>(&self) -> AResult<impl Iterator<Item = T>>
     where T: DeserializeOwned + 'static
     {
         let it = self.db.iter().filter_map(|f| f.ok()).map(move |(_, v)| {
             let cp = v.to_vec();
             let item: T = serde_json::from_str(&String::from_utf8(cp).unwrap()).unwrap();
             item
-        });
+        }).into_iter();
 
-        Ok(it.collect::<Vec<T>>())
+        Ok(it)
     }
 
     pub fn get<K, T>(&self, k: &'a K) -> AResult<T> 
