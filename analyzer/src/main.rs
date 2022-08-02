@@ -34,7 +34,7 @@ use crate::subcommands::reduce::reduce;
 
 
 
-pub const NO_WORKERS: usize = 10;
+pub const NO_WORKERS: usize = 20;
 
 pub trait Hasheable {
     fn hash256(&self) -> Vec<u8>;
