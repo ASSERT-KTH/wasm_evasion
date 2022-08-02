@@ -16,3 +16,7 @@ extract_all.sh
 backup
 *_db
 datas
+compress_data.sh
+create_csv.sh
+data.zip
+deploy_to_release.sh

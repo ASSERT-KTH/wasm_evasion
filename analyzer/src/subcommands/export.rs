@@ -33,9 +33,6 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
             }
             2 => {
     
-                str_result.push_str(
-                    &format!(",{}", item.num_instructions)
-                );
                 if item.mutations.len() > 0 {
     
                     let first = item.mutations.get(0).unwrap();
@@ -44,7 +41,7 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
                         log::warn!("More than one possible mutator, check this {}", item.mutations.len())
                     }
                     str_result.push_str(
-                        &format!("{},{},{},{},{},{},{},{},{}\n", 
+                        &format!(",{},{},{},{},{},{},{},{},{},{}\n", 
                         item.num_tags,
                         item.function_count,
                         item.num_globals,
@@ -53,12 +50,13 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
                         item.num_data,
                         item.num_tpes,
                         item.memory_count,
+                        item.num_instructions,
                         first.generic_map.as_ref().unwrap().len())
                     );
                 } else{
     
                     str_result.push_str(
-                        &format!("{},{},{},{},{},{},{},{},{}\n", 
+                        &format!(",{},{},{},{},{},{},{},{},{},{}\n", 
                         item.num_tags,
                         item.function_count,
                         item.num_globals,
@@ -66,7 +64,8 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
                         item.num_elements,
                         item.num_data,
                         item.num_tpes,
-                        item.memory_count, 0)
+                        item.memory_count, 
+                        item.num_instructions,0)
                     );
                 }
             }
