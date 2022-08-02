@@ -1,7 +1,6 @@
 //! DTO for analysis tool
 
 use bitflags::bitflags;
-use mongodb::bson::Bson;
 use std::{collections::HashMap, ops::Range, hash::Hash};
 
 use serde::{Deserialize, Serialize};
@@ -56,12 +55,6 @@ pub struct MutationInfo {
     pub can_reduce: bool,
     pub affects_execution: bool,
     pub tpe: u8,
-}
-
-impl From<MutationInfo> for Bson {
-    fn from(_: MutationInfo) -> Self {
-        todo!()
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

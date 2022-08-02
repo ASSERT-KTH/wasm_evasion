@@ -9,7 +9,6 @@ use std::{
 };
 
 use anyhow::Context;
-use mongodb::bson::Document;
 use tempfile::NamedTempFile;
 use wasm_shrink::{IsInteresting, WasmShrink};
 
@@ -39,8 +38,6 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
 
     let outfolder = state.out_folder.as_ref().unwrap().clone();
     let dbclient = state.dbclient.as_ref().unwrap().clone();
-    let dbname = state.dbname.clone();
-    let collection_name = state.collection_name.clone();
 
     'iter: for f in chunk.iter() {
 
@@ -52,37 +49,23 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
 
         let name = f.file_name().unwrap().to_str().unwrap().to_string();
 
-        // Check if it in the DB, continue if so
-        let db = dbclient.database(&dbname);
-        let collection = db.collection::<Meta>(&collection_name);
-        let mut filter = Document::new();
-        filter.insert("parent", name.clone());
-
-        let entry = collection.find_one(filter, None);
+        let entry: AResult<Meta> = dbclient.get(&name.clone());
         
         match entry {
             Err(e) => {
-                log::error!("{}", e);
+                log::debug !("key not found {}", e);
             }
             Ok(d) => {
-                match d {
-                    Some(_) => {
-                        log::debug!("\rSkipping {}", name);
-                        if state
-                            .process
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 99
-                            == 0
-                        {
-                            log::debug!("\n{} processed", state.process.load(Ordering::Relaxed));
-                        }
-                        continue 'iter;
-                    }
-                    None => {
-                        log::debug!("\nReducing {} ", name);
-                    }
+                log::debug!("\rSkipping {}", name);
+                if state
+                    .process
+                    .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                    % 99
+                    == 0
+                {
+                    log::debug!("\n{} processed", state.process.load(Ordering::Relaxed));
                 }
-                
+                continue 'iter;
             }
         }
 
@@ -230,12 +213,7 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                     bindata.len() as f32 / initial_size as f32
                 );
 
-                let db = dbclient.database(&dbname);
-                let collection = db.collection::<Meta>(&collection_name);
-
-                let docs = vec![meta];
-
-                match collection.insert_many(docs, None) {
+                match dbclient.set(&meta.id.clone(), meta) {
                     Ok(_) => {}
                     Err(e) => {
                         log::error!("{}", e);

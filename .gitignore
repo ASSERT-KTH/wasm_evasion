@@ -14,3 +14,5 @@ metas
 bucket
 extract_all.sh
 backup
+*_db
+datas

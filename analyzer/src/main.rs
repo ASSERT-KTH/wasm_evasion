@@ -1,6 +1,7 @@
 #![feature(internal_output_capture)]
 
 use clap::{load_yaml, App, value_t};
+use db::DB;
 use env_logger::{Builder, Env};
 use errors::{CliError};
 
@@ -17,9 +18,6 @@ use std::{
 
 use std::collections::HashMap;
 use crate::meta::Meta;
-use mongodb::{options::{ClientOptions, Credential}, bson::Bson};
-use mongodb::sync::Client;
-
 
 #[macro_use]
 extern crate log;
@@ -28,6 +26,7 @@ mod errors;
 pub mod info;
 mod meta;
 pub mod subcommands;
+pub mod db;
 
 use crate::subcommands::extract::extract;
 use crate::subcommands::reduce::reduce;
@@ -66,7 +65,7 @@ impl Printable for Vec<u8> {
 
 #[derive(Debug)]
 pub struct State {
-    dbclient: Option<Client>,
+    dbclient: Option<DB<'static>>,
     collection_name: String,
     mutation_cl_name: String,
     dbname: String,
@@ -95,6 +94,10 @@ macro_rules! arg_or_error {
     };
 }
 
+fn string_to_static_str(s: String) -> &'static str {
+    Box::leak(s.into_boxed_str())
+}
+
 pub fn main() -> Result<(), errors::CliError> {
     
     let env = Env::default()
@@ -107,26 +110,16 @@ pub fn main() -> Result<(), errors::CliError> {
 
     let yaml = load_yaml!("config.yml");
     let matches = App::from_yaml(yaml).get_matches();
-
-    let mut dbclientoptions = ClientOptions::parse(arg_or_error!(matches, "dbconn"))?;
-
-    dbclientoptions.app_name = Some(arg_or_error!(matches, "dbname"));
-
-    let mut credentials = Credential::default();
-    credentials.password = Some(arg_or_error!(matches, "dbpass"));
-    credentials.username = Some(arg_or_error!(matches, "dbuser"));
-
-    dbclientoptions.credential = Some(credentials);
-
-    let dbclient = Client::with_options(dbclientoptions)?;
+    let dbconn = arg_or_error!(matches, "dbconn");
+    let dbclient = DB::new(string_to_static_str(dbconn.clone()))?;
     let mut state = State {
         dbclient: Some(dbclient.clone()),
         mutation_cl_name: "muts".into(),
         process: AtomicU32::new(0),
         error: AtomicU32::new(0),
         parsing_error: AtomicU32::new(0),
-        collection_name: arg_or_error!(matches, "collection_name"),
-        dbname: arg_or_error!(matches, "dbname"),
+        collection_name: "t".into(),
+        dbname: "".into(),
         out_folder: None,
         save_logs: false,
         finish: AtomicBool::new(false),
@@ -141,10 +134,7 @@ pub fn main() -> Result<(), errors::CliError> {
             let reset = args.is_present("reset");
             if reset {
                 log::debug!("Reseting ");
-                dbclient
-                    .database(&arg_or_error!(matches, "dbname"))
-                    .collection::<Meta>(&arg_or_error!(matches, "collection_name"))
-                    .drop(None)?;
+                std::fs::remove_dir_all(dbconn);
             }
             log::debug!("Extracting...");
 
@@ -175,10 +165,7 @@ pub fn main() -> Result<(), errors::CliError> {
             let reset = args.is_present("reset");
             if reset {
                 log::debug!("Reseting ");
-                dbclient
-                    .database(&arg_or_error!(matches, "dbname"))
-                    .collection::<Meta>(&arg_or_error!(matches, "collection_name"))
-                    .drop(None)?;
+                std::fs::remove_dir_all(dbconn);
             }
 
             if args.is_present("save_logs") {
@@ -215,10 +202,7 @@ pub fn main() -> Result<(), errors::CliError> {
         }
         ("clean", Some(_)) => {
             log::debug!("Reseting ");
-            dbclient
-                .database(&arg_or_error!(matches, "dbname"))
-                .collection::<Meta>(&arg_or_error!(matches, "collection_name"))
-                .drop(None)?;
+            std::fs::remove_dir_all(dbconn);
         }
         (c, _) => {
             todo!("Command {}", c);
@@ -233,9 +217,6 @@ pub mod tests {
     use std::sync::atomic::{AtomicU32, AtomicBool};
     use std::sync::Arc;
     use std::time::Duration;
-
-    use mongodb::options::{ClientOptions, Credential};
-    use mongodb::sync::Client;
 
     use crate::meta::Meta;
     use crate::{extract, State};
@@ -284,27 +265,6 @@ pub mod tests {
             seed: 0
         };
         extract(Arc::new(state), "./".to_string()).unwrap();
-    }
-
-    pub fn test_db() {
-        let mut dbclientoptions = ClientOptions::parse("mongodb://localhost:27017").unwrap();
-
-        dbclientoptions.app_name = Some("obfuscator".to_string());
-        dbclientoptions.connect_timeout = Some(Duration::from_millis(500));
-        dbclientoptions.server_selection_timeout = Some(Duration::from_millis(500));
-
-        let mut credentials = Credential::default();
-        credentials.password = Some("admin".to_string());
-        credentials.username = Some("admin".to_string());
-
-        dbclientoptions.credential = Some(credentials);
-
-        let client = Client::with_options(dbclientoptions).unwrap();
-
-        // List the names of the databases in that deployment.
-        for db_name in client.list_database_names(None, None).unwrap() {
-            println!("{}", db_name);
-        }
     }
 
     #[test]

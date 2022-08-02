@@ -1,9 +1,8 @@
 use std::{collections::HashMap, io::Write, sync::{atomic::{AtomicU32, Ordering, AtomicBool}, Arc}, fs::File};
 
 use clap::{ArgMatches, value_t};
-use mongodb::{sync::Client, bson::Bson};
 
-use crate::{State, errors::CliError, meta::Meta, arg_or_error, arge, NO_WORKERS};
+use crate::{State, errors::CliError, meta::Meta, arg_or_error, arge, NO_WORKERS, db::DB};
 
 
 pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, file_locker: Arc<AtomicBool>, file: &mut File) -> () {
@@ -91,31 +90,10 @@ pub fn create_chunk(records: Vec<Meta>, level: u32, counter: Arc<AtomicU32>, fil
     
 }
 
-pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Result<(), CliError> {
+pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: DB<'static>) -> Result<(), CliError> {
 
     if args.is_present("list") {
-        let collection = dbclient
-            .database(&arg_or_error!(matches, "dbname"));
-
-        println!("Collections");
-
-       for l in  collection.list_collection_names(None).unwrap() {
-            println!("\t{}", l);
-       }
-
-    } else {
-        log::debug!("Exporting");
-
-    if args.is_present("list") {
-        let collection = dbclient
-            .database(&arg_or_error!(matches, "dbname"));
-
-        println!("Collections");
-
-        // Do this also in parallel
-       for l in  collection.list_collection_names(None).unwrap() {
-            println!("\t{}", l);
-       }
+        // TODO
 
     } else {
         log::debug!("Exporting {}", &arg_or_error!(matches, "collection_name"));
@@ -125,12 +103,7 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
         // If JSON do this
         if args.is_present("csv") {
 
-            let collection = dbclient
-            .database(&arg_or_error!(matches, "dbname"))
-            .collection::<Meta>(&arg_or_error!(matches, "collection_name"));
-
-            let records = collection.find(None, None).unwrap();
-
+            
             let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
             // Write headers
 
@@ -155,8 +128,9 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
                 }
             }
             let mut workers = vec![vec![];NO_WORKERS];
-            for (idx, record) in records.enumerate() {
-                let item = record.unwrap();
+            let records: Vec<Meta> = dbclient.get_all().unwrap();
+            for (idx, record) in records.iter().enumerate() {
+                let item = record;
                 workers[idx%NO_WORKERS].push(item.clone());
             }
 
@@ -193,17 +167,15 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
 
         } else {
 
-            let collection = dbclient
-            .database(&arg_or_error!(matches, "dbname"))
-            .collection::<Bson>(&arg_or_error!(matches, "collection_name"));
 
-                let records = collection.find(None, None).unwrap();
+
+                let records: Vec<Meta> = dbclient.get_all().unwrap();
                 let mut outfile = std::fs::File::create(arg_or_error!(args, "out")).unwrap();
 
                 let mut all = vec![];
 
                 for record in records {
-                    all.push(record.unwrap());
+                    all.push(record);
                 }
 
                 outfile
@@ -211,6 +183,5 @@ pub fn export(matches: &ArgMatches, args: &ArgMatches, dbclient: Client) -> Resu
                     .unwrap();
             }
         }
-    }
     Ok(())
 }

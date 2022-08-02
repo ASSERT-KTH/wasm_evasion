@@ -9,7 +9,6 @@ use std::{
     time, cell::RefCell, collections::HashMap, borrow::Borrow,
 };
 
-use mongodb::bson::{Document, Bson, doc};
 use wasm_mutate::WasmMutate;
 
 use crate::{
@@ -37,111 +36,15 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
         let name = f.file_name().unwrap().to_str().unwrap().to_string();
 
-        // Check if it in the DB, continue if Some
-        let db = dbclient.database(&dbname);
-        let collection = db.collection::<Document>(&collection_name);
-        let mut filter = Document::new();
-        filter.insert("id", name.clone());
 
-        let entry = collection.find_one(filter.clone(), None);
+        let entry: AResult<Meta> = dbclient.get(&name.clone());
 
         match entry {
             Err(e) => {
-                log::error!("{}", e);
-                if patch {
-                    continue 'iter;
-                }
+                // log::debug!("Extracting {}", e);
             }
             Ok(d) => {
-                match d {
-                    Some(m) => {
-                        log::debug!("Patching {:?}", patch);
-                        if patch {
-                            // Get the static info
-                            // Filter first the header to check for Wasm
-                            let mut buf = [0; 4];
-                            let r = file.read_exact(&mut buf);
-
-                            match r {
-                                Err(e) => {
-                                    log::error!("{}", e);
-                                    continue 'iter;
-                                },
-                                Ok(_) => {
-
-                                }
-                            }
-
-                            match &buf {
-                                b"\0asm" => {
-                                    //println!("Wasm !");
-
-                                    let mut meta = meta::Meta::new();
-                                    meta.id = name;
-                                    // Get size of the file
-                                    let fileinfo = fs::metadata(f)?;
-                                    meta.size = fileinfo.len() as usize;
-
-                                    // Parse Wasm to get more info
-                                    let bindata = fs::read(f)?;
-                                    let cp = bindata.clone();
-
-                                    let info =
-                                        std::panic::catch_unwind(move || InfoExtractor::get_info(&cp, &mut meta));
-
-                                    match info {
-                                        Err(e) => {
-                                            log::error!("{:#?}               Parsing error {:?}", f, e);
-
-                                            // Patch metadata
-                                        }
-                                        Ok(metadata) => {
-                                            // continue
-                                            //let mut patch = Document::new();
-                                            let collection = db.collection::<Document>(&collection_name);
-                                            
-
-                                            match metadata {
-                                                Err(e) => log::error!("{}", e),
-                                                Ok(metadata) => {
-                                                    let patch  = doc!{"$set" : 
-                                                        {
-                                                            "num_tags": metadata.num_tags,
-                                                            "num_globals": metadata.num_globals,
-                                                            "num_types": metadata.num_tpes,
-                                                            "num_tables": metadata.num_tables,
-                                                            "num_elements": metadata.num_elements,
-                                                            "num_data": metadata.num_data,
-                                                            "num_data_segments": metadata.num_data_segments,
-                                                            "num_imports": metadata.num_imports,
-                                                            "num_exports": metadata.num_exports
-                                                        } 
-                                                    };
-                                                    //patch.insert("num_tags", metadata.num_tags);
-                                                    let updater = collection.update_one(
-                                                        m.clone() , patch, None);
-
-                                                    match updater {
-                                                        Err(e) => log::error!("{} m {:?}", e, m),
-                                                        Ok(_) => {}
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                _ => {
-                                 
-                                }
-                            }
-                        }
-                        continue 'iter;
-                    }
-                    None => {
-                        log::debug!("\nExtracting {} ", name);
-                    }
-                }
-                
+                continue 'iter;
             }
         }
         // Filter first the header to check for Wasm
@@ -237,14 +140,11 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                 let mut cp = info?.clone();
 
                 let info = InfoExtractor::get_mutable_info(&mut cp, config, state.depth, state.seed, state.sample_ratio);
-
                 match info {
                     Ok((mut info, mut mutations)) => {
                         // Save meta to_string mongodb
                         if let Some(client) = &state.dbclient {
-                            let db = client.database(&state.dbname);
-                            let collection = db.collection::<Meta>(&state.collection_name);
-
+                            
                             for (m, map) in mutations.iter_mut() {
                                 
                                 
@@ -259,11 +159,13 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
                             let docs = vec![info.clone()];
 
-                            match collection.insert_many(docs, None) {
+                            match dbclient.set(&info.id.clone(), info) {
                                 Ok(_) => {
+
                                 }
                                 Err(e) => {
-                                    log::error!("{:?}", e)
+                                    log::error!("{:?}", e);
+                                   
                                 }
                             }
                         } else {

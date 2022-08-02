@@ -110,34 +110,11 @@ subcommands:
           - out:
               help: Out file, type of output is decided by file extension
 args:
-  - dbpass:
-      required: true
-      help: "Mongo db pass" 
-      value_name: "pass"
-      takes_value: true
-  - dbuser:
-      required: true 
-      value_name: "user"
-      help: "Mongo db username"
-      takes_value: true
   - dbconn:
       short: n
       long: dbconn
-      default_value: "mongodb://localhost:27017"
-      help: "Mongo db connection string"
+      default_value: "data_db"
+      help: "Sled db folder address"
       value_name: "dbconn"
       takes_value: true
-  - dbname:
-      default_value: "obfuscator"
-      required: false
-      takes_value: true
-      value_name: dbname
       
-  - collection_name:
-      default_value: "wasms"
-      required: false
-      takes_value: true
-      value_name: collection_name
-      long: collection_name
-      short: t
-    
