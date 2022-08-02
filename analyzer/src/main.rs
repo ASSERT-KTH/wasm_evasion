@@ -169,7 +169,7 @@ pub fn main() -> Result<(), errors::CliError> {
                 state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
             }
 
-            extract(RefCell::new(state), arg_or_error!(args, "input"))?;
+            extract(Arc::new(state), arg_or_error!(args, "input"))?;
         }
         ("reduce", Some(args)) => {
             let reset = args.is_present("reset");
@@ -208,7 +208,7 @@ pub fn main() -> Result<(), errors::CliError> {
 
             log::debug!("Reducing...");
             state.out_folder = Some(arg_or_error!(args, "out"));
-            reduce(RefCell::new(state), arg_or_error!(args, "input"))?;
+            reduce(Arc::new(state), arg_or_error!(args, "input"))?;
         }
         ("export", Some(args)) => {
             export(&matches, args, dbclient)?;
@@ -259,7 +259,7 @@ pub mod tests {
             seed: 0
         };
         extract(
-            RefCell::new(state),
+            Arc::new(state),
             "../RQ1/all-binaries-metadata/all".to_string(),
         )
         .unwrap();
@@ -283,7 +283,7 @@ pub mod tests {
             sample_ratio: 1,
             seed: 0
         };
-        extract(RefCell::new(state), "./".to_string()).unwrap();
+        extract(Arc::new(state), "./".to_string()).unwrap();
     }
 
     pub fn test_db() {

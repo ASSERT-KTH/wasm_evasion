@@ -20,18 +20,17 @@ use crate::{
 };
 
 
-pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: bool) -> AResult<Vec<PathBuf>> {
+pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -> AResult<Vec<PathBuf>> {
     if chunk.is_empty() {
         return Ok(vec![]);
     }
 
-    let dbclient = state.borrow().dbclient.as_ref().unwrap().clone();
-    let dbname = state.borrow().dbname.clone();
-    let collection_name = state.borrow().collection_name.clone();
-    let depth = state.borrow().depth.clone();
-    let outfolder = state.borrow().out_folder.clone().unwrap_or("metas".into());
-    let br = state.borrow();
-    let patch = state.borrow().patch_metadata;
+    let dbclient = state.dbclient.as_ref().unwrap().clone();
+    let dbname = state.dbname.clone();
+    let collection_name = state.collection_name.clone();
+    let depth = state.depth.clone();
+    let outfolder = state.out_folder.clone().unwrap_or("metas".into());
+    let patch = state.patch_metadata;
 
     'iter: for f in chunk.iter() {
         let mut file = fs::File::open(f)?;
@@ -180,7 +179,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                     Err(e) => {
                         log::error!("{:#?}               Parsing error {:?}", f, e);
 
-                        if state.borrow()
+                        if state
                             .parsing_error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 9
@@ -188,7 +187,7 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                         {
                             log::error!(
                                 "{} parsing errors!",
-                                state.borrow().parsing_error.load(Ordering::Relaxed)
+                                state.parsing_error.load(Ordering::Relaxed)
                             );
                         }
                         continue;
@@ -204,13 +203,12 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
                     Err(e) => {
                         log::error!("{:#?}               Error {:?}", f, e);
 
-                        if state
-                        .borrow().error
+                        if state.error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
                             % 9
                             == 0
                         {
-                            log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+                            log::error!("{} errors!", state.error.load(Ordering::Relaxed));
                         }
                         continue;
                     }
@@ -238,35 +236,14 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
 
                 let mut cp = info?.clone();
 
-                let info = InfoExtractor::get_mutable_info(&mut cp, config, br.depth, br.seed, br.sample_ratio);
+                let info = InfoExtractor::get_mutable_info(&mut cp, config, state.depth, state.seed, state.sample_ratio);
 
                 match info {
                     Ok((mut info, mut mutations)) => {
                         // Save meta to_string mongodb
-                        if let Some(client) = &state.borrow().dbclient {
-                            let db = client.database(&state.borrow().dbname);
-                            let collection = db.collection::<Meta>(&state.borrow().collection_name);
-                            // Add mutations but send mutations map to a file :)
-                            /*if ! print_meta {
-                                for (m, map) in mutations.iter_mut() {
-
-                                    let dirname = format!("{}", outfolder);
-                                    std::fs::create_dir(dirname.clone());
-                                    let filename = format!("{}/{}.{}.meta.json", dirname, info.id, m.class_name);
-                                    std::fs::write(
-                                        filename.clone(),
-                                        serde_json::to_vec_pretty(map)?
-                                    ).unwrap();
-
-                                    m.map = (map.len(), filename.into());
-
-                                    info.mutations.push(
-                                        m.clone()
-                                    );
-                                    
-                                }
-                            } */
-
+                        if let Some(client) = &state.dbclient {
+                            let db = client.database(&state.dbname);
+                            let collection = db.collection::<Meta>(&state.collection_name);
 
                             for (m, map) in mutations.iter_mut() {
                                 
@@ -303,50 +280,33 @@ pub fn get_wasm_info(state: RefCell<State>, chunk: Vec<PathBuf>, print_meta: boo
             }
         }
 
-        if state.borrow()
+        if state
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
             % 99
             == 0
         {
-            log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+            log::debug!("{} processed", state.process.load(Ordering::Relaxed));
         }
     }
 
     Ok(vec![])
 }
 
-pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>, print_meta: bool) -> Result<Vec<PathBuf>, CliError> {
+pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>, print_meta: bool) -> Result<Vec<PathBuf>, CliError> {
     let mut workers = vec![vec![]; NO_WORKERS];
 
     for (idx, file) in files.iter().enumerate() {
         workers[idx % NO_WORKERS].push(file.clone());
     }
 
+    let cp = state.clone();
     let jobs = workers
         .into_iter()
         .enumerate()
         .map(|(_, x)| {
-            let br = state.borrow();
-
-            let t = State {
-                dbclient: br.dbclient.clone(),
-                collection_name: br.collection_name.clone(),
-                dbname: br.dbname.clone(),
-                process: AtomicU32::new(0),
-                error: AtomicU32::new(0),
-                parsing_error: AtomicU32::new(0),
-                out_folder: br.out_folder.clone(),
-                save_logs: br.save_logs.clone(),
-                finish: AtomicBool::new(false),
-                depth: br.depth.clone(),
-                mutation_cl_name: br.mutation_cl_name.clone(),
-                seed: br.seed.clone(),
-                patch_metadata: br.patch_metadata.clone(),
-                sample_ratio: br.sample_ratio.clone(),
-            };
-
-            spawn(move || get_wasm_info(RefCell::new(t), x, print_meta))
+            let cp2 = cp.clone();
+            spawn(move || get_wasm_info(cp2, x, print_meta))
         })
         .collect::<Vec<_>>();
 
@@ -354,17 +314,17 @@ pub fn get_only_wasm(state: RefCell<State>, files: &Vec<PathBuf>, print_meta: bo
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    log::debug!("{} processed", state.borrow().process.load(Ordering::Relaxed));
+    log::debug!("{} processed", state.process.load(Ordering::Relaxed));
     log::error!(
         "{} parsing errors!",
-        state.borrow().parsing_error.load(Ordering::Relaxed)
+        state.parsing_error.load(Ordering::Relaxed)
     );
-    log::error!("{} errors!", state.borrow().error.load(Ordering::Relaxed));
+    log::error!("{} errors!", state.error.load(Ordering::Relaxed));
 
     Ok(vec![])
 }
 
-pub fn extract(state: RefCell<State>, path: String) -> Result<Vec<PathBuf>, CliError> {
+pub fn extract(state: Arc<State>, path: String) -> Result<Vec<PathBuf>, CliError> {
     let mut files = vec![];
 
     let mut count = 0;
