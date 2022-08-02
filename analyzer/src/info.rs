@@ -216,7 +216,7 @@ impl InfoExtractor {
         } else {
 
             get_info!(
-                PeepholeMutator::new(1), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
+                PeepholeMutator::new(2 /* 2 is the defalt value used by wasm-mutate */), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
                 config,
                 state,
                 meta,
