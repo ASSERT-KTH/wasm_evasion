@@ -39,7 +39,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: analyzer/target/release/analyzer
           asset_name: analyzer
-          tag: analyzer
+          tag: 0.1.0
           overwrite: true
           body: "Analyzer binary for linux"
 
