@@ -3,7 +3,7 @@ use std::hash::Hash;
 use std::ops::Range;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
-
+use wasm_mutate::ErrorKind::Timeout;
 use crate::meta::{Meta, MutationInfo, MutationMap as MM, MutationType};
 use crate::State;
 use std::collections::HashMap;
@@ -27,22 +27,37 @@ macro_rules! get_info {
         { if $config.is_some() && $mutation.can_mutate(&$config) {
 
             let mut idxsmap: HashMap<String, Vec<MM>> = HashMap::new();
+            let mut is_sample_due_to_timeout = false;
             if $state > 0 {
                 // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
                 // catch unwind and check if the panic is due to timeout
                 let cpsignal = $stopsignal.clone();
 
-                let info = $mutation.get_mutation_info(&$config, $state, $seed, $sample_ratio, cpsignal).map_err(|f|{
-                    match f {
-                        Timeout => crate::errors::CliError::ThreadTimeout,
-                        _ => crate::errors::CliError::Any(format!("{}", f))
+                let info = $mutation.get_mutation_info(&$config, $state, $seed, $sample_ratio, cpsignal);
+                
+                let (info2, is_sample) = match info {
+                    Err(e) => {
+                        match e.kind() {
+                            wasm_mutate::ErrorKind::Timeout(maps) => {
+                                if maps.len() > 0 {
+                                    Ok((Some(maps.clone()), true))
+                                } else {
+                                    // If is a timeout only is none map was returned and there is a sample ratio
+                                    Err(crate::errors::CliError::ThreadTimeout)
+                                }
+                            },
+                            _ => Err(crate::errors::CliError::Any(format!("{}", e)))
+                        
+                        }
                     }
-                })?;
+                    Ok(i) => Ok((i, false))
+                }?;
 
+                is_sample_due_to_timeout = is_sample;
 
                 // TODO, get the seed to reach a mutation over the specific target
 
-                if let Some(info) = info {
+                if let Some(info) = info2 {
 
                     for origm in info.iter() {
                         // Group by idx
@@ -66,7 +81,7 @@ macro_rules! get_info {
                 }
             }
             $rs.push(
-                (MutationInfo{ class_name: format!("{} sample {}",stringify!($mutation), $sample_ratio), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: (0, "".into()), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution, generic_map: None }, idxsmap)
+                (MutationInfo{ class_name: format!("{} sample {} timeout {:?}",stringify!($mutation), $sample_ratio, is_sample_due_to_timeout), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: (0, "".into()), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution, generic_map: None }, idxsmap)
             );
         }
     }

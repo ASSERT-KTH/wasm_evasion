@@ -17,7 +17,6 @@ pub fn create_chunk(record: Meta, level: u32) -> String {
     let mut str_result = String::new();
 
     str_result.push_str(&format!("{}", record.id));
-
     match level {
         1 => {
             if record.mutations.len() > 0 {
@@ -37,7 +36,7 @@ pub fn create_chunk(record: Meta, level: u32) -> String {
                     )
                 }
                 str_result.push_str(&format!(
-                    ",{},{},{},{},{},{},{},{},{},{}\n",
+                    ",{},{},{},{},{},{},{},{},{},{},{}\n",
                     record.num_tags,
                     record.function_count,
                     record.num_globals,
@@ -47,11 +46,12 @@ pub fn create_chunk(record: Meta, level: u32) -> String {
                     record.num_tpes,
                     record.memory_count,
                     record.num_instructions,
+                    first.class_name,
                     first.generic_map.as_ref().unwrap().len()
                 ));
             } else {
                 str_result.push_str(&format!(
-                    ",{},{},{},{},{},{},{},{},{},{}\n",
+                    ",{},{},{},{},{},{},{},{},{},{},{}\n",
                     record.num_tags,
                     record.function_count,
                     record.num_globals,
@@ -61,6 +61,7 @@ pub fn create_chunk(record: Meta, level: u32) -> String {
                     record.num_tpes,
                     record.memory_count,
                     record.num_instructions,
+                    "none",
                     0
                 ));
             }
@@ -97,7 +98,7 @@ pub fn export(
                 }
                 2 => {
                     outfile.write_all(
-                        "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,mutable_count\n".as_bytes()
+                        "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,class_name, mutable_count\n".as_bytes()
                      ).unwrap();
                 }
                 _ => {

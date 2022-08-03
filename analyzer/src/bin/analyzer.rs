@@ -211,7 +211,7 @@ pub mod tests {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
-            timeout: 10, // 2 minutes per binary
+            timeout: 60, // 2 minutes per binary
         };
         extract(Arc::new(state), "./tests/wasms".to_string()).unwrap();
     }

@@ -276,7 +276,8 @@ pub fn get_wasm_info(
                 let signal = Arc::new(AtomicBool::new(false));
                 let signalcp = signal.clone();
 
-                log::debug!("Restarting thread");
+                let s = chunk.lock().unwrap().len();
+                log::debug!("Restarting thread. Worklist size {}/{}", s + 1 /* the one already working */, total);
                 let time = time::Instant::now();
                 let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
 
@@ -317,38 +318,16 @@ pub fn get_wasm_info(
                         }
                     },
                     Ok(_) => {
-                        break
-                        /* if state
-                            .processed_files
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 100
-                            == 99
-                        {
-                            log::debug!(
-                                "{} processed {} in {}ms",
-                                state.process.load(Ordering::Relaxed),
-                                dbclient.f,
-                                time.elapsed().as_millis()
-                            );
-                            time = time::Instant::now();
-                        } */
+                         state
+                            .process
+                            .fetch_add(1, std::sync::atomic::Ordering::Acquire);
+                            break
                     }
                 }
                 
             }
         }
     }
-    
-    return Ok(vec![]);
-    
-    /* let dbclient = state.dbclient.as_ref().unwrap().clone();
-
-    let mut time = time::Instant::now();
-    for f in chunk.iter() {
-        
-    } */
-
-    
     Ok(vec![])
 }
 
