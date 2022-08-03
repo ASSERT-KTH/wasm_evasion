@@ -1,9 +1,9 @@
 use std::cell::RefCell;
 use std::hash::Hash;
-use std::{ops::Range};
+use std::ops::Range;
 
-use crate::State;
 use crate::meta::{Meta, MutationInfo, MutationMap as MM, MutationType};
+use crate::State;
 use std::collections::HashMap;
 use wasm_mutate::mutators::codemotion::CodemotionMutator;
 use wasm_mutate::mutators::remove_item::RemoveItemMutator;
@@ -200,16 +200,22 @@ impl InfoExtractor {
         Ok(meta.clone())
     }
 
-    pub fn get_mutable_info(meta: &mut Meta, config: WasmMutate, state: u32, seed: u64, sample_ratio: u32) -> crate::errors::AResult<(Meta, Vec<(MutationInfo, HashMap<String, Vec<MM>>)>)> {
+    pub fn get_mutable_info(
+        meta: &mut Meta,
+        config: WasmMutate,
+        state: u32,
+        seed: u64,
+        sample_ratio: u32,
+    ) -> crate::errors::AResult<(Meta, Vec<(MutationInfo, HashMap<String, Vec<MM>>)>)> {
         // Check all mutators `can_mutate`, if true, creates a new entry for that mutator and where it can be applied
         let Add = MutationType::Add;
         let Edit = MutationType::Edit;
         let Delete = MutationType::Delete;
         let mut rs = vec![];
 
-        // iterate through the heights if depth > 5 
-        
-        if state > 4{
+        // iterate through the heights if depth > 5
+
+        if state > 4 {
             for d in 1..=state {
                 get_info!(
                     PeepholeMutator::new(d), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
@@ -222,9 +228,8 @@ impl InfoExtractor {
                     Add | Edit | Delete,
                     true, rs, seed, sample_ratio
                 );
-            }    
+            }
         } else {
-
             get_info!(
                 PeepholeMutator::new(2 /* 2 is the defalt value used by wasm-mutate */), // This will just see if the egraph can be contructed from it, then we sould iteratively increase this. 
                 config,
@@ -237,7 +242,7 @@ impl InfoExtractor {
                 true, rs, seed, sample_ratio
             );
         }
-        
+
         get_info!(
             RemoveExportMutator,
             config,
@@ -247,7 +252,10 @@ impl InfoExtractor {
             "Remove an export",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RenameExportMutator { max_name_size: 100 },
@@ -258,7 +266,10 @@ impl InfoExtractor {
             "Renames an export",
             true,
             Edit,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(SnipMutator, config,
             state, meta, "Snip a function body", "Removes the body of a function and replaces its body by a default value given the type of the function", true, Delete, true, rs, seed, sample_ratio);
@@ -273,7 +284,10 @@ impl InfoExtractor {
             "Changes the cfg of the function body",
             false,
             Edit,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -285,7 +299,10 @@ impl InfoExtractor {
             "Replaces a function body by unreachable",
             true,
             Delete | Edit,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             AddTypeMutator {
@@ -299,7 +316,10 @@ impl InfoExtractor {
             "Adds a new random type declaration to the binary",
             false,
             Add,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -311,7 +331,10 @@ impl InfoExtractor {
             "Adds a custom random created function to the binary",
             false,
             Add,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveSection::Custom,
@@ -322,7 +345,10 @@ impl InfoExtractor {
             "Removes a custom section",
             true,
             Delete,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveSection::Empty,
@@ -333,7 +359,10 @@ impl InfoExtractor {
             "Removes empty section",
             true,
             Delete,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -345,7 +374,10 @@ impl InfoExtractor {
             "Mutates the initial expression of a global",
             true,
             Edit,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -357,7 +389,10 @@ impl InfoExtractor {
             "Mutate the init expression of the element offset",
             true,
             Edit,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -369,7 +404,10 @@ impl InfoExtractor {
             "Mutate the init expression of the element func",
             true,
             Edit,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(
@@ -381,7 +419,10 @@ impl InfoExtractor {
             "Removes a ramdon function",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Global),
@@ -392,7 +433,10 @@ impl InfoExtractor {
             "Removes a random global",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Memory),
@@ -403,7 +447,10 @@ impl InfoExtractor {
             "Removes a memory element",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Table),
@@ -414,7 +461,10 @@ impl InfoExtractor {
             "Removes a table",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Type),
@@ -425,7 +475,10 @@ impl InfoExtractor {
             "Removes a type",
             true,
             Delete,
-            false, rs, seed, sample_ratio
+            false,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Data),
@@ -436,7 +489,10 @@ impl InfoExtractor {
             "Remove data segment",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Element),
@@ -447,7 +503,10 @@ impl InfoExtractor {
             "Removes element",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
         get_info!(
             RemoveItemMutator(Item::Tag),
@@ -458,7 +517,10 @@ impl InfoExtractor {
             "Remove tag",
             true,
             Delete,
-            true, rs, seed, sample_ratio
+            true,
+            rs,
+            seed,
+            sample_ratio
         );
 
         get_info!(CustomSectionMutator, config,
@@ -471,7 +533,7 @@ impl InfoExtractor {
 #[cfg(test)]
 pub mod tests {
 
-    use std::{fs};
+    use std::fs;
 
     use crate::meta::Meta;
 

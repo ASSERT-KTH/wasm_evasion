@@ -1,45 +1,43 @@
 #![feature(internal_output_capture)]
 
-use analyzer::{arg_or_error, arge, State};
-use clap::{load_yaml, App, value_t};
 use analyzer::db::DB;
+use analyzer::errors::CliError;
+use analyzer::{arg_or_error, arge, State};
+use clap::{load_yaml, value_t, App};
 use env_logger::{Builder, Env};
-use analyzer::errors::{CliError};
 
 use std::{
-    io::{Write},
+    cell::RefCell,
+    fs::OpenOptions,
+    io::Write,
     sync::{
-        atomic::{AtomicU32, AtomicBool},
+        atomic::{AtomicBool, AtomicU32},
         Arc,
-    }, fs::OpenOptions, time::{SystemTime, UNIX_EPOCH}, cell::RefCell,
+    },
+    time::{SystemTime, UNIX_EPOCH},
 };
 
-use std::collections::HashMap;
 use analyzer::meta::Meta;
+use std::collections::HashMap;
 
 #[macro_use]
 extern crate log;
 
-
+use analyzer::subcommands::export::export;
 use analyzer::subcommands::extract::extract;
 use analyzer::subcommands::reduce::reduce;
-use analyzer::subcommands::export::export;
-
-
 
 fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
 }
 
 pub fn main() -> Result<(), analyzer::errors::CliError> {
-    
     let env = Env::default()
-    //.filter_or("LOG_LEVEL", "trace")
-    .filter("RUST_LOG")
-    .write_style_or("LOG_STYLE", "always");
+        //.filter_or("LOG_LEVEL", "trace")
+        .filter("RUST_LOG")
+        .write_style_or("LOG_STYLE", "always");
 
-    Builder::from_env(env)
-        .init();
+    Builder::from_env(env).init();
 
     let yaml = load_yaml!("config.yml");
     let matches = App::from_yaml(yaml).get_matches();
@@ -56,7 +54,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
         depth: 0,
         patch_metadata: false,
         sample_ratio: 1,
-        seed: 0
+        seed: 0,
     };
 
     match matches.subcommand() {
@@ -76,7 +74,6 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
                 state.seed = value_t!(args.value_of("seed"), u64).unwrap();
             }
 
-
             if args.is_present("sample") {
                 state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
             }
@@ -93,28 +90,40 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
 
             if args.is_present("save_logs") {
                 let env = Env::default()
-                //.filter_or("LOG_LEVEL", "trace")
-                .filter("RUST_LOG")
-                .write_style_or("LOG_STYLE", "never");
+                    //.filter_or("LOG_LEVEL", "trace")
+                    .filter("RUST_LOG")
+                    .write_style_or("LOG_STYLE", "never");
 
                 Builder::from_env(env)
                     .format(move |buff, record| {
                         let name = std::thread::current();
                         let name = name.name().unwrap();
                         let logname = format!("output{}.log", name);
-                        let mut outlog = OpenOptions::new().create(true).append(true).open(logname).unwrap();
+                        let mut outlog = OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(logname)
+                            .unwrap();
 
-                        outlog.write(format!("[{}] [{}] <<<{}>>>\n", 
-                            SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis(), 
-                            record.module_path().unwrap_or(""), 
-                            record.args()).as_bytes());
+                        outlog.write(
+                            format!(
+                                "[{}] [{}] <<<{}>>>\n",
+                                SystemTime::now()
+                                    .duration_since(UNIX_EPOCH)
+                                    .unwrap()
+                                    .as_millis(),
+                                record.module_path().unwrap_or(""),
+                                record.args()
+                            )
+                            .as_bytes(),
+                        );
 
                         Ok(())
                     })
                     .init();
 
                 state.save_logs = true;
-            } 
+            }
 
             log::debug!("Reducing...");
             state.out_folder = Some(arg_or_error!(args, "out"));
@@ -139,16 +148,16 @@ pub mod tests {
     use std::borrow::Borrow;
     use std::cell::RefCell;
     use std::fs;
-    use std::sync::atomic::{AtomicU32, AtomicBool};
+    use std::sync::atomic::{AtomicBool, AtomicU32};
     use std::sync::Arc;
     use std::time::Duration;
 
     use analyzer::State;
-    use env_logger::{Env, Builder};
+    use env_logger::{Builder, Env};
 
     use analyzer::db::DB;
     use analyzer::meta::Meta;
-    use analyzer::subcommands::{extract};
+    use analyzer::subcommands::extract;
     use analyzer::subcommands::extract::extract;
 
     #[test]
@@ -164,13 +173,9 @@ pub mod tests {
             depth: 2,
             sample_ratio: 1,
             patch_metadata: false,
-            seed: 0
+            seed: 0,
         };
-        extract(
-            Arc::new(state),
-            "./tests".to_string(),
-        )
-        .unwrap();
+        extract(Arc::new(state), "./tests".to_string()).unwrap();
     }
 
     #[test]

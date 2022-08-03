@@ -1,7 +1,7 @@
 //! DTO for analysis tool
 
 use bitflags::bitflags;
-use std::{collections::HashMap, ops::Range, hash::Hash};
+use std::{collections::HashMap, hash::Hash, ops::Range};
 
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +27,7 @@ pub struct MutationMap {
     /// Display of the target, None if it is not relevant
     pub display: Option<String>,
     /// Map for arbitrary metadata information
-    pub meta: Option<HashMap<String,String>>,
+    pub meta: Option<HashMap<String, String>>,
 }
 
 bitflags! {
@@ -92,7 +92,7 @@ pub struct Meta {
     #[serde(default)]
     pub num_tables: u32,
     #[serde(default)]
-    pub num_globals: u32,   
+    pub num_globals: u32,
     #[serde(default)]
     pub num_elements: u32,
     #[serde(default)]
@@ -151,7 +151,7 @@ impl Meta {
             num_elements: 0,
             num_data: 0,
             num_data_segments: 0,
-            num_tags: 0
+            num_tags: 0,
         }
     }
 }

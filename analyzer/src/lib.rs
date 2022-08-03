@@ -1,16 +1,13 @@
-use std::sync::atomic::{AtomicBool, AtomicU32};
-use sha2::Digest;
 use db::DB;
+use sha2::Digest;
 use sha2::Sha256;
+use std::sync::atomic::{AtomicBool, AtomicU32};
 
-
+pub mod db;
 pub mod errors;
 pub mod info;
 pub mod meta;
 pub mod subcommands;
-pub mod db;
-
-
 
 pub const NO_WORKERS: usize = 8;
 
@@ -52,7 +49,7 @@ pub struct State {
     pub finish: AtomicBool,
     pub depth: u32,
     pub seed: u64,
-    pub sample_ratio: u32
+    pub sample_ratio: u32,
 }
 
 #[macro_export]

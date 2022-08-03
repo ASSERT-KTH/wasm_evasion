@@ -1,11 +1,17 @@
 use std::{
+    borrow::Borrow,
+    cell::RefCell,
     fmt::Display,
     fs,
     io::Read,
     path::PathBuf,
+    rc::Rc,
     str::FromStr,
-    sync::{atomic::{Ordering, AtomicU32, AtomicBool}, Arc},
-    time, borrow::Borrow, rc::Rc, cell::RefCell,
+    sync::{
+        atomic::{AtomicBool, AtomicU32, Ordering},
+        Arc,
+    },
+    time,
 };
 
 use anyhow::Context;
@@ -40,7 +46,6 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
     let dbclient = state.dbclient.as_ref().unwrap().clone();
 
     'iter: for f in chunk.iter() {
-
         log::debug!("{:?}", state.finish.load(Ordering::Relaxed));
         if state.finish.load(Ordering::Relaxed) {
             break;
@@ -50,17 +55,18 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
         let name = f.file_name().unwrap().to_str().unwrap().to_string();
 
         let entry: AResult<Meta> = dbclient.get(&name.clone());
-        
+
         match entry {
             Err(e) => {
-                log::debug !("key not found {}", e);
+                log::debug!("key not found {}", e);
             }
             Ok(d) => {
                 log::debug!("\rSkipping {}", name);
                 if state
                     .process
                     .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                    % 100 == 99 
+                    % 100
+                    == 99
                 {
                     log::debug!("\n{} processed", state.process.load(Ordering::Relaxed));
                 }
@@ -76,10 +82,8 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
             Err(e) => {
                 log::error!("{}", e);
                 continue 'iter;
-            },
-            Ok(_) => {
-
             }
+            Ok(_) => {}
         }
 
         match &buf {
@@ -140,24 +144,22 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                     Err(e) => {
                         log::debug!("Error {}", e);
                         if state.save_logs {
-
                             log::debug!("Saving logs");
                             let name = std::thread::current();
-                            let name  = name.name().unwrap();
+                            let name = name.name().unwrap();
                             let log_file = format!("output{}.log", name);
                             let r = std::fs::rename(log_file, logs.clone());
 
                             match r {
                                 Err(e) => log::error!("{}", e),
-                                Ok(_) => {
-
-                                }
+                                Ok(_) => {}
                             }
                         }
                         if state
                             .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 10 == 9 
+                            % 10
+                            == 9
                         {
                             log::error!("{} errors!", state.error.load(Ordering::Relaxed));
                         }
@@ -166,18 +168,15 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
                     Ok(_i) => {
                         // Save logs if flag is set
                         if state.save_logs {
-
                             log::debug!("Saving logs");
                             let name = std::thread::current();
-                            let name  = name.name().unwrap();
+                            let name = name.name().unwrap();
                             let log_file = format!("output{}.log", name);
                             let r = std::fs::rename(log_file, logs.clone());
 
                             match r {
                                 Err(e) => log::error!("{}", e),
-                                Ok(_) => {
-
-                                }
+                                Ok(_) => {}
                             }
                         }
                     }
@@ -227,7 +226,8 @@ pub fn reduce_single_binary(state: Arc<State>, chunk: Vec<PathBuf>) -> AResult<(
         if state
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-            % 100 == 99 
+            % 100
+            == 99
         {
             log::debug!("{} processed", state.process.load(Ordering::Relaxed));
         }
@@ -257,9 +257,8 @@ pub fn reduce_binaries(state: Arc<State>, files: &Vec<PathBuf>) -> Result<(), Cl
         })
         .collect::<Vec<_>>();
 
-
     // Capture ctrl-c signal
-    /* 
+    /*
     ctrlc::set_handler(move|| {
         println!("received Ctrl+C! Finishing up");
         t.borrow().finish.store(true,Ordering::SeqCst);
@@ -286,7 +285,6 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
     let outf = &state.out_folder;
     let outf = outf.as_ref().unwrap();
 
-
     std::fs::create_dir(outf.clone()); // Ignore if error since it's already created
 
     let mut files = vec![];
@@ -311,7 +309,7 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
                 files.push(path);
             }
 
-            if count % 100 == 99  {
+            if count % 100 == 99 {
                 let elapsed = start.elapsed();
 
                 log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
@@ -325,7 +323,7 @@ pub fn reduce(state: Arc<State>, path: String) -> AResult<()> {
     log::debug!("Final files count {}", count);
     // Filter files if they are not Wasm binaries
     // Do so in parallel
-    
+
     reduce_binaries(state, &files)?;
     Ok(())
 }

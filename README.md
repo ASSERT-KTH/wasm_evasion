@@ -24,3 +24,20 @@ We continuously update our experiments insights using the notebooks [here](./not
 TODO
 
 ### Simple KV database to restore the experiment's data
+
+TODO
+
+### Tests
+- Run `cargo test --features <wasm-mutate features>`
+
+### Flamegraph
+- Run `rm -rf test_db && RUST_LOG=debug cargo flamegraph --features wasm-mutate/peep_hole,"<features> --unit-test -- tests::test_extract`
+- See it in `flamegraph.svg`
+
+### Benches
+- Run `cargo bench --features <wasm-mutate features>`
+- Some preliminary results with `cargo bench wasm-mutate/peep_hole,wasm-mutate/i64.mul-by-8`:
+```
+
+
+```

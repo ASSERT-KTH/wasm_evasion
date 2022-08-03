@@ -1,12 +1,18 @@
 // Extract subcommand logic
 
 use std::{
+    borrow::Borrow,
+    cell::RefCell,
+    collections::HashMap,
     fs,
     io::Read,
     path::PathBuf,
-    sync::{atomic::{Ordering, AtomicU32, AtomicBool}, Arc},
+    sync::{
+        atomic::{AtomicBool, AtomicU32, Ordering},
+        Arc,
+    },
     thread::spawn,
-    time, cell::RefCell, collections::HashMap, borrow::Borrow,
+    time,
 };
 
 use wasm_mutate::WasmMutate;
@@ -15,18 +21,19 @@ use crate::{
     errors::{AResult, CliError},
     info::InfoExtractor,
     meta::{self, Meta},
-    State, NO_WORKERS
+    State, NO_WORKERS,
 };
 
-
-pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -> AResult<Vec<PathBuf>> {
+pub fn get_wasm_info(
+    state: Arc<State>,
+    chunk: Vec<PathBuf>,
+    print_meta: bool,
+) -> AResult<Vec<PathBuf>> {
     if chunk.is_empty() {
         return Ok(vec![]);
     }
 
     let dbclient = state.dbclient.as_ref().unwrap().clone();
-    let dbname = state.dbname.clone();
-    let collection_name = state.collection_name.clone();
     let depth = state.depth.clone();
     let outfolder = state.out_folder.clone().unwrap_or("metas".into());
     let patch = state.patch_metadata;
@@ -37,16 +44,23 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
         let name = f.file_name().unwrap().to_str().unwrap().to_string();
 
-
         let entry: AResult<Meta> = dbclient.get(&name.clone());
 
         match entry {
             Err(e) => {
-             log::debug!("Extracting {} {}",  name.clone(), state.process.load(Ordering::Relaxed));
+                log::trace!(
+                    "Extracting {} {}",
+                    name.clone(),
+                    state.process.load(Ordering::Relaxed)
+                );
             }
             Ok(d) => {
                 state.process.fetch_add(1, Ordering::SeqCst);
-                log::debug!("{} already processed {}", state.process.load(Ordering::Relaxed), dbclient.f);
+                log::trace!(
+                    "{} already processed {}",
+                    state.process.load(Ordering::Relaxed),
+                    dbclient.f
+                );
                 continue 'iter;
             }
         }
@@ -59,10 +73,8 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
             Err(e) => {
                 log::error!("{}", e);
                 continue 'iter;
-            },
-            Ok(_) => {
-
             }
+            Ok(_) => {}
         }
 
         match &buf {
@@ -89,7 +101,8 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                         if state
                             .parsing_error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 10 == 9 
+                            % 10
+                            == 9
                         {
                             log::error!(
                                 "{} parsing errors!",
@@ -109,9 +122,11 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                     Err(e) => {
                         log::error!("{:#?}               Error {:?}", f, e);
 
-                        if state.error
+                        if state
+                            .error
                             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 10 == 9 
+                            % 10
+                            == 9
                         {
                             log::error!("{} errors!", state.error.load(Ordering::Relaxed));
                         }
@@ -131,7 +146,6 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
                 match stinfo {
                     Err(_e) => {
-                        
                         continue;
                     }
                     Ok(_) => {}
@@ -141,31 +155,34 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
                 let mut cp = info?.clone();
 
-                let info = InfoExtractor::get_mutable_info(&mut cp, config, state.depth, state.seed, state.sample_ratio);
+                let info = InfoExtractor::get_mutable_info(
+                    &mut cp,
+                    config,
+                    state.depth,
+                    state.seed,
+                    state.sample_ratio,
+                );
                 match info {
                     Ok((mut info, mut mutations)) => {
                         // Save meta to_string mongodb
                         if let Some(client) = &state.dbclient {
-                            
                             for (m, map) in mutations.iter_mut() {
-                                
                                 if map.len() > 0 {
                                     m.generic_map = Some(map.clone());
-                                    
-                                    info.mutations.push(
-                                        m.clone()
-                                    );
+
+                                    info.mutations.push(m.clone());
                                 }
                             }
 
-                            log::debug!("Saving record for {} {}", name.clone(), state.process.load(Ordering::Relaxed));
+                            log::debug!(
+                                "Saving record for {} {}",
+                                name.clone(),
+                                state.process.load(Ordering::Relaxed)
+                            );
                             match dbclient.set(&info.id.clone(), info) {
-                                Ok(_) => {
-
-                                }
+                                Ok(_) => {}
                                 Err(e) => {
                                     log::error!("{:?}", e);
-                                   
                                 }
                             }
                         } else {
@@ -185,9 +202,15 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
         if state
             .process
             .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-            % 100 == 99 
+            % 100
+            == 99
         {
-            log::debug!("{} processed {} in {}ms", state.process.load(Ordering::Relaxed), dbclient.f, time.elapsed().as_millis());
+            log::debug!(
+                "{} processed {} in {}ms",
+                state.process.load(Ordering::Relaxed),
+                dbclient.f,
+                time.elapsed().as_millis()
+            );
             time = time::Instant::now();
         }
     }
@@ -195,9 +218,14 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
     Ok(vec![])
 }
 
-pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>, print_meta: bool) -> Result<Vec<PathBuf>, CliError> {
+pub fn get_only_wasm(
+    state: Arc<State>,
+    files: &Vec<PathBuf>,
+    print_meta: bool,
+) -> Result<Vec<PathBuf>, CliError> {
     let mut workers = vec![vec![]; NO_WORKERS];
 
+    let elapsed = time::Instant::now();
     for (idx, file) in files.iter().enumerate() {
         workers[idx % NO_WORKERS].push(file.clone());
     }
@@ -216,7 +244,12 @@ pub fn get_only_wasm(state: Arc<State>, files: &Vec<PathBuf>, print_meta: bool) 
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
 
-    log::debug!("{} processed {}", state.process.load(Ordering::Relaxed), state.dbclient.as_ref().unwrap().f);
+    log::debug!(
+        "{} processed {} in {}ms",
+        state.process.load(Ordering::Relaxed),
+        state.dbclient.as_ref().unwrap().f,
+        elapsed.elapsed().as_millis()
+    );
     log::error!(
         "{} parsing errors!",
         state.parsing_error.load(Ordering::Relaxed)
@@ -238,9 +271,7 @@ pub fn extract(state: Arc<State>, path: String) -> Result<Vec<PathBuf>, CliError
         files.push(PathBuf::from(path.clone()));
         print_meta = true;
         count += 1;
-    } 
-    else {
-
+    } else {
         for entry in fs::read_dir(path)? {
             let entry = entry?;
             let path = entry.path();
@@ -252,7 +283,7 @@ pub fn extract(state: Arc<State>, path: String) -> Result<Vec<PathBuf>, CliError
                 files.push(path);
             }
 
-            if count % 100 == 99  {
+            if count % 100 == 99 {
                 let elapsed = start.elapsed();
 
                 log::debug!("Files count {} in {}ms", count, elapsed.as_millis());
