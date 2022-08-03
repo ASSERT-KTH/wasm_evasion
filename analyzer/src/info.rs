@@ -81,7 +81,7 @@ macro_rules! get_info {
                 }
             }
             $rs.push(
-                (MutationInfo{ class_name: format!("{} sample {} timeout {:?}",stringify!($mutation), $sample_ratio, is_sample_due_to_timeout), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: (0, "".into()), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution, generic_map: None }, idxsmap)
+                (MutationInfo{ class_name: format!("{} sample {} timeout {:?} seed  {}",stringify!($mutation), $sample_ratio, is_sample_due_to_timeout, $seed), pretty_name:$prettyname.to_string(), desccription: $description.to_string(), map: (0, "".into()), can_reduce: $reduce, tpe: $tpe.get_val(), affects_execution:$affects_execution, generic_map: None }, idxsmap)
             );
         }
     }
