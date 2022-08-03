@@ -26,7 +26,7 @@ use crate::{
 };
 
 
-pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, stopsignal: Arc<AtomicBool>) -> AResult<()> {
+pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, seed: u64, stopsignal: Arc<AtomicBool>) -> AResult<()> {
     
     let mut file = fs::File::open(f)?;
 
@@ -184,7 +184,7 @@ pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, stopsig
                 &mut cp,
                 config,
                 state.depth,
-                state.seed,
+                seed,
                 sample,
                 stopsignal.clone()
             );
@@ -269,6 +269,7 @@ pub fn get_wasm_info(
             log::debug!("Timeout {}", waitfor);
             let mut cp = state.clone();
             let mut sample = cp.sample_ratio;
+            let mut seed = cp.seed;
             loop {
                 let movecp = cp.clone();
                 let fcp = f.clone();
@@ -279,7 +280,7 @@ pub fn get_wasm_info(
                 let s = chunk.lock().unwrap().len();
                 log::debug!("Restarting thread. Worklist size {}/{}", s + 1 /* the one already working */, total);
                 let time = time::Instant::now();
-                let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
+                let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, seed, signalcp));
 
                 loop {
                     let lapsed = time.elapsed().as_secs();
@@ -305,6 +306,7 @@ pub fn get_wasm_info(
                                 log::warn!("Thread is taking to much ({}s) {} {}, setting sample to 1/{} and restarting",lapsed, fcp2.clone().display(), e, sample*2);
                                 signal.store(false, Ordering::SeqCst);
                                 sample = sample * 2;
+                                seed += 1; // like a nonce
                                 if sample > 128 {
                                     log::error!("The binary {} cannot be processed", fcp2.clone().display());
                                     break;
