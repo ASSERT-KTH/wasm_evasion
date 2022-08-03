@@ -35,7 +35,7 @@ use crate::subcommands::export::export;
 
 
 
-pub const NO_WORKERS: usize = 12;
+pub const NO_WORKERS: usize = 8;
 
 pub trait Hasheable {
     fn hash256(&self) -> Vec<u8>;
@@ -219,13 +219,16 @@ pub mod tests {
     use std::sync::Arc;
     use std::time::Duration;
 
+    use env_logger::{Env, Builder};
+
+    use crate::db::DB;
     use crate::meta::Meta;
     use crate::{extract, State};
 
-    //#[test]
+    #[test]
     pub fn test_extract() {
         let state = State {
-            dbclient: None,
+            dbclient: Some(DB::new("test_db").unwrap()),
             mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
@@ -235,22 +238,32 @@ pub mod tests {
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),
-            depth: 0,
+            depth: 2,
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0
         };
         extract(
             Arc::new(state),
-            "../RQ1/all-binaries-metadata/all".to_string(),
+            "./tests".to_string(),
         )
         .unwrap();
     }
 
+
     #[test]
-    pub fn test_extract2() {
+    pub fn test_extract_many() {
+
+        let env = Env::default()
+        //.filter_or("LOG_LEVEL", "trace")
+        .filter("RUST_LOG")
+        .write_style_or("LOG_STYLE", "always");
+    
+        Builder::from_env(env)
+            .init();
+            
         let state = State {
-            dbclient: None,
+            dbclient: Some(DB::new("test_db").unwrap()),
             mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
@@ -259,14 +272,20 @@ pub mod tests {
             dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
-            patch_metadata: false,
             finish: AtomicBool::new(false),
-            depth: 0,
+            depth: 2,
             sample_ratio: 1,
+            patch_metadata: false,
             seed: 0
         };
-        extract(Arc::new(state), "./".to_string()).unwrap();
+        extract(
+            Arc::new(state),
+            "./tests/wasms".to_string(),
+        )
+        .unwrap();
+        
     }
+
 
     #[test]
     pub fn test_csv() {

@@ -20,3 +20,4 @@ compress_data.sh
 create_csv.sh
 data.zip
 deploy_to_release.sh
+*.svg

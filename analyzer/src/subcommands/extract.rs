@@ -42,12 +42,15 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
 
         match entry {
             Err(e) => {
-                // log::debug!("Extracting {}", e);
+             log::debug!("Extracting {} {}",  name.clone(), state.process.load(Ordering::Relaxed));
             }
             Ok(d) => {
+                state.process.fetch_add(1, Ordering::SeqCst);
+                log::debug!("{} already processed {}", state.process.load(Ordering::Relaxed), dbclient.f);
                 continue 'iter;
             }
         }
+
         // Filter first the header to check for Wasm
         let mut buf = [0; 4];
         let r = file.read_exact(&mut buf);
@@ -67,7 +70,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                 //println!("Wasm !");
 
                 let mut meta = meta::Meta::new();
-                meta.id = name;
+                meta.id = name.clone();
                 // Get size of the file
                 let fileinfo = fs::metadata(f)?;
                 meta.size = fileinfo.len() as usize;
@@ -155,6 +158,7 @@ pub fn get_wasm_info(state: Arc<State>, chunk: Vec<PathBuf>, print_meta: bool) -
                                 }
                             }
 
+                            log::debug!("Saving record for {} {}", name.clone(), state.process.load(Ordering::Relaxed));
                             match dbclient.set(&info.id.clone(), info) {
                                 Ok(_) => {
 
