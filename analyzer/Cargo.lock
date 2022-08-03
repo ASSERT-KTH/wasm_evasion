@@ -26,6 +26,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sled",
+ "stop-thread",
  "tempfile",
  "thiserror",
  "wasm-mutate",
@@ -649,6 +650,16 @@ name = "smallvec"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2fd0db749597d91ff862fd1d55ea87f7855a744a8425a64695b6fca237d1dad1"
+
+[[package]]
+name = "stop-thread"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c23d5c8acb801cd2ad6cbae2415ac8e87437c5d1ce8cc2f8fd420c1afacfdb2"
+dependencies = [
+ "libc",
+ "winapi",
+]
 
 [[package]]
 name = "strsim"

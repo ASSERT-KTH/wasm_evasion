@@ -19,7 +19,7 @@ env_logger = "0.9"
 log = "0.4"
 ctrlc = "3.2.2"
 sled = "0.34.7"
-
+stop-thread = "0.2.0"
 tempfile = "3.1"
 anyhow = "1.0"
 

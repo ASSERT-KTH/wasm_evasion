@@ -12,9 +12,10 @@ use std::{
         Arc,
     },
     thread::spawn,
-    time,
+    time::{self, Duration},
 };
 
+use stop_thread::kill_thread_graceful;
 use wasm_mutate::WasmMutate;
 
 use crate::{
@@ -23,6 +24,229 @@ use crate::{
     meta::{self, Meta},
     State, NO_WORKERS,
 };
+
+
+pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, stopsignal: Arc<AtomicBool>) -> AResult<()> {
+    
+    let mut file = fs::File::open(f)?;
+
+    let name = f.file_name().unwrap().to_str().unwrap().to_string();
+
+    let dbclient = state.dbclient.as_ref().unwrap().clone();
+    let entry: AResult<Meta> = dbclient.get(&name.clone());
+
+    // Add the Stop signal in the expensive places
+    if stopsignal.load(Ordering::SeqCst) {
+        log::error!("Stopping due to signal");
+        return Err(CliError::ThreadTimeout)
+    }
+
+    match entry {
+        Err(e) => {
+            log::trace!(
+                "Extracting {} {}",
+                name.clone(),
+                state.process.load(Ordering::Relaxed)
+            );
+        }
+        Ok(d) => {
+            state.process.fetch_add(1, Ordering::SeqCst);
+            log::trace!(
+                "{} already processed {}",
+                state.process.load(Ordering::Relaxed),
+                dbclient.f
+            );
+            return Ok(())
+        }
+    }
+
+    // Filter first the header to check for Wasm
+    let mut buf = [0; 4];
+    let r = file.read_exact(&mut buf);
+
+    match r {
+        Err(e) => {
+            log::error!("{}", e);
+            return Ok(())
+        }
+        Ok(_) => {}
+    }
+
+    // Add the Stop signal in the expensive places
+    if stopsignal.load(Ordering::Relaxed) {
+        log::error!("Stopping due to signal");
+        return Err(CliError::ThreadTimeout)
+    }
+
+    match &buf {
+        b"\0asm" => {
+            //println!("Wasm !");
+
+            let mut meta = meta::Meta::new();
+            meta.id = name.clone();
+            // Get size of the file
+            let fileinfo = fs::metadata(f)?;
+            meta.size = fileinfo.len() as usize;
+
+            // Parse Wasm to get more info
+            let bindata = fs::read(f)?;
+            let cp = bindata.clone();
+
+            let info =
+                std::panic::catch_unwind(move || InfoExtractor::get_info(&cp, &mut meta));
+
+            // Add the Stop signal in the expensive places
+            if stopsignal.load(Ordering::Relaxed) {
+                log::error!("Stopping due to signal");
+                return Err(CliError::ThreadTimeout)
+            }
+
+            match info {
+                Err(e) => {
+                    log::error!("{:#?}               Parsing error {:?}", f, e);
+
+                    if state
+                        .parsing_error
+                        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                        % 10
+                        == 9
+                    {
+                        log::error!(
+                            "{} parsing errors!",
+                            state.parsing_error.load(Ordering::Relaxed)
+                        );
+                    }
+                    
+                    return Ok(())
+                }
+                _ => {
+                    // continue
+                }
+            }
+
+            let info = info.map_err(|x| CliError::Any(format!("{:#?}", x)))?;
+
+            match info {
+                Err(e) => {
+                    log::error!("{:#?}               Error {:?}", f, e);
+
+                    if state
+                        .error
+                        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                        % 10
+                        == 9
+                    {
+                        log::error!("{} errors!", state.error.load(Ordering::Relaxed));
+                    }
+                    return Ok(());
+                }
+                _ => {
+                    // continue
+                }
+            }
+
+            // Get mutation info, TODO
+
+            // Add the Stop signal in the expensive places
+            if stopsignal.load(Ordering::Relaxed) {
+                log::error!("Stopping due to signal");
+                return Err(CliError::ThreadTimeout)
+            }
+            let mut config = WasmMutate::default();
+            let stinfo = config
+                .setup(&bindata)
+                .map_err(|x| CliError::Any(format!("{:#?}", x)));
+
+            // Add the Stop signal information the expensive places
+            if stopsignal.load(Ordering::Relaxed) {
+                log::error!("Stopping due to signal");
+                return Err(CliError::ThreadTimeout)
+            }
+            match stinfo {
+                Err(_e) => {
+                    
+                    return Ok(())
+                }
+                Ok(_) => {}
+            }
+
+            config.preserve_semantics(true);
+
+            let mut cp = info?.clone();
+
+            // Add the Stop signal in the expensive places
+            if stopsignal.load(Ordering::Relaxed) {
+                log::error!("Stopping due to signal");
+                return Err(CliError::ThreadTimeout)
+            }
+            
+            let info = InfoExtractor::get_mutable_info(
+                &mut cp,
+                config,
+                state.depth,
+                state.seed,
+                sample,
+                stopsignal.clone()
+            );
+
+            match info {
+                Ok((mut info, mut mutations)) => {
+                    // Save meta to_string mongodb
+                    if let Some(client) = &state.dbclient {
+                        for (m, map) in mutations.iter_mut() {
+                            if map.len() > 0 {
+                                m.generic_map = Some(map.clone());
+
+                                info.mutations.push(m.clone());
+                            }
+                        }
+
+                        log::debug!(
+                            "Saving record for {} {}",
+                            name.clone(),
+                            state.process.load(Ordering::Relaxed)
+                        );
+                        match dbclient.set(&info.id.clone(), info) {
+                            Ok(_) => {}
+                            Err(e) => {
+                                match e {
+                                    CliError::ThreadTimeout => {
+            
+                                        return Err(CliError::ThreadTimeout)
+                                    },
+                                    _ => {
+            
+                                        log::error!("{:?}", e)
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        log::error!("Where is the client")
+                    }
+                }
+                Err(e) => {
+                    match e {
+                        CliError::ThreadTimeout => {
+
+                            return Err(CliError::ThreadTimeout)
+                        },
+                        _ => {
+
+                            log::error!("{:?}", e)
+                        }
+                    }
+                }
+            }
+        }
+        _ => {
+            log::error!("\nJust discard {:?}\n", f);
+        }
+    }
+
+
+    Ok(())
+}
 
 pub fn get_wasm_info(
     state: Arc<State>,
@@ -34,187 +258,76 @@ pub fn get_wasm_info(
     }
 
     let dbclient = state.dbclient.as_ref().unwrap().clone();
-    let depth = state.depth.clone();
-    let outfolder = state.out_folder.clone().unwrap_or("metas".into());
-    let patch = state.patch_metadata;
 
     let mut time = time::Instant::now();
-    'iter: for f in chunk.iter() {
-        let mut file = fs::File::open(f)?;
+    for f in chunk.iter() {
+        // Send this to a thread and create a monitor
+        let mut waitfor = 1; // wait for x seconds, get from arguments
+        let mut cp = state.clone();
+        let mut time = time::Instant::now();
+        let mut sample = cp.sample_ratio;
+        loop {
+            let movecp = cp.clone();
+            let fcp = f.clone();
+            let fcp2 = f.clone();
+            let signal = Arc::new(AtomicBool::new(false));
+            let signalcp = signal.clone();
 
-        let name = f.file_name().unwrap().to_str().unwrap().to_string();
+            let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
 
-        let entry: AResult<Meta> = dbclient.get(&name.clone());
+            loop {
+                let lapsed = time.elapsed().as_secs();
 
-        match entry {
-            Err(e) => {
-                log::trace!(
-                    "Extracting {} {}",
-                    name.clone(),
-                    state.process.load(Ordering::Relaxed)
-                );
-            }
-            Ok(d) => {
-                state.process.fetch_add(1, Ordering::SeqCst);
-                log::trace!(
-                    "{} already processed {}",
-                    state.process.load(Ordering::Relaxed),
-                    dbclient.f
-                );
-                continue 'iter;
-            }
-        }
-
-        // Filter first the header to check for Wasm
-        let mut buf = [0; 4];
-        let r = file.read_exact(&mut buf);
-
-        match r {
-            Err(e) => {
-                log::error!("{}", e);
-                continue 'iter;
-            }
-            Ok(_) => {}
-        }
-
-        match &buf {
-            b"\0asm" => {
-                //println!("Wasm !");
-
-                let mut meta = meta::Meta::new();
-                meta.id = name.clone();
-                // Get size of the file
-                let fileinfo = fs::metadata(f)?;
-                meta.size = fileinfo.len() as usize;
-
-                // Parse Wasm to get more info
-                let bindata = fs::read(f)?;
-                let cp = bindata.clone();
-
-                let info =
-                    std::panic::catch_unwind(move || InfoExtractor::get_info(&cp, &mut meta));
-
-                match info {
-                    Err(e) => {
-                        log::error!("{:#?}               Parsing error {:?}", f, e);
-
-                        if state
-                            .parsing_error
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 10
-                            == 9
-                        {
-                            log::error!(
-                                "{} parsing errors!",
-                                state.parsing_error.load(Ordering::Relaxed)
-                            );
-                        }
-                        continue;
-                    }
-                    _ => {
-                        // continue
-                    }
+                if lapsed > waitfor || th.is_finished() {
+                    signal.store(true, Ordering::SeqCst);
+                    break
                 }
+            }
+            //std::thread::sleep(Duration::from_secs(waitfor));
+            //log::debug!("Thread for {} is finished", fcp2.clone().display());
+            let r = th.join().unwrap();
 
-                let info = info.map_err(|x| CliError::Any(format!("{:#?}", x)))?;
+            match r {
+                Err(e) => {
+                    match e {
+                        CliError::ThreadTimeout => {
 
-                match info {
-                    Err(e) => {
-                        log::error!("{:#?}               Error {:?}", f, e);
-
-                        if state
-                            .error
-                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                            % 10
-                            == 9
-                        {
-                            log::error!("{} errors!", state.error.load(Ordering::Relaxed));
-                        }
-                        continue;
-                    }
-                    _ => {
-                        // continue
-                    }
-                }
-
-                // Get mutation info, TODO
-
-                let mut config = WasmMutate::default();
-                let stinfo = config
-                    .setup(&bindata)
-                    .map_err(|x| CliError::Any(format!("{:#?}", x)));
-
-                match stinfo {
-                    Err(_e) => {
-                        continue;
-                    }
-                    Ok(_) => {}
-                }
-
-                config.preserve_semantics(true);
-
-                let mut cp = info?.clone();
-
-                let info = InfoExtractor::get_mutable_info(
-                    &mut cp,
-                    config,
-                    state.depth,
-                    state.seed,
-                    state.sample_ratio,
-                );
-                match info {
-                    Ok((mut info, mut mutations)) => {
-                        // Save meta to_string mongodb
-                        if let Some(client) = &state.dbclient {
-                            for (m, map) in mutations.iter_mut() {
-                                if map.len() > 0 {
-                                    m.generic_map = Some(map.clone());
-
-                                    info.mutations.push(m.clone());
-                                }
+                            log::warn!("Thread is taking to much {} {}, setting sample to 1/{} and restarting",fcp2.clone().display(), e, sample*10);
+                            signal.store(false, Ordering::SeqCst);
+                            sample = sample * 10;
+                            if sample > 1000000 {
+                                log::error!("The binary cannot be processed");
+                                break;
                             }
-
-                            log::debug!(
-                                "Saving record for {} {}",
-                                name.clone(),
-                                state.process.load(Ordering::Relaxed)
-                            );
-                            match dbclient.set(&info.id.clone(), info) {
-                                Ok(_) => {}
-                                Err(e) => {
-                                    log::error!("{:?}", e);
-                                }
-                            }
-                        } else {
-                            log::error!("Where is the client")
+                        }
+                        _ => {
+                            // ANy other erro break
+                            break
                         }
                     }
-                    Err(e) => {
-                        log::error!("{:?}", e)
-                    }
+                },
+                Ok(_) => {
+                    break
                 }
             }
-            _ => {
-                log::error!("\nJust discard {:?}\n", f);
-            }
-        }
-
-        if state
-            .process
-            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-            % 100
-            == 99
-        {
-            log::debug!(
-                "{} processed {} in {}ms",
-                state.process.load(Ordering::Relaxed),
-                dbclient.f,
-                time.elapsed().as_millis()
-            );
-            time = time::Instant::now();
+            
         }
     }
 
+    if state
+        .process
+        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+        % 100
+        == 99
+    {
+        log::debug!(
+            "{} processed {} in {}ms",
+            state.process.load(Ordering::Relaxed),
+            dbclient.f,
+            time.elapsed().as_millis()
+        );
+        time = time::Instant::now();
+    }
     Ok(vec![])
 }
 

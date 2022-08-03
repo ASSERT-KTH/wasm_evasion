@@ -22,6 +22,9 @@ pub enum CliError {
     #[error("Not valid database ")]
     NotValidDB(),
 
+    #[error("Timeout")]
+    ThreadTimeout,
+
     #[error("serde error")]
     Serde(#[from] serde_json::error::Error),
 

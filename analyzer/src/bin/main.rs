@@ -162,6 +162,12 @@ pub mod tests {
 
     #[test]
     pub fn test_extract() {
+
+        let env = Env::default()
+            .filter_or("LOG_LEVEL", "bench,analyzer=debug")
+            .write_style_or("LOG_STYLE", "always");
+        Builder::from_env(env).init();  
+
         let state = State {
             dbclient: Some(DB::new("test_db").unwrap()),
             process: AtomicU32::new(0),
@@ -177,6 +183,32 @@ pub mod tests {
         };
         extract(Arc::new(state), "./tests".to_string()).unwrap();
     }
+
+
+    #[test]
+    pub fn test_extract_depth() {
+
+        let env = Env::default()
+            .filter_or("LOG_LEVEL", "bench,analyzer=debug")
+            .write_style_or("LOG_STYLE", "always");
+        Builder::from_env(env).init();  
+
+        let state = State {
+            dbclient: Some(DB::new("test_db").unwrap()),
+            process: AtomicU32::new(0),
+            error: AtomicU32::new(0),
+            parsing_error: AtomicU32::new(0),
+            out_folder: None,
+            save_logs: false,
+            finish: AtomicBool::new(false),
+            depth: 3,
+            sample_ratio: 1,
+            patch_metadata: false,
+            seed: 0,
+        };
+        extract(Arc::new(state), "./tests".to_string()).unwrap();
+    }
+
 
     #[test]
     pub fn test_csv() {
