@@ -1,4 +1,6 @@
-## Obfuscation analysis for Wasm [![Build and deploy](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml)
+## Obfuscation analysis for Wasm 
+
+[![Build and deploy](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml)
 
 This repo contains the tooling and the reproduction of our experiments on Wasm obfuscation.
 
