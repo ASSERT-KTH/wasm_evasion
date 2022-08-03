@@ -9,7 +9,7 @@ use std::{
     path::PathBuf,
     sync::{
         atomic::{AtomicBool, AtomicU32, Ordering},
-        Arc,
+        Arc, Mutex,
     },
     thread::spawn,
     time::{self, Duration},
@@ -250,90 +250,103 @@ pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, stopsig
 
 pub fn get_wasm_info(
     state: Arc<State>,
-    chunk: Vec<PathBuf>,
-    print_meta: bool,
+    chunk: Arc<Mutex<Vec<PathBuf>>>,
+    workerid: u32,
+    total: usize
 ) -> AResult<Vec<PathBuf>> {
-    if chunk.is_empty() {
-        return Ok(vec![]);
-    }
+    loop {
+        if chunk.lock().unwrap().is_empty() {
+            return Ok(vec![]);
+        }
 
-    let dbclient = state.dbclient.as_ref().unwrap().clone();
+        let f = chunk.lock().unwrap().pop();
+        if let Some(f) = f {
+            let s = chunk.lock().unwrap().len();
+            println!("worker {} takes {:?}. List size {}/{}", workerid, f, s, total);
+
+            // Send this to a thread and create a monitor
+            let mut waitfor = state.timeout as u64; // wait for x seconds, get from arguments
+            log::debug!("Timeout {}", waitfor);
+            let mut cp = state.clone();
+            let mut sample = cp.sample_ratio;
+            loop {
+                let movecp = cp.clone();
+                let fcp = f.clone();
+                let fcp2 = f.clone();
+                let signal = Arc::new(AtomicBool::new(false));
+                let signalcp = signal.clone();
+
+                log::debug!("Restarting thread");
+                let time = time::Instant::now();
+                let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
+
+                loop {
+                    let lapsed = time.elapsed().as_secs();
+                    
+                    if th.is_finished() { 
+                        break
+                    }
+                    if lapsed > waitfor {
+                        signal.store(true, Ordering::SeqCst);
+                        break
+                    }
+                }
+                //std::thread::sleep(Duration::from_secs(waitfor));
+                //log::debug!("Thread for {} is finished", fcp2.clone().display());
+                let r = th.join().unwrap();
+                log::debug!("Result after {}s", time.elapsed().as_secs());
+
+                match r {
+                    Err(e) => {
+                        match e {
+                            CliError::ThreadTimeout => {
+                                let lapsed = time.elapsed().as_secs();
+                                log::warn!("Thread is taking to much ({}s) {} {}, setting sample to 1/{} and restarting",lapsed, fcp2.clone().display(), e, sample*2);
+                                signal.store(false, Ordering::SeqCst);
+                                sample = sample * 2;
+                                if sample > 128 {
+                                    log::error!("The binary cannot be processed");
+                                    break;
+                                }
+                            }
+                            e => {
+                                // Any other error break
+                                log::error!("Error {}", e);
+                                break
+                            }
+                        }
+                    },
+                    Ok(_) => {
+                        break
+                        /* if state
+                            .processed_files
+                            .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                            % 100
+                            == 99
+                        {
+                            log::debug!(
+                                "{} processed {} in {}ms",
+                                state.process.load(Ordering::Relaxed),
+                                dbclient.f,
+                                time.elapsed().as_millis()
+                            );
+                            time = time::Instant::now();
+                        } */
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    return Ok(vec![]);
+    
+    /* let dbclient = state.dbclient.as_ref().unwrap().clone();
 
     let mut time = time::Instant::now();
     for f in chunk.iter() {
-        // Send this to a thread and create a monitor
-        let mut waitfor = state.timeout as u64; // wait for x seconds, get from arguments
-        log::debug!("Timeout {}", waitfor);
-        let mut cp = state.clone();
-        let mut sample = cp.sample_ratio;
-        loop {
-            let movecp = cp.clone();
-            let fcp = f.clone();
-            let fcp2 = f.clone();
-            let signal = Arc::new(AtomicBool::new(false));
-            let signalcp = signal.clone();
-
-            log::debug!("Restarting thread");
-            let time = time::Instant::now();
-            let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
-
-            loop {
-                let lapsed = time.elapsed().as_secs();
-                
-                if th.is_finished() { 
-                    break
-                }
-                if lapsed > waitfor {
-                    signal.store(true, Ordering::SeqCst);
-                    break
-                }
-            }
-            //std::thread::sleep(Duration::from_secs(waitfor));
-            //log::debug!("Thread for {} is finished", fcp2.clone().display());
-            let r = th.join().unwrap();
-            log::debug!("Result after {}s", time.elapsed().as_secs());
-
-            match r {
-                Err(e) => {
-                    match e {
-                        CliError::ThreadTimeout => {
-                            let lapsed = time.elapsed().as_secs();
-                            log::warn!("Thread is taking to much ({}s) {} {}, setting sample to 1/{} and restarting",lapsed, fcp2.clone().display(), e, sample*2);
-                            signal.store(false, Ordering::SeqCst);
-                            sample = sample * 2;
-                            if sample > 128 {
-                                log::error!("The binary cannot be processed");
-                                break;
-                            }
-                        }
-                        e => {
-                            // Any other error break
-                            log::error!("Error {}", e);
-                            break
-                        }
-                    }
-                },
-                Ok(_) => {
-                    break
-                    /* if state
-                        .processed_files
-                        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-                        % 100
-                        == 99
-                    {
-                        log::debug!(
-                            "{} processed {} in {}ms",
-                            state.process.load(Ordering::Relaxed),
-                            dbclient.f,
-                            time.elapsed().as_millis()
-                        );
-                        time = time::Instant::now();
-                    } */
-                }
-            }
-            
-        }
-    }
+        
+    } */
 
     
     Ok(vec![])
@@ -352,14 +365,17 @@ pub fn get_only_wasm(
     }
 
     let cp = state.clone();
-    let jobs = workers
-        .into_iter()
-        .enumerate()
-        .map(|(_, x)| {
-            let cp2 = cp.clone();
-            spawn(move || get_wasm_info(cp2, x, print_meta))
-        })
-        .collect::<Vec<_>>();
+    let alljobs = Arc::new(Mutex::new(files.clone()));
+
+    let mut jobs = vec![];
+    let total = files.len();
+    for j in 0..NO_WORKERS {
+        let cp2 = cp.clone();
+        let cp3 = alljobs.clone();
+        let th = spawn(move || get_wasm_info(cp2, cp3, j as u32, total));
+        
+        jobs.push(th);
+    }
 
     for j in jobs {
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
