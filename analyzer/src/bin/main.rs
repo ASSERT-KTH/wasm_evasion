@@ -207,11 +207,11 @@ pub mod tests {
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),
-            depth: 3,
+            depth: 2,
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
-            timeout: 120, // 2 minutes per binary
+            timeout: 10, // 2 minutes per binary
         };
         extract(Arc::new(state), "./tests/wasms".to_string()).unwrap();
     }

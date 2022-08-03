@@ -279,8 +279,11 @@ pub fn get_wasm_info(
 
             loop {
                 let lapsed = time.elapsed().as_secs();
-
-                if lapsed > waitfor || th.is_finished() {
+                
+                if th.is_finished() { 
+                    break
+                }
+                if lapsed > waitfor {
                     signal.store(true, Ordering::SeqCst);
                     break
                 }
@@ -311,6 +314,7 @@ pub fn get_wasm_info(
                     }
                 },
                 Ok(_) => {
+                    break
                     /* if state
                         .processed_files
                         .fetch_add(1, std::sync::atomic::Ordering::Acquire)

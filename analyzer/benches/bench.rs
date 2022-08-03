@@ -18,7 +18,7 @@ use test::{Bencher, black_box};
 //#[path="../src/main.rs"]
 //pub mod main;
 
-#[bench]
+//#[bench]
 pub fn bench_extract_many_2_100(b: &mut Bencher) {
 
     let env = Env::default()
@@ -42,6 +42,7 @@ pub fn bench_extract_many_2_100(b: &mut Bencher) {
             sample_ratio: 100, // 1/100
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         log::debug!("ratio 100");
         black_box(extract(Arc::new(state), "./tests/wasms".into()).unwrap());
@@ -49,7 +50,7 @@ pub fn bench_extract_many_2_100(b: &mut Bencher) {
 }
 
 
-#[bench]
+//#[bench]
 pub fn bench_extract_many_2_10(b: &mut Bencher) {
 
     let env = Env::default()
@@ -73,6 +74,7 @@ pub fn bench_extract_many_2_10(b: &mut Bencher) {
             sample_ratio: 10, // 1/10
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         log::debug!("ratio 10");
         black_box(extract(Arc::new(state), "./tests/wasms".into()).unwrap());
@@ -136,6 +138,7 @@ pub fn bench_extract_many_0(b: &mut Bencher) {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         extract(Arc::new(state), "./tests/wasms".into()).unwrap();
     })
@@ -168,6 +171,7 @@ pub fn bench_extract_many_3(b: &mut Bencher) {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         extract(Arc::new(state), "./tests/wasms".into()).unwrap();
     })
