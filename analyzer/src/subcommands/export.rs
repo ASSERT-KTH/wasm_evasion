@@ -98,7 +98,7 @@ pub fn export(
                 }
                 2 => {
                     outfile.write_all(
-                        "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,class_name, mutable_count\n".as_bytes()
+                        "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,class_name,mutable_count\n".as_bytes()
                      ).unwrap();
                 }
                 _ => {
