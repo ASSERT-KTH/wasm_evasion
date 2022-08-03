@@ -26,14 +26,14 @@ subcommands:
             value_name: "depth"
             long: depth
             help: "How deep the extraction should go (0 for the minimum)"
-        - mutation_cl_name:
-            short: m
+        - timeout:
+            short: t
             required: false
             takes_value: true
-            value_name: "cl_name"
-            long: mutation_cl_name
-            default_value: "muts"
-            help: "Collection in which the mutation infor is stored"
+            value_name: "timeout"
+            long: timeout
+            help: "Timeout to process a binary. If the timeout is reached the sample ratio is divided by 2 until 1/16 is reached"
+        
         - sample:
             short: s
             required: false

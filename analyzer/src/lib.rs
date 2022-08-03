@@ -49,6 +49,7 @@ pub struct State {
     pub finish: AtomicBool,
     pub depth: u32,
     pub seed: u64,
+    pub timeout: u32,
     pub sample_ratio: u32,
 }
 

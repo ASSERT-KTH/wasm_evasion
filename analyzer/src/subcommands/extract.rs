@@ -262,9 +262,9 @@ pub fn get_wasm_info(
     let mut time = time::Instant::now();
     for f in chunk.iter() {
         // Send this to a thread and create a monitor
-        let mut waitfor = 1; // wait for x seconds, get from arguments
+        let mut waitfor = state.timeout as u64; // wait for x seconds, get from arguments
+        log::debug!("Timeout {}", waitfor);
         let mut cp = state.clone();
-        let mut time = time::Instant::now();
         let mut sample = cp.sample_ratio;
         loop {
             let movecp = cp.clone();
@@ -273,6 +273,8 @@ pub fn get_wasm_info(
             let signal = Arc::new(AtomicBool::new(false));
             let signalcp = signal.clone();
 
+            log::debug!("Restarting thread");
+            let time = time::Instant::now();
             let th = spawn(move || get_single_wasm_info(&fcp.clone(), movecp.clone(), sample, signalcp));
 
             loop {
@@ -291,17 +293,18 @@ pub fn get_wasm_info(
                 Err(e) => {
                     match e {
                         CliError::ThreadTimeout => {
-
-                            log::warn!("Thread is taking to much {} {}, setting sample to 1/{} and restarting",fcp2.clone().display(), e, sample*10);
+                            let lapsed = time.elapsed().as_secs();
+                            log::warn!("Thread is taking to much ({}s) {} {}, setting sample to 1/{} and restarting",lapsed, fcp2.clone().display(), e, sample*2);
                             signal.store(false, Ordering::SeqCst);
-                            sample = sample * 10;
-                            if sample > 1000000 {
+                            sample = sample * 2;
+                            if sample > 16 {
                                 log::error!("The binary cannot be processed");
                                 break;
                             }
                         }
-                        _ => {
-                            // ANy other erro break
+                        e => {
+                            // Any other error break
+                            log::error!("Error {}", e);
                             break
                         }
                     }

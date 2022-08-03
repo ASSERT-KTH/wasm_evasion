@@ -31,7 +31,13 @@ macro_rules! get_info {
                 // The can mutate needs to be more deep, the code motio for example is returning true, when it is not checking for code motion
                 // catch unwind and check if the panic is due to timeout
                 let cpsignal = $stopsignal.clone();
-                let info = $mutation.get_mutation_info(&$config, $state, $seed, $sample_ratio, cpsignal);
+
+                let info = $mutation.get_mutation_info(&$config, $state, $seed, $sample_ratio, cpsignal).map_err(|f|{
+                    match f {
+                        Timeout => crate::errors::CliError::ThreadTimeout,
+                        _ => crate::errors::CliError::Any(format!("{}", f))
+                    }
+                })?;
 
 
                 // TODO, get the seed to reach a mutation over the specific target

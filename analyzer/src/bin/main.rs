@@ -55,6 +55,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
         patch_metadata: false,
         sample_ratio: 1,
         seed: 0,
+        timeout: 0
     };
 
     match matches.subcommand() {
@@ -76,6 +77,10 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
 
             if args.is_present("sample") {
                 state.sample_ratio = value_t!(args.value_of("sample"), u32).unwrap();
+            }
+
+            if args.is_present("timeout") {
+                state.timeout = value_t!(args.value_of("timeout"), u32).unwrap();
             }
 
             log::debug!("Extracting to {}", dbconn.clone());
@@ -180,6 +185,7 @@ pub mod tests {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         extract(Arc::new(state), "./tests".to_string()).unwrap();
     }
@@ -205,8 +211,9 @@ pub mod tests {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
+            timeout: 5,
         };
-        extract(Arc::new(state), "./tests".to_string()).unwrap();
+        extract(Arc::new(state), "./tests/wasms".to_string()).unwrap();
     }
 
 
