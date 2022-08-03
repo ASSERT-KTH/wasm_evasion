@@ -1,14 +1,11 @@
 #![feature(internal_output_capture)]
-#![feature(test)]
 
+use analyzer::{arg_or_error, arge, State};
 use clap::{load_yaml, App, value_t};
-use db::DB;
+use analyzer::db::DB;
 use env_logger::{Builder, Env};
-use errors::{CliError};
-extern crate test;
+use analyzer::errors::{CliError};
 
-use sha2::{Digest, Sha256};
-use subcommands::export;
 use std::{
     io::{Write},
     sync::{
@@ -18,88 +15,23 @@ use std::{
 };
 
 use std::collections::HashMap;
-use crate::meta::Meta;
+use analyzer::meta::Meta;
 
 #[macro_use]
 extern crate log;
 
-mod errors;
-pub mod info;
-mod meta;
-pub mod subcommands;
-pub mod db;
 
-use crate::subcommands::extract::extract;
-use crate::subcommands::reduce::reduce;
-use crate::subcommands::export::export;
+use analyzer::subcommands::extract::extract;
+use analyzer::subcommands::reduce::reduce;
+use analyzer::subcommands::export::export;
 
 
-
-
-pub const NO_WORKERS: usize = 8;
-
-pub trait Hasheable {
-    fn hash256(&self) -> Vec<u8>;
-}
-
-impl Hasheable for Vec<u8> {
-    fn hash256(&self) -> Vec<u8> {
-        let mut encoder = Sha256::new();
-        encoder.update(self);
-        let hash_bytes = encoder.finalize();
-        hash_bytes.to_vec()
-    }
-}
-
-pub trait Printable {
-    fn fmt1(&self) -> String;
-}
-
-impl Printable for Vec<u8> {
-    fn fmt1(&self) -> String {
-        self.iter()
-            .map(|x| format!("{:02x}", x))
-            .collect::<Vec<_>>()
-            .join("")
-    }
-}
-
-#[derive(Debug)]
-pub struct State {
-    dbclient: Option<DB<'static>>,
-    collection_name: String,
-    mutation_cl_name: String,
-    dbname: String,
-    process: AtomicU32,
-    error: AtomicU32,
-    parsing_error: AtomicU32,
-    out_folder: Option<String>,
-    save_logs: bool,
-    patch_metadata: bool,
-    finish: AtomicBool,
-    depth: u32,
-    seed: u64,
-    sample_ratio: u32
-}
-#[macro_export]
-macro_rules! arge {
-    ($str: literal) => {
-        CliError::Arg($str.to_string())
-    };
-}
-
-#[macro_export]
-macro_rules! arg_or_error {
-    ($matches: ident,$arg: literal) => {
-        $matches.value_of($arg).ok_or(arge!($arg))?.to_string()
-    };
-}
 
 fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
 }
 
-pub fn main() -> Result<(), errors::CliError> {
+pub fn main() -> Result<(), analyzer::errors::CliError> {
     
     let env = Env::default()
     //.filter_or("LOG_LEVEL", "trace")
@@ -138,14 +70,6 @@ pub fn main() -> Result<(), errors::CliError> {
                 std::fs::remove_dir_all(dbconn.clone());
             }
             log::debug!("Extracting...");
-
-            if args.is_present("mutation_cl_name") {
-                state.mutation_cl_name = args.value_of("mutation_cl_name").unwrap().into();
-            }
-
-            if args.is_present("patch") {
-                state.patch_metadata = true;
-            }
 
             if args.is_present("depth") {
                 state.depth = value_t!(args.value_of("depth"), u32).unwrap();
@@ -222,12 +146,13 @@ pub mod tests {
     use std::sync::Arc;
     use std::time::Duration;
 
+    use analyzer::State;
     use env_logger::{Env, Builder};
-    use test::{Bencher};
 
-    use crate::db::DB;
-    use crate::meta::Meta;
-    use crate::{extract, State};
+    use analyzer::db::DB;
+    use analyzer::meta::Meta;
+    use analyzer::subcommands::{extract};
+    use analyzer::subcommands::extract::extract;
 
     #[test]
     pub fn test_extract() {
@@ -253,48 +178,6 @@ pub mod tests {
         )
         .unwrap();
     }
-
-
-    #[bench]
-    pub fn bench_extract_many(b: &mut Bencher) {
-
-        let env = Env::default()
-        //.filter_or("LOG_LEVEL", "trace")
-        .filter("RUST_LOG")
-        .write_style_or("LOG_STYLE", "always");
-    
-        Builder::from_env(env)
-            .init();
-            
-        b.iter(move ||{
-            // Remove the testdb
-            fs::remove_dir_all("test_db");
-
-            let mut state = State {
-                dbclient: Some(DB::new("test_db").unwrap()),
-                mutation_cl_name: "muts".to_string(),
-                process: AtomicU32::new(0),
-                error: AtomicU32::new(0),
-                parsing_error: AtomicU32::new(0),
-                collection_name: "wasms".to_string(),
-                dbname: "obfuscator".to_string(),
-                out_folder: None,
-                save_logs: false,
-                finish: AtomicBool::new(false),
-                depth: 2,
-                sample_ratio: 1,
-                patch_metadata: false,
-                seed: 0
-            };
-            extract(
-                Arc::new(state),
-                "./tests/wasms".into(),
-            )
-            .unwrap();
-        })
-        
-    }
-
 
     #[test]
     pub fn test_csv() {
