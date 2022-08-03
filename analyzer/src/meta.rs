@@ -55,6 +55,8 @@ pub struct MutationInfo {
     pub can_reduce: bool,
     pub affects_execution: bool,
     pub tpe: u8,
+    #[serde(default)]
+    pub sampled: bool
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -101,7 +103,6 @@ pub struct Meta {
     pub num_data_segments: u32,
     #[serde(default)]
     pub num_tags: u32,
-
     // custom data info
     pub custom_sections: HashMap<String, (u32, u32)>,
     pub custom_sections_count: u32,

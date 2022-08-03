@@ -50,12 +50,6 @@ pub fn get_single_wasm_info(f: &PathBuf, state: Arc<State>, sample: u32, seed: u
             );
         }
         Ok(d) => {
-            state.process.fetch_add(1, Ordering::SeqCst);
-            log::trace!(
-                "{} already processed {}",
-                state.process.load(Ordering::Relaxed),
-                dbclient.f
-            );
             return Ok(())
         }
     }
@@ -346,7 +340,19 @@ pub fn get_only_wasm(
     }
 
     let cp = state.clone();
-    let alljobs = Arc::new(Mutex::new(files.clone()));
+    let cp2 = state.clone();
+    let filtered = files.iter()
+        .filter(move |&f| {
+            let ccp = cp2.clone();
+            ccp.dbclient.as_ref().unwrap().get::<String, Meta>(&f.file_name().unwrap().to_str().unwrap().to_string()).is_err()
+        })
+        .map(|f|f.clone())
+        .collect::<Vec<_>>();
+    println!("Missing {}", filtered.len());
+
+    state.process.store((files.len() - filtered.len()) as u32, Ordering::SeqCst);
+
+    let alljobs = Arc::new(Mutex::new(filtered.clone()));
 
     let mut jobs = vec![];
     let total = files.len();
