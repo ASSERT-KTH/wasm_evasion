@@ -355,7 +355,7 @@ pub fn get_only_wasm(
     let alljobs = Arc::new(Mutex::new(filtered.clone()));
 
     let mut jobs = vec![];
-    let total = files.len();
+    let total = filtered.len();
     for j in 0..NO_WORKERS {
         let cp2 = cp.clone();
         let cp3 = alljobs.clone();
