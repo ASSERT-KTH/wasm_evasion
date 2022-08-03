@@ -47,12 +47,9 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
     let dbclient = DB::new(string_to_static_str(dbconn.clone()))?;
     let mut state = State {
         dbclient: Some(dbclient.clone()),
-        mutation_cl_name: "muts".into(),
         process: AtomicU32::new(0),
         error: AtomicU32::new(0),
         parsing_error: AtomicU32::new(0),
-        collection_name: "t".into(),
-        dbname: "".into(),
         out_folder: None,
         save_logs: false,
         finish: AtomicBool::new(false),
@@ -158,12 +155,9 @@ pub mod tests {
     pub fn test_extract() {
         let state = State {
             dbclient: Some(DB::new("test_db").unwrap()),
-            mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
-            collection_name: "wasms".to_string(),
-            dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),

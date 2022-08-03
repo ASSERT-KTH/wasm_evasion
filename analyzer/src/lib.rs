@@ -43,9 +43,6 @@ impl Printable for Vec<u8> {
 #[derive(Debug)]
 pub struct State {
     pub dbclient: Option<DB<'static>>,
-    pub collection_name: String,
-    pub mutation_cl_name: String,
-    pub dbname: String,
     pub process: AtomicU32,
     pub error: AtomicU32,
     pub parsing_error: AtomicU32,

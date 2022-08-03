@@ -35,12 +35,9 @@ pub fn bench_extract_many(b: &mut Bencher) {
 
         let mut state = State {
             dbclient: Some(DB::new("test_db").unwrap()),
-            mutation_cl_name: "muts".to_string(),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
-            collection_name: "wasms".to_string(),
-            dbname: "obfuscator".to_string(),
             out_folder: None,
             save_logs: false,
             finish: AtomicBool::new(false),
