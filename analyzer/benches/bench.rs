@@ -104,6 +104,7 @@ pub fn bench_extract_many_2_1(b: &mut Bencher) {
             sample_ratio: 1, 
             patch_metadata: false,
             seed: 0,
+            timeout: 10
         };
         log::debug!("ratio 1");
         black_box(extract(Arc::new(state), "./tests/wasms".into()).unwrap());

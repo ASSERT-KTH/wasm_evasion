@@ -288,6 +288,7 @@ pub fn get_wasm_info(
             //std::thread::sleep(Duration::from_secs(waitfor));
             //log::debug!("Thread for {} is finished", fcp2.clone().display());
             let r = th.join().unwrap();
+            log::debug!("Result after {}s", time.elapsed().as_secs());
 
             match r {
                 Err(e) => {
@@ -297,7 +298,7 @@ pub fn get_wasm_info(
                             log::warn!("Thread is taking to much ({}s) {} {}, setting sample to 1/{} and restarting",lapsed, fcp2.clone().display(), e, sample*2);
                             signal.store(false, Ordering::SeqCst);
                             sample = sample * 2;
-                            if sample > 16 {
+                            if sample > 128 {
                                 log::error!("The binary cannot be processed");
                                 break;
                             }
@@ -310,27 +311,27 @@ pub fn get_wasm_info(
                     }
                 },
                 Ok(_) => {
-                    break
+                    /* if state
+                        .processed_files
+                        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
+                        % 100
+                        == 99
+                    {
+                        log::debug!(
+                            "{} processed {} in {}ms",
+                            state.process.load(Ordering::Relaxed),
+                            dbclient.f,
+                            time.elapsed().as_millis()
+                        );
+                        time = time::Instant::now();
+                    } */
                 }
             }
             
         }
     }
 
-    if state
-        .process
-        .fetch_add(1, std::sync::atomic::Ordering::Acquire)
-        % 100
-        == 99
-    {
-        log::debug!(
-            "{} processed {} in {}ms",
-            state.process.load(Ordering::Relaxed),
-            dbclient.f,
-            time.elapsed().as_millis()
-        );
-        time = time::Instant::now();
-    }
+    
     Ok(vec![])
 }
 
