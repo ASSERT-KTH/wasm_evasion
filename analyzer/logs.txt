@@ -1,0 +1,1636 @@
+warning: unused import: `iter::empty`
+ --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/loop_unrolling.rs:3:46
+  |
+3 | use std::{collections::HashMap, slice::Iter, iter::empty};
+  |                                              ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused label
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:203:9
+    |
+203 |         'functions: for fidx in 0..function_count {
+    |         ^^^^^^^^^^
+    |
+    = note: `#[warn(unused_labels)]` on by default
+
+warning: unused import: `Rng`
+ --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:7:30
+  |
+7 | use rand::{seq::SliceRandom, Rng};
+  |                              ^^^
+
+warning: unused import: `CodeSection`
+ --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:8:20
+  |
+8 | use wasm_encoder::{CodeSection, SectionId};
+  |                    ^^^^^^^^^^^
+
+warning: unused import: `hash::Hash`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:43:45
+   |
+43 | use std::{ops::Range, collections::HashMap, hash::Hash, cmp::max, sync::{Arc, atomic::{AtomicBool, Ordering}}};
+   |                                             ^^^^^^^^^^
+
+warning: unnecessary trailing semicolon
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:464:62
+    |
+464 |                 return Err(Error::no_mutations_applicable());;
+    |                                                              ^ help: remove this semicolon
+    |
+    = note: `#[warn(redundant_semicolons)]` on by default
+
+warning: unused import: `CodeSection`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:47:28
+   |
+47 | use wasm_encoder::{Module, CodeSection, SectionId};
+   |                            ^^^^^^^^^^^
+
+warning: unused variable: `config`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:98:33
+   |
+98 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result...
+   |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `deeplevel`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:98:54
+   |
+98 | ...elf, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<MutationMap>...
+   |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `seed`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:98:70
+   |
+98 | ...: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<MutationMap>>> {
+   |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:98:81
+   |
+98 | ...level: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<MutationMap>>> {
+   |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators.rs:98:100
+   |
+98 | ... u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<MutationMap>>> {
+   |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: unused variable: `config`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:133:33
+    |
+133 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result...
+    |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `deeplevel`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:133:54
+    |
+133 | ...elf, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::Mutat...
+    |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `seed`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:133:70
+    |
+133 | ...: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+    |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:133:81
+    |
+133 | ...level: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+    |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:133:100
+    |
+133 | ... u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+    |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: unused variable: `config`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:45:33
+   |
+45 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result...
+   |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `deeplevel`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:45:54
+   |
+45 | ...elf, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::Mutat...
+   |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `seed`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:45:70
+   |
+45 | ...: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+   |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:45:81
+   |
+45 | ...level: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+   |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:45:100
+   |
+45 | ... u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> Result<Option<Vec<super::MutationMap>>> {
+   |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: unused variable: `fidx`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:136:37
+    |
+136 |     fn get_mutation_info<'a>(&self, fidx: u32,deeplevel: u32, config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_fidx`
+
+warning: unused variable: `deeplevel`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:136:47
+    |
+136 |     fn get_mutation_info<'a>(&self, fidx: u32,deeplevel: u32, config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                               ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `config`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:136:63
+    |
+136 |     fn get_mutation_info<'a>(&self, fidx: u32,deeplevel: u32, config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `ast`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:136:94
+    |
+136 |     fn get_mutation_info<'a>(&self, fidx: u32,deeplevel: u32, config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                                                                              ^^^ help: if this is intentional, prefix it with an underscore: `_ast`
+
+warning: unused variable: `cp`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:193:17
+    |
+193 |         let mut cp = config.clone();
+    |                 ^^ help: if this is intentional, prefix it with an underscore: `_cp`
+
+warning: unused variable: `seed`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:182:70
+    |
+182 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> 
+    |                                                                      ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:182:81
+    |
+182 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> 
+    |                                                                                 ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:182:100
+    |
+182 |     fn get_mutation_info(&self, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> 
+    |                                                                                                    ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: unused variable: `config`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/if_complement.rs:118:64
+    |
+118 |     fn get_mutation_info<'a>(&self, fidx: u32, deeplevel: u32, config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                                                ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/loop_unrolling.rs:207:64
+    |
+207 |     fn get_mutation_info<'a>(&self, fidx: u32,deeplevel: u32,  config: &'a crate::WasmMutate, ast: &Ast) -> Option<Vec<MutationMap>> {
+    |                                                                ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `s`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:36:19
+   |
+36 |         for (idx, s) in custom_section_indices {
+   |                   ^ help: if this is intentional, prefix it with an underscore: `_s`
+
+warning: unused variable: `deeplevel`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:23:61
+   |
+23 | ...nfig: &crate::WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super...
+   |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `seed`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:23:77
+   |
+23 | ...e::WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationM...
+   |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:23:88
+   |
+23 | ...level: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationMap>>> {
+   |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/custom.rs:23:107
+   |
+23 | ... u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationMap>>> {
+   |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: unused variable: `count`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:453:17
+    |
+453 |         let mut count = 0;
+    |                 ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`
+
+warning: value assigned to `original` is never read
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:711:37
+    |
+711 | ...                   let mut original = "".to_string();
+    |                               ^^^^^^^^
+    |
+    = note: `#[warn(unused_assignments)]` on by default
+    = help: maybe it is overwritten before being read?
+
+warning: unused variable: `max_globals`
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole/rules.rs:463:17
+    |
+463 |             let max_globals = 100_000;
+    |                 ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_max_globals`
+
+warning: unused variable: `deeplevel`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_item.rs:45:54
+   |
+45 | ...elf, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super...
+   |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `deeplevel`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_section.rs:58:54
+   |
+58 | ...elf, config: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super...
+   |                              ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_deeplevel`
+
+warning: unused variable: `seed`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_section.rs:58:70
+   |
+58 | ...: &WasmMutate, deeplevel: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationM...
+   |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_seed`
+
+warning: unused variable: `sample_ratio`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_section.rs:58:81
+   |
+58 | ...level: u32, seed: u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationMap>>> {
+   |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sample_ratio`
+
+warning: unused variable: `stopsignal`
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_section.rs:58:100
+   |
+58 | ... u64, sample_ratio: u32, stopsignal: Arc<AtomicBool>) -> crate::Result<Option<Vec<super::MutationMap>>> {
+   |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_stopsignal`
+
+warning: variable does not need to be mutable
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_function.rs:134:13
+    |
+134 |         let mut r = vec![MutationMap { 
+    |             ----^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: variable does not need to be mutable
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/add_type.rs:46:13
+   |
+46 |         let mut r = vec![MutationMap { 
+   |             ----^
+   |             |
+   |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion.rs:193:13
+    |
+193 |         let mut cp = config.clone();
+    |             ----^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:441:13
+    |
+441 |         let mut opcode_to_mutate = oidx; // Replace by read from map fidx
+    |             ----^^^^^^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:453:13
+    |
+453 |         let mut count = 0;
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:667:17
+    |
+667 |             let mut pob = (operatorscount as f32/sample_ratio as f32).ceil();
+    |                 ----^^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_item.rs:50:13
+   |
+50 |         let mut pob = (maxidx.len() as f32/sample_ratio as f32).ceil();
+   |             ----^^^
+   |             |
+   |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/remove_item.rs:73:25
+   |
+73 |                     let mut mm = MutationMap { 
+   |                         ----^^
+   |                         |
+   |                         help: remove this `mut`
+
+warning: field `tree_profiling` is never read
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole.rs:565:5
+    |
+562 | struct TreeInfo {
+    |        -------- field in this struct
+...
+565 |     tree_profiling: HashMap<String, usize>,
+    |     ^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+    = note: `TreeInfo` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: associated function `is_type` is never used
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole/rules.rs:774:8
+    |
+774 |     fn is_type(
+    |        ^^^^^^^
+
+warning: associated function `is_const` is never used
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole/rules.rs:795:8
+    |
+795 |     fn is_const(&self, vari: &'static str) -> impl Fn(&mut EG, Id, &Subst) -> bool {
+    |        ^^^^^^^^
+
+warning: associated function `global_count_less_than` is never used
+   --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/peephole/rules.rs:820:8
+    |
+820 |     fn global_count_less_than(
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:52:17
+   |
+52 |                 astrep.write_str("\t");
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_must_use)]` on by default
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:58:21
+   |
+58 |                     astrep.write_str(&format!("If({r})(ty:{:?}) {}:{}\n", ty, range.start, range.end));
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:60:25
+   |
+60 |                         astrep.write_str("\t");
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:62:21
+   |
+62 |                     astrep.write_str(&format!("then\n"));
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:70:29
+   |
+70 | ...                   astrep.write_str("\t");
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:72:25
+   |
+72 |                         astrep.write_str(&format!("else\n"));
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:79:21
+   |
+79 |                     astrep.write_str(&format!("Code({r}) {}:{}", range.start, range.end));
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:83:21
+   |
+83 |                     astrep.write_str(&format!("Loop({r})(ty:{:?}) {}:{}", ty, range.start, range.end));
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `std::result::Result` that must be used
+  --> /Users/javierca/Documents/Develop/new_obfuscation_paper/wasm-tools/crates/wasm-mutate/src/mutators/codemotion/ir/parse_context.rs:89:21
+   |
+89 |                     astrep.write_str(&format!("Block({r})(ty:{:?}) {}:{}", ty, range.start, range.end));
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: `wasm-mutate` (lib) generated 66 warnings
+warning: unused import: `core::slice`
+ --> src/db.rs:1:5
+  |
+1 | use core::slice;
+  |     ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused imports: `BufReader`, `Read`, `borrow::Borrow`, `cell::RefCell`
+ --> src/db.rs:3:5
+  |
+3 |     borrow::Borrow,
+  |     ^^^^^^^^^^^^^^
+4 |     cell::RefCell,
+  |     ^^^^^^^^^^^^^
+5 |     fmt::Debug,
+6 |     io::{BufReader, Read},
+  |          ^^^^^^^^^  ^^^^
+
+warning: unused imports: `Deserialize`, `Deserializer`
+ --> src/db.rs:9:35
+  |
+9 | use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize};
+  |                                   ^^^^^^^^^^^  ^^^^^^^^^^^^
+
+warning: unused import: `std::cell::RefCell`
+ --> src/info.rs:1:5
+  |
+1 | use std::cell::RefCell;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::hash::Hash`
+ --> src/info.rs:2:5
+  |
+2 | use std::hash::Hash;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused import: `wasm_mutate::ErrorKind::Timeout`
+ --> src/info.rs:6:5
+  |
+6 | use wasm_mutate::ErrorKind::Timeout;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::State`
+ --> src/info.rs:8:5
+  |
+8 | use crate::State;
+  |     ^^^^^^^^^^^^
+
+warning: unused imports: `AtomicBool`, `AtomicU32`, `Ordering`, `collections::HashMap`, `fs::File`, `time`
+ --> src/subcommands/export.rs:2:5
+  |
+2 |     collections::HashMap,
+  |     ^^^^^^^^^^^^^^^^^^^^
+3 |     fs::File,
+  |     ^^^^^^^^
+...
+6 |         atomic::{AtomicBool, AtomicU32, Ordering},
+  |                  ^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^
+...
+9 |     time,
+  |     ^^^^
+
+warning: unused import: `NO_WORKERS`
+  --> src/subcommands/export.rs:14:78
+   |
+14 | use crate::{arg_or_error, arge, db::DB, errors::CliError, meta::Meta, State, NO_WORKERS};
+   |                                                                              ^^^^^^^^^^
+
+warning: unused imports: `AtomicU32`, `borrow::Borrow`, `cell::RefCell`, `collections::HashMap`
+  --> src/subcommands/extract.rs:4:5
+   |
+4  |     borrow::Borrow,
+   |     ^^^^^^^^^^^^^^
+5  |     cell::RefCell,
+   |     ^^^^^^^^^^^^^
+6  |     collections::HashMap,
+   |     ^^^^^^^^^^^^^^^^^^^^
+...
+11 |         atomic::{AtomicBool, AtomicU32, Ordering},
+   |                              ^^^^^^^^^
+
+warning: unused import: `stop_thread::kill_thread_graceful`
+  --> src/subcommands/extract.rs:18:5
+   |
+18 | use stop_thread::kill_thread_graceful;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicBool`, `AtomicU32`, `borrow::Borrow`, `cell::RefCell`, `rc::Rc`
+  --> src/subcommands/reduce.rs:2:5
+   |
+2  |     borrow::Borrow,
+   |     ^^^^^^^^^^^^^^
+3  |     cell::RefCell,
+   |     ^^^^^^^^^^^^^
+...
+8  |     rc::Rc,
+   |     ^^^^^^
+...
+11 |         atomic::{AtomicBool, AtomicU32, Ordering},
+   |                  ^^^^^^^^^^  ^^^^^^^^^
+
+warning: trait objects without an explicit `dyn` are deprecated
+  --> src/db.rs:41:30
+   |
+41 |     pub fn set<T>(&self, k: &AsRef<[u8]>, v: T) -> AResult<bool>
+   |                              ^^^^^^^^^^^
+   |
+   = note: `#[warn(bare_trait_objects)]` on by default
+   = warning: this is accepted in the current edition (Rust 2018) but is a hard error in Rust 2021!
+   = note: for more information, see <https://doc.rust-lang.org/nightly/edition-guide/rust-2021/warnings-promoted-to-error.html>
+help: use `dyn`
+   |
+41 -     pub fn set<T>(&self, k: &AsRef<[u8]>, v: T) -> AResult<bool>
+41 +     pub fn set<T>(&self, k: &dyn AsRef<[u8]>, v: T) -> AResult<bool>
+   |
+
+warning: unreachable expression
+   --> src/subcommands/extract.rs:332:5
+    |
+252 | /     loop {
+253 | |         if chunk.lock().unwrap().is_empty() {
+254 | |             return Ok(vec![]);
+255 | |         }
+...   |
+330 | |         }
+331 | |     }
+    | |_____- any code following this expression is unreachable
+332 |       Ok(vec![])
+    |       ^^^^^^^^^^ unreachable expression
+    |
+    = note: `#[warn(unreachable_code)]` on by default
+
+warning: value assigned to `buff` is never read
+   --> src/subcommands/export.rs:129:13
+    |
+129 |             buff = String::new();
+    |             ^^^^
+    |
+    = note: `#[warn(unused_assignments)]` on by default
+    = help: maybe it is overwritten before being read?
+
+warning: unused variable: `state`
+  --> src/subcommands/export.rs:81:5
+   |
+81 |     state: Arc<State>,
+   |     ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `e`
+  --> src/subcommands/extract.rs:45:13
+   |
+45 |         Err(e) => {
+   |             ^ help: if this is intentional, prefix it with an underscore: `_e`
+
+warning: unused variable: `d`
+  --> src/subcommands/extract.rs:52:12
+   |
+52 |         Ok(d) => {
+   |            ^ help: if this is intentional, prefix it with an underscore: `_d`
+
+warning: unused variable: `client`
+   --> src/subcommands/extract.rs:189:33
+    |
+189 |                     if let Some(client) = &state.dbclient {
+    |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_client`
+
+warning: unused variable: `d`
+   --> src/subcommands/extract.rs:271:25
+    |
+271 |                     let d = snapsignal.lock().unwrap();
+    |                         ^ help: if this is intentional, prefix it with an underscore: `_d`
+
+warning: unused variable: `snapth`
+   --> src/subcommands/extract.rs:386:17
+    |
+386 |             let snapth = spawn(move || {
+    |                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_snapth`
+
+warning: unused variable: `print_meta`
+   --> src/subcommands/extract.rs:338:5
+    |
+338 |     print_meta: bool,
+    |     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_print_meta`
+
+warning: unused variable: `d`
+  --> src/subcommands/reduce.rs:63:16
+   |
+63 |             Ok(d) => {
+   |                ^ help: if this is intentional, prefix it with an underscore: `_d`
+
+warning: variable does not need to be mutable
+   --> src/subcommands/extract.rs:263:17
+    |
+263 |             let mut waitfor = state.timeout as u64; // wait for x seconds, get from arguments
+    |                 ----^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: variable does not need to be mutable
+   --> src/subcommands/extract.rs:265:17
+    |
+265 |             let mut cp = state.clone();
+    |                 ----^^
+    |                 |
+    |                 help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/subcommands/reduce.rs:102:21
+    |
+102 |                 let mut reducer = WasmShrink::default();
+    |                     ----^^^^^^^
+    |                     |
+    |                     help: remove this `mut`
+
+warning: variable `Add` should have a snake case name
+   --> src/info.rs:237:13
+    |
+237 |         let Add = MutationType::Add;
+    |             ^^^ help: convert the identifier to snake case: `add`
+    |
+    = note: `#[warn(non_snake_case)]` on by default
+
+warning: variable `Edit` should have a snake case name
+   --> src/info.rs:238:13
+    |
+238 |         let Edit = MutationType::Edit;
+    |             ^^^^ help: convert the identifier to snake case: `edit`
+
+warning: variable `Delete` should have a snake case name
+   --> src/info.rs:239:13
+    |
+239 |         let Delete = MutationType::Delete;
+    |             ^^^^^^ help: convert the identifier to snake case: `delete`
+
+warning: associated constant `Add` should have an upper case name
+  --> src/meta.rs:36:15
+   |
+36 |         const Add = 0x01;
+   |               ^^^ help: convert the identifier to upper case: `ADD`
+   |
+   = note: `#[warn(non_upper_case_globals)]` on by default
+
+warning: associated constant `Edit` should have an upper case name
+  --> src/meta.rs:37:15
+   |
+37 |         const Edit = 0x02;
+   |               ^^^^ help: convert the identifier to upper case: `EDIT`
+
+warning: associated constant `Delete` should have an upper case name
+  --> src/meta.rs:38:15
+   |
+38 |         const Delete = 0x04;
+   |               ^^^^^^ help: convert the identifier to upper case: `DELETE`
+
+warning: variable `TH` should have a snake case name
+   --> src/subcommands/export.rs:111:17
+    |
+111 |             let TH = 1024 * 10;
+    |                 ^^ help: convert the identifier to snake case: `th`
+
+warning: unused `Result` that must be used
+   --> src/subcommands/export.rs:123:21
+    |
+123 |                     outfile.write_all(buff.as_bytes());
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_must_use)]` on by default
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `Result` that must be used
+   --> src/subcommands/export.rs:128:13
+    |
+128 |             outfile.write_all(buff.as_bytes());
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `Result` that must be used
+   --> src/subcommands/reduce.rs:288:5
+    |
+288 |     std::fs::create_dir(outf.clone()); // Ignore if error since it's already created
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: `analyzer` (lib) generated 36 warnings
+warning: unused import: `cell::RefCell`
+  --> src/bin/analyzer.rs:10:5
+   |
+10 |     cell::RefCell,
+   |     ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `analyzer::meta::Meta`
+  --> src/bin/analyzer.rs:20:5
+   |
+20 | use analyzer::meta::Meta;
+   |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> src/bin/analyzer.rs:21:5
+   |
+21 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused `#[macro_use]` import
+  --> src/bin/analyzer.rs:23:1
+   |
+23 | #[macro_use]
+   | ^^^^^^^^^^^^
+
+warning: unused variable: `buff`
+   --> src/bin/analyzer.rs:113:35
+    |
+113 |                     .format(move |buff, record| {
+    |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_buff`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused `Result` that must be used
+  --> src/bin/analyzer.rs:68:17
+   |
+68 |                 std::fs::remove_dir_all(dbconn.clone());
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_must_use)]` on by default
+   = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `Result` that must be used
+   --> src/bin/analyzer.rs:103:17
+    |
+103 |                 std::fs::remove_dir_all(dbconn);
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `Result` that must be used
+   --> src/bin/analyzer.rs:123:25
+    |
+123 | /                         outlog.write(
+124 | |                             format!(
+125 | |                                 "[{}] [{}] <<<{}>>>\n",
+126 | |                                 SystemTime::now()
+...   |
+133 | |                             .as_bytes(),
+134 | |                         );
+    | |__________________________^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: unused `Result` that must be used
+   --> src/bin/analyzer.rs:152:13
+    |
+152 |             std::fs::remove_dir_all(dbconn);
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: this `Result` may be an `Err` variant, which should be handled
+
+warning: `analyzer` (bin "analyzer") generated 9 warnings
+    Finished release [optimized] target(s) in 0.28s
+[2022-08-04T20:40:20Z DEBUG analyzer] Extracting...
+[2022-08-04T20:40:20Z DEBUG analyzer] Extracting to datas/i64.mul-by-2_t5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 99 in 1ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 1999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 2999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 3999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 4999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 5999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 6999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7399 in 1ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7499 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7599 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7699 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7799 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7899 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 7999 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 8099 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 8199 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 8299 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Files count 8399 in 0ms
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Final files count 8461
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8249/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8248/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Snapshot None Some(60)
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:40:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:40:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:32Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:40:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:40:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:40:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:51Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:51Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:51Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:51Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:51Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:40:51Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:57Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:57Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:57Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:40:57Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/64 and restarting
+[2022-08-04T20:40:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:03Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:03Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:03Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:03Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/128 and restarting
+[2022-08-04T20:41:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:08Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:08Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:08Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:08Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:09Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:09Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:09Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:09Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/256 and restarting
+[2022-08-04T20:41:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:14Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:14Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:14Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:14Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:15Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:15Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:15Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:15Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:15Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/512 and restarting
+[2022-08-04T20:41:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:20Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:20Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:20Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:20Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:21Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/1024 and restarting
+[2022-08-04T20:41:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8247/8254
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:26Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/422a95cb2e534da664e9a1d231ca6e5fb291fe32bf42f009fda4d78b4e27d781.wasm cannot be processed
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8246/8254
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:26Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:26Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/83c0448fdfe7ca33fdafc81ddd15b4dd37caf870b43981bf82ebea47e6bb09d6.wasm cannot be processed
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:26Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8245/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/ebd32babfd326a30cd1ca5c9bef5736f212dbc76b58170c371ee25981ab07faa.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8244/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/f4525edcf8f626a098cee697d699dd4529fd18f1ef16bac7275164f180d8fa77.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8243/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/b66ebf41628b05b8bb3c230d63511dae35a41e417bc814294fe41290ae313c54.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8242/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/6d2a09b4bffdc751b9325d727817fa729c56465e5a4042ea6a4e21fd6b4f8d8a.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8241/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/bdf07b83d5bd9bab0fdfba0691cd6fbe71c86d84cda38d114bd9143bad2bd4bc.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8240/8254
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:27Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm Timeout, setting sample to 1/2048 and restarting
+[2022-08-04T20:41:27Z ERROR analyzer::subcommands::extract] The binary ../RQ1/filtered-binaries-metadata 2/filtered/acd9c8fa520bdf3cff52109b246d3c971cc0f7299edd5deb54e91849f0eea584.wasm cannot be processed
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:27Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8239/8254
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Saving record for 230f0d9d6eb8d9ad0eac7d773768fd624d8c4e74e812c711a0bca1bc83bee5f6.wasm 207
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8238/8254
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Saving record for 842a4f610d63ee497aa4bf8848d70044ac8323188bc42c568512e95e504510b1.wasm 208
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:28Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8237/8254
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Saving record for ac80c82466ca31c5704eaa80542d7c4a40c8fd822561bab87c91480e4e0d17d6.wasm 209
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8236/8254
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Saving record for 37c5693128ba315548b3b9b52dbb313128b1f3ffff37485ce503c2dfb8b9f222.wasm 210
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:30Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8235/8254
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Saving record for 62b0a9f2fcd05fb2ad18680591962dab43647adabae663ad8491b20a4f002857.wasm 211
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Result after 4s
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8234/8254
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Saving record for 3d4918b5037b1ad0d47fd05b4189a8a1711cf87ced85148c4d087e0b55e63b5d.wasm 212
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8233/8254
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Saving record for d43381eb2abd093903859d2f99bf735713dab14917ba0b8c7477d64fbff30c19.wasm 213
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:31Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8232/8254
+[2022-08-04T20:41:32Z DEBUG analyzer::subcommands::extract] Saving record for d4ed92636ed181a7a0a2699e45efeaa460638ed9ff49d43e07a4c03b57d37a31.wasm 214
+[2022-08-04T20:41:32Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:32Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:32Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8231/8254
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:33Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/3e258b5ae6837eef5e18c0029a88d70157620a4e87c16509e93676517645b894.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8231/8254
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:33Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/29a64ba0fea8d0a38164bab73bbbbff97dcb97ff9bef3d4dd6c3335ea610f0d2.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8231/8254
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:33Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/d4c05615d46345e16fdf4bd61c125efb3623d0611de824c07e8e453d1cf3f4f5.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:33Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8231/8254
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Saving record for 33bca86839579d49a3b1f94410b41889ba67e2276c3efd111e74af02ab4d4351.wasm 215
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8230/8254
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Saving record for b742f08c885358f2fe2b5d9e44d34941d43b023a93323706d777e11390b26025.wasm 216
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8229/8254
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Saving record for b76e248e821e41d31ed135ff72116a2bc75935785973accac03a136bca7095b8.wasm 217
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:34Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8228/8254
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Saving record for 8a0fc32302599d00fa96a2d0724d159dd34d06f4b3e963f536ac402c681f3d0d.wasm 218
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8227/8254
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Saving record for 1fcfb17dd1607f7cd13b96b44802b669c6b3d2aae2abea00cae8c238fff997bc.wasm 219
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:35Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8226/8254
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:37Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/34aa1599fca7a192e4adda818afc58b945978355d13c99bda2fc1d3b5741b9c7.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8226/8254
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Saving record for 3e258b5ae6837eef5e18c0029a88d70157620a4e87c16509e93676517645b894.wasm 220
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Result after 4s
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:37Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8225/8254
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Saving record for e93490296f4f10efad7b0a5fe89691ec141fd3b6687c115ee752df4c1ae74440.wasm 221
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8224/8254
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:38Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/df3d989f1c24deb6175cd06f4918de5ebec862f3115404f72fefc0a491e07bea.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:38Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8224/8254
+[2022-08-04T20:41:39Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:39Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/29a64ba0fea8d0a38164bab73bbbbff97dcb97ff9bef3d4dd6c3335ea610f0d2.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:39Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8224/8254
+[2022-08-04T20:41:39Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:39Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/d4c05615d46345e16fdf4bd61c125efb3623d0611de824c07e8e453d1cf3f4f5.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:39Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8224/8254
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Saving record for c471fa9bfb94a953338d16f6bce4adb04e9ecfda089fe25a1f3c1e492d3e18f6.wasm 222
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Result after 5s
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8223/8254
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:40Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/84c497b903a2feaef02ce9200feee523af41803e528e89aaf4f2b7d23cbe5b67.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:40Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8223/8254
+[2022-08-04T20:41:42Z DEBUG analyzer::subcommands::extract] Saving record for aab2396cd6fa3cc8df612913de52dbdb594db0241e4ba5e238583624ad66a1dc.wasm 223
+[2022-08-04T20:41:42Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:41:42Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:42Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8222/8254
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:43Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/34aa1599fca7a192e4adda818afc58b945978355d13c99bda2fc1d3b5741b9c7.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8222/8254
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Saving record for 84c497b903a2feaef02ce9200feee523af41803e528e89aaf4f2b7d23cbe5b67.wasm 224
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8221/8254
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:43Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a616b961af1f898516e92ad7c6ef9ed15132b41487ea6836ec5ca818787e80d5.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:43Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8221/8254
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7a0255045ad4f28a210e9cb3f99e932700cb88b25a10144f5ed9985dd3741037.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8221/8254
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Saving record for d4c05615d46345e16fdf4bd61c125efb3623d0611de824c07e8e453d1cf3f4f5.wasm 225
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Result after 5s
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8220/8254
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:44Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/df3d989f1c24deb6175cd06f4918de5ebec862f3115404f72fefc0a491e07bea.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:44Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8220/8254
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:45Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/29a64ba0fea8d0a38164bab73bbbbff97dcb97ff9bef3d4dd6c3335ea610f0d2.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8220/8254
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Saving record for 56cd175c4018678bca2cfb067f0002f0605ed078c064972f53e0495986025584.wasm 226
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8219/8254
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Saving record for f1611c88000f05d88779f8442715daac1c84c7d60dcae4afdf1acbc9f13d3649.wasm 227
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:45Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8218/8254
+[2022-08-04T20:41:48Z DEBUG analyzer::subcommands::extract] Saving record for c1385e13ee4960c016dbdeff2722bf3f856d35f577364f8fd8b6461c3dc02dc6.wasm 228
+[2022-08-04T20:41:48Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:41:48Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:48Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8217/8254
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Saving record for 34aa1599fca7a192e4adda818afc58b945978355d13c99bda2fc1d3b5741b9c7.wasm 229
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8216/8254
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Saving record for eabd36b47b3d815fae0343ece26d87a4bbd44058a8af034698e4ee3793631cbf.wasm 230
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Saving record for 7624f2f4deebc937dffb5d8d647d060e8c62839bf15a07c8659dea2e2e086c0f.wasm 230
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8215/8254
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8214/8254
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Saving record for 43f97e78966034d03e4ab6ff40771e3b562371f76962a41b29ac1e94b609722c.wasm 232
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8213/8254
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:49Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a616b961af1f898516e92ad7c6ef9ed15132b41487ea6836ec5ca818787e80d5.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:49Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8213/8254
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7a0255045ad4f28a210e9cb3f99e932700cb88b25a10144f5ed9985dd3741037.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8213/8254
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8213/8254
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:50Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/df3d989f1c24deb6175cd06f4918de5ebec862f3115404f72fefc0a491e07bea.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:41:50Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8213/8254
+[2022-08-04T20:41:51Z DEBUG analyzer::subcommands::extract] Saving record for 29a64ba0fea8d0a38164bab73bbbbff97dcb97ff9bef3d4dd6c3335ea610f0d2.wasm 233
+[2022-08-04T20:41:51Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:51Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:51Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8212/8254
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:52Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a80b041e58215dae17b890ca0dd6a76a8a51020345df17b23a4e3e71a8723bef.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8212/8254
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Saving record for 14d11ea128d06ab2aefd9f7de675b06976be401483bf84005038237d52abd56d.wasm 234
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:52Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8211/8254
+[2022-08-04T20:41:54Z DEBUG analyzer::subcommands::extract] Saving record for df3d989f1c24deb6175cd06f4918de5ebec862f3115404f72fefc0a491e07bea.wasm 235
+[2022-08-04T20:41:54Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:54Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:54Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8210/8254
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Saving record for 608da57fb934ea33018deec1af82726a5f7eccd7f5d45ba18c37d1c622b3a576.wasm 236
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8209/8254
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Saving record for a6da4bd2ce6bd6fcc4d3146b793513aedbff2f095bae805d859c36ae9e13ade3.wasm 237
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8208/8254
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Saving record for d088c344f3305270c8783e4ec968d8aec415ea4c1d570053185d7c7063735796.wasm 238
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8207/8254
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Saving record for 88fd684c5c9873ddde726b054a69a5c2cbcc30b3521e11c40b0b81eda5d39a67.wasm 239
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8206/8254
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Saving record for 91ac1e2a2dac91cbcd4c25d721b75a217ab77d30b385bfd225d2ea49fba59034.wasm 240
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:55Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8205/8254
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a616b961af1f898516e92ad7c6ef9ed15132b41487ea6836ec5ca818787e80d5.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8205/8254
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Saving record for 6f8d93724e25276e0f3f7bf9be5e7f70b29364d67eeab0a307e0ad560649f43b.wasm 241
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8204/8254
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7a0255045ad4f28a210e9cb3f99e932700cb88b25a10144f5ed9985dd3741037.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8204/8254
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:56Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:41:56Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8204/8254
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:41:57Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a431eea1cb5d63da9305960029929837b865e00556bb1654b4282a779cc6a9a5.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8204/8254
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Saving record for a80b041e58215dae17b890ca0dd6a76a8a51020345df17b23a4e3e71a8723bef.wasm 242
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Result after 5s
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8203/8254
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Saving record for a21df36284f9c47f4d624650a4311ae712261d68cf43cba01a64017938ef2ed6.wasm 243
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Saving record for f1e56b796fbc59c564668932f04c7cca864bfed0d67cf488e5e498082e4635af.wasm 243
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8202/8254
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:41:57Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8201/8254
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Saving record for a0fefff53dd6bac2404bb0bb91ef523851b2a38f92c303cae6e8fa9a453631bc.wasm 245
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Saving record for ef4e2476236667c2410174b31fe7580efebf4e7fc34c42bdd9f6b4cdb4aac98c.wasm 245
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8200/8254
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Result after 4s
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8199/8254
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Saving record for 4a6f01d75f96586fd5830d67944b3afddccaeef448b99a2809d027bab03c8a77.wasm 247
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8198/8254
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Saving record for f58d94249c19efb5b9e880f44d2e228deed4b59c76dea21081af6c01be568d89.wasm 248
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8197/8254
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Saving record for 7a0255045ad4f28a210e9cb3f99e932700cb88b25a10144f5ed9985dd3741037.wasm 249
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Result after 4s
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:00Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8196/8254
+[2022-08-04T20:42:01Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:01Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/948772c5e5619e5544f00b9593eb063b1bbcbc46a2775ecb96df9663e421bd13.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:01Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8196/8254
+[2022-08-04T20:42:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a616b961af1f898516e92ad7c6ef9ed15132b41487ea6836ec5ca818787e80d5.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:42:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8196/8254
+[2022-08-04T20:42:02Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:02Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:42:02Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8196/8254
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:03Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/a431eea1cb5d63da9305960029929837b865e00556bb1654b4282a779cc6a9a5.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8196/8254
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Saving record for 7d48a9e74d97088500e08741589feedf47e32ec861f61be100a8bbee6266509e.wasm 250
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:03Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8195/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for 97e9fdd08f718d41982d7006f02039afe65970eb55fdf5d18774188c335e1a3c.wasm 251
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8194/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for 5d198952ab27407382e2ddc0b928f695fb5c262ccbd9c7696ac75d2db0ad5a75.wasm 252
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8193/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for 4d3062b597811240930ad88d3ac35175b80a2ca51922620ac0a62db5e4565d32.wasm 253
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8192/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for a616b961af1f898516e92ad7c6ef9ed15132b41487ea6836ec5ca818787e80d5.wasm 254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for cf6dfd229c39de786f343a5e2c3b1c664856f193aa1c62845d0bb552aed0aff1.wasm 254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 2s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8191/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Saving record for 6f688eecc5197f61a99ad766a162496bfdea6abc84742d1c417ba72b43a63534.wasm 255
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 4s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8190/8254
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:04Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8189/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for 5dddc699be2c24089a57e257e6714da1d14f160848c5f95a2b174cb6e1c25ed4.wasm 257
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8188/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for 5c4ca96265061d4ce6c05949dacd32ab828c7dd18f7a1dd6a02806b1cba10aae.wasm 258
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for 948772c5e5619e5544f00b9593eb063b1bbcbc46a2775ecb96df9663e421bd13.wasm 258
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8187/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8186/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for c6835fff75842407f812a461707243e366d4899a115927dd2b482e41adee5fef.wasm 260
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8185/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for c158447f0f64fd0cee88992bd014d7dbfe0b73780aa5e519d1e34119ea37bff6.wasm 261
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8184/8254
+[2022-08-04T20:42:05Z DEBUG analyzer::subcommands::extract] Saving record for 472de605dbf71112ac9c4ffb42db9be88527b145d40687c0cda993c77c45c199.wasm 262
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8183/8254
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Saving record for a7b9142d495545c131dd1474bd11d04c41a546beeed0b3d03496e781ddf0209f.wasm 263
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8182/8254
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Saving record for d79453e0803ebcdf3753c6b1d8d51543b52fed96f7f0d4aec94acd847e225169.wasm 264
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8181/8254
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Saving record for a431eea1cb5d63da9305960029929837b865e00556bb1654b4282a779cc6a9a5.wasm 265
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8180/8254
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Saving record for 5d32697d9ab51f5680f38c8ee4c8420724dfceb97d1cbb1897c9de435c9dd960.wasm 266
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8179/8254
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Saving record for e559b68595786af3c736ac882a1026628e66623bf3dfe21ba44259e381dff9c3.wasm 267
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:06Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8178/8254
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Saving record for 4f872aae5479368b8ea6df9d9c25c9e30275b5198006a1092c82b633ff684c82.wasm 268
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8177/8254
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Saving record for 56220abb11775087109c4af6bd4acdd14105c28284d897c6aa2ff815e187e308.wasm 269
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:07Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8176/8254
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Saving record for 6de2f77d265d617190bbaf69a9b6b147a49d734c63461ea81ca2301d42946505.wasm 270
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8175/8254
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:08Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm Timeout, setting sample to 1/16 and restarting
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8175/8254
+[2022-08-04T20:42:08Z DEBUG analyzer::subcommands::extract] Saving record for a0a16b3c59b66f84d786eb69db84eff6681ced4e8e7453f92cbd71ccd381b4bc.wasm 271
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8174/8254
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Saving record for 8a6c0a05fb020e770850832742e5b1d1a45c8856b8c76eae8cf508cdf21a58f9.wasm 272
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:09Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8173/8254
+[2022-08-04T20:42:10Z DEBUG analyzer::subcommands::extract] Saving record for df1a51dc6127090928938ac69ecc36f16a0cee0068c008e260b0b6aa9cb37a14.wasm 273
+[2022-08-04T20:42:10Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:42:10Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:10Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8172/8254
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:11Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/abb9442e2e9a1417a201593c0d4b13d1c6f26304e6cf0a5a4e13cc356ad5aff2.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8172/8254
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Saving record for 30ee74252884e89df61f9e20130d437336b2fbaee6a411bacb63291d0d2044a9.wasm 274
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8171/8254
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:11Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/20148d799e87608788763c0e1f9ec8f0bf12686ab04039e1258e3b4c62d99d00.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:11Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8171/8254
+[2022-08-04T20:42:12Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:12Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/23eadb0de5efdb4082f00e8b94142d860a328f1e7603489ccf7ecd37c8f1f3c5.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:12Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8171/8254
+[2022-08-04T20:42:12Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:12Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/d6fb2d9d69ff94496eb462410df30ff1b86e822afbe52a50c7861b9eaf73bc0d.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:12Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8171/8254
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:13Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/eeb09719fbc200d646efaa7162d06cab2cb95068ef4984c2443a67b61cbdf4b9.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8171/8254
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Saving record for f8efe1d2609dfca093b302d6a3ab7aa07e7685e3d44565d10369543ea7e72da3.wasm 275
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:13Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8170/8254
+[2022-08-04T20:42:14Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:14Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm Timeout, setting sample to 1/32 and restarting
+[2022-08-04T20:42:14Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8170/8254
+[2022-08-04T20:42:15Z DEBUG analyzer::subcommands::extract] Saving record for 6d302db8553d9dba0e5d32d1ca71aca6c295d0d498ef370e8641b321fe99ce78.wasm 276
+[2022-08-04T20:42:15Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:15Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:15Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8169/8254
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:17Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/abb9442e2e9a1417a201593c0d4b13d1c6f26304e6cf0a5a4e13cc356ad5aff2.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8169/8254
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Saving record for 20148d799e87608788763c0e1f9ec8f0bf12686ab04039e1258e3b4c62d99d00.wasm 277
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Result after 5s
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:17Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8168/8254
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:18Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/23eadb0de5efdb4082f00e8b94142d860a328f1e7603489ccf7ecd37c8f1f3c5.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8168/8254
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Saving record for 945d2ac5fb8d887e24aaca1753066a2d9476773322acdd8cceae880d8bed68c0.wasm 278
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8167/8254
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Saving record for 7cd03f1294374cf888db3205212a51beb1a97b21f77e8d4bf994fbdfb94623a6.wasm 279
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:18Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/d6fb2d9d69ff94496eb462410df30ff1b86e822afbe52a50c7861b9eaf73bc0d.wasm Timeout, setting sample to 1/4 and restarting
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8167/8254
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:18Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8166/8254
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Saving record for eeb09719fbc200d646efaa7162d06cab2cb95068ef4984c2443a67b61cbdf4b9.wasm 280
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8165/8254
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Saving record for 401510388fc59d7e55c986b27f62d27c390e56f227b99ec517404cb0a4cc37d3.wasm 281
+[2022-08-04T20:42:19Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8164/8254
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Saving record for 56e9a7a09b766765f534aa882e86d71b2b0737cf9b2b530d8aaf6eb139ed2332.wasm 282
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Result after 0s
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8163/8254
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Saving record for 55f5bb5bcfb4f20cf2566eecf32f37f5e5d7da0caf21529d88cb29c8043cbcac.wasm 283
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:20Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8162/8254
+[2022-08-04T20:42:21Z DEBUG analyzer::subcommands::extract] Saving record for a9f03bfcb9f2dbe10d46e43256120f40df2c45a537c8a2ddc4caf192cc02e74f.wasm 284
+[2022-08-04T20:42:21Z DEBUG analyzer::subcommands::extract] Result after 1s
+[2022-08-04T20:42:21Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:21Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8161/8254
+[2022-08-04T20:42:22Z DEBUG analyzer::subcommands::extract] Saving record for 74725085253813c489211481d8b2151311c7928f6030f75020f971648ca8f7b4.wasm 285
+[2022-08-04T20:42:22Z DEBUG analyzer::subcommands::extract] Result after 3s
+[2022-08-04T20:42:22Z DEBUG analyzer::subcommands::extract] Timeout 5
+[2022-08-04T20:42:22Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8160/8254
+[2022-08-04T20:42:23Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:23Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/abb9442e2e9a1417a201593c0d4b13d1c6f26304e6cf0a5a4e13cc356ad5aff2.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:42:23Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8160/8254
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:24Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/23eadb0de5efdb4082f00e8b94142d860a328f1e7603489ccf7ecd37c8f1f3c5.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8160/8254
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:24Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/51f5880aa3930ddd3b08264ffa4bf89fb511038320f45a34042f06b66ae2fdb3.wasm Timeout, setting sample to 1/2 and restarting
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8160/8254
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Result after 6s
+[2022-08-04T20:42:24Z WARN  analyzer::subcommands::extract] Thread is taking to much (6s) ../RQ1/filtered-binaries-metadata 2/filtered/d6fb2d9d69ff94496eb462410df30ff1b86e822afbe52a50c7861b9eaf73bc0d.wasm Timeout, setting sample to 1/8 and restarting
+[2022-08-04T20:42:24Z DEBUG analyzer::subcommands::extract] Restarting thread. Worklist size 8160/8254
