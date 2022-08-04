@@ -5,6 +5,7 @@ metadata:
 spec:
   entrypoint: obfuscator-distributed
   parallelism: 40
+  
   templates:
   - name: obfuscator-distributed
     steps:
@@ -18,7 +19,10 @@ spec:
             value: "{{item.features}}"
         withItems:
           - { dbconn: "i64.or-associates", features: "wasm-mutate/peep_hole,wasm-mutate/i64.or-associates" }
+          - { dbconn: "i32.or-associates", features: "wasm-mutate/peep_hole,wasm-mutate/i32.or-associates" }
           
+          - {   dbconn: "remove_item_function", features: "wasm-mutate/remove_item_function"  }
+          - {   dbconn: "container-x-nop", features: "wasm-mutate/peep_hole,wasm-mutate/container-x-nop"  }
         continueOn:
           failed: true
    
@@ -36,7 +40,7 @@ spec:
           bucket: my-bucket
           endpoint: minio-service.minio:3434
           insecure: true
-          key: "my-artifacts/filtered"
+          key: "my-artifacts/tests"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -54,7 +58,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "my-artifacts/datas"
+          key: "my-artifacts/datas/{{inputs.parameters.dbconn}}_t1.zip"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -70,7 +74,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "my-artifacts/csvs"
+          key: "my-artifacts/csvs/{{inputs.parameters.dbconn}}_t1.csv"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -81,7 +85,19 @@ spec:
     
       image: jacarte/obf-image:code
       command: [bash]
+      resources:
+        requests:
+          memory: 2G
+          cpu: 2
       source: |
+         # Install mc client to save snapshot
+          mkdir -p $HOME/minio-binaries
+          wget -O $HOME/minio-binaries/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          ls
+          echo "======"
+          chmod +x $HOME/minio-binaries/mc
+          export PATH=$PATH:$HOME/minio-binaries/
+         
          # Update with latest version
          git pull
          git submodule update --recursive
@@ -89,11 +105,19 @@ spec:
          # Ok compile the right version
          $HOME/.cargo/bin/cargo build --release --features "{{inputs.parameters.features}}" 
 
+          # launch watchdog
+          touch "{{inputs.parameters.dbconn}}_t1.snapshot.csv"
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}_t1.snapshot.csv" 5 &
+          watchID=$!
+
          # Now run the analysis 
-         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t1" extract -t 2 -s 1 -d 2 --input "/wasms" 
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t1" extract --snapshot "{{inputs.parameters.dbconn}}_t1.snapshot.csv" --snapshot-time 10 -t 2 -s 1 -d 2 --input "/wasms" 
         
+         kill -9 $watchID
          # Get some data
           RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn  "datas/{{inputs.parameters.dbconn}}_t1" export --level 2 -c "/{{inputs.parameters.dbconn}}_t1.csv"
+
+         echo "minio" | bash watchdog.sh "/{{inputs.parameters.dbconn}}_t1.final.csv"
 
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}_t1.zip "datas/{{inputs.parameters.dbconn}}_t1"
