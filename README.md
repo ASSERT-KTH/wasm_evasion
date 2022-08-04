@@ -15,9 +15,9 @@ This repo contains the tooling and the reproduction of our experiments on Wasm o
 
 ### Analyzer CLI
 
-The tool provides a cli to perform mutation analysis on binaries. To access the help lines of the tool, run `./analyzer --help`. The analysis tool provides 6 subcommands:
+The tool provides a cli to perform mutation analysis on binaries. To access the help lines of the tool, run `./analyzer --help`. 
 
-### Notebooks
+### Notebooks and experiments
 
 We continuously update our experiments insights using the notebooks [here](./notebooks). Our experiments are based on the [wasmbench](todo) dataset. In the following figure we plot a sample of the wasmbench dataset mutability. The x axis ticks represent different mutators, the bar height represent how man binaries are subceptible (can be mutated by the x mutator).
 
