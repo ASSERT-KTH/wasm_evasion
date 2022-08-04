@@ -403,6 +403,10 @@ pub fn get_only_wasm(
                      
                     std::thread::sleep(Duration::from_secs(60)); // Simulate 1 minute exporting
                     log::debug!("Saved {:?}", d);
+                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
+                    let flushed  = statecp.dbclient.as_ref().unwrap().db.flush().unwrap();
+                    println!("Flushed {}", flushed);
+                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
 
                     if !stopsignalcp.load(Ordering::Relaxed) {
                         break
