@@ -10,7 +10,7 @@ function save() {
 }
 
 function save_mem() {
-    ps -o pid,user,%mem,command ax > mem.log
+    ps -o pid,user,%mem,command ax > $1.mem.log
     mc --quiet cp $1.mem.log exp/my-bucket/snapshots/ 
 }
 
