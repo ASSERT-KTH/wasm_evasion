@@ -5,7 +5,7 @@ command="$@"
 
 
 # launch process in background
-$command 1> out.txt 2> logs.txt &
+$command  2> logs.txt &
 pid=$!
 
 echo $pid
@@ -36,7 +36,7 @@ do
         kill -9 $pid
         kill -9 $underlyingid
         # For testing
-        $command 1>> out.txt 2>> logs.txt &
+        $command 2>> logs.txt &
         pid=$!
     fi
 done
