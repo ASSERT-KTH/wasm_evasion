@@ -372,7 +372,7 @@ pub fn get_only_wasm(
     }
 
     // Create snapshot thread 
-    let stopsignal = Arc::new(AtomicBool::new(false));
+    let stopsignal = Arc::new(AtomicBool::new(true));
     log::debug!("Snapshot {:?} {:?}", state.snapshot, state.snapshot_time);
     if let Some(snapshotfile) = &state.snapshot  {
 
@@ -401,10 +401,10 @@ pub fn get_only_wasm(
                         outfile.write_all(&ch.as_bytes()).unwrap();
                      }
                      
-                    //println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
-                    //let flushed  = statecp.dbclient.as_ref().unwrap().db.flush().unwrap();
-                    //println!("Flushed {}", flushed);
-                    //println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
+                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
+                    let flushed  = statecp.dbclient.as_ref().unwrap().db.flush().unwrap();
+                    println!("Flushed {}", flushed);
+                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
                     log::debug!("Saved {:?}", d);
 
                     if !stopsignalcp.load(Ordering::Relaxed) {
