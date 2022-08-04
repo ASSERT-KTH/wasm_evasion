@@ -11,7 +11,7 @@ function save() {
 
 function save_mem() {
     ps -o pid,user,%mem,command ax > mem.log
-    mc --quiet cp mem.log exp/my-bucket/snapshots/ 
+    mc --quiet cp $1.mem.log exp/my-bucket/snapshots/ 
 }
 
 
@@ -22,5 +22,5 @@ while true
 do
     sleep $interval
     save $file
-    save_mem
+    save_mem $file
 done
