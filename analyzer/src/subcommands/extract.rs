@@ -401,12 +401,11 @@ pub fn get_only_wasm(
                         outfile.write_all(&ch.as_bytes()).unwrap();
                      }
                      
-                    std::thread::sleep(Duration::from_secs(60)); // Simulate 1 minute exporting
-                    log::debug!("Saved {:?}", d);
                     println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
                     let flushed  = statecp.dbclient.as_ref().unwrap().db.flush().unwrap();
                     println!("Flushed {}", flushed);
                     println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
+                    log::debug!("Saved {:?}", d);
 
                     if !stopsignalcp.load(Ordering::Relaxed) {
                         break
