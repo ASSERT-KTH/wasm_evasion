@@ -23,6 +23,15 @@ We continuously update our experiments insights using the notebooks [here](./not
 
 ![mutable](notebooks/mutable.png)
 
+#### The [notebooks](notebooks)
+
+The notebooks folder contains the information needed to reproduce our experiments
+
+- **[RQ1.ipynb](notebooks/RQ1.ipynb)** Here we evaluate the muatbility of the filtered dataset of wasmbench
+- **[MINOS.ipynb](notebooks/MINOS.ipynb)** Here we reproduce the experiments of MINOS. MINOS uses a neural network to detect malwares. It transforms binaries into images and those images are the information passed to the neural network to detect classifiers.
+- **[Features.ipynb](notebooks/Features%20selection.ipynb)** This notebook contains our process to generate the configs for a `swarm testing` process. The swarm testing process allows us to determine which features are better to get interesting mutated binaries regarding an Oracle.
+
+
 ### Featurized wasm-mutate
 
 TODO
