@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: save-files-to-minio-
+spec:
+  entrypoint: obfuscator-distributed
+  templates:
+  - name: obfuscator-distributed
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: folder
+            value: "{{item.folder}}"
+          - name: url
+            value: "{{item.url}}"
+          - name: path
+            value: "{{item.path}}"
+        withItems:
+          - { folder: filtered, url: https://github.com/sola-st/WasmBench/releases/download/v1.0/filtered-binaries-metadata.7z, path: filtered }
+          
+        continueOn:
+          failed: true
+ 
+  - name: analyzer-template
+    inputs:
+      parameters:
+      - name: url
+      - name: folder
+      - name: path
+    outputs:
+      artifacts:
+      - name: wasms
+        path: /wasms
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          key: "my-artifacts/filtered"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    script:
+      image: ubuntu:20.04
+      command: [bash]
+      source: |
+         apt-get update && apt-get install -y wget curl p7zip-full p7zip-rar
+         echo "======="
+         echo "======="
+        
+         mkdir -p /wasms
+         wget -O {{inputs.parameters.folder}}.7z {{inputs.parameters.url}}
+         echo "======="
+         echo "======="
+         ls .
+
+         7z x {{inputs.parameters.folder}}.7z
+         
+         find {{inputs.parameters.folder}} -type f -exec bash -c "cp {} /wasms/" \;
