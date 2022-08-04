@@ -18,9 +18,14 @@ pub struct DB<'a> {
 
 impl<'a> DB<'a> {
     pub fn new(f: &'a str) -> AResult<Self> {
+        let config = sled::Config::default()
+        .path(f.to_owned())
+        .cache_capacity(4_294_967_296);
+        
+        
         Ok(DB {
             f: f.clone(),
-            db: sled::open(f.clone())?,
+            db: config.open()?,
         })
     }
 
