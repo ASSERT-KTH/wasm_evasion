@@ -35,7 +35,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
     let env = Env::default()
         //.filter_or("LOG_LEVEL", "trace")
         .filter("RUST_LOG")
-        .write_style_or("LOG_STYLE", "always");
+        .write_style_or("LOG_STYLE", "never");
 
     Builder::from_env(env).init();
 
