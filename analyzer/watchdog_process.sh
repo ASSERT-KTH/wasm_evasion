@@ -16,9 +16,9 @@ do
     # sleep for a while and then check the mem
     sleep $sleep
     echo "Checking mem"
-    ps -o pid,rss,vsz,command -a | grep analyzer | grep -v grep | awk 'NR>1{$2=int($2/1024);$3=int($3/1024);}{print ;}'
-    val=$(ps -o pid,rss,vsz,command -a | grep analyzer | grep -v grep | awk 'NR>1{$2=int($2/1024);$3=int($3/1024);}{print ;}' | awk {'print$2'})
-    underlyingid=$(ps -o pid,command -a | grep analyzer | grep -v grep | awk {'print$1'})
+    ps -o pid,rss,vsz,command ax | grep analyzer | grep -v grep | awk 'NR>1{$2=int($2/1024);$3=int($3/1024);}{print ;}'
+    val=$(ps -o pid,rss,vsz,command ax | grep analyzer | grep -v grep | awk 'NR>1{$2=int($2/1024);$3=int($3/1024);}{print ;}' | awk {'print$2'})
+    underlyingid=$(ps -o pid,command ax | grep analyzer | grep -v grep | awk {'print$1'})
     echo "Analyzer process id $underlyingid"
 
     if [ -z "$val" ]; then
