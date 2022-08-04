@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-collect-metadata-filtered-
+spec:
+  entrypoint: obfuscator-distributed
+  parallelism: 40
+  templates:
+  - name: obfuscator-distributed
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: dbconn
+            value: "{{item.dbconn}}"
+          - name: features
+            value: "{{item.features}}"
+        withItems:
+          - { dbconn: "i64.or-associates", features: "wasm-mutate/peep_hole,wasm-mutate/i64.or-associates" }
+          
+        continueOn:
+          failed: true
+   
+  - name: analyzer-template
+
+    inputs:
+      parameters:
+      - name: dbconn
+      - name: features
+    
+      artifacts:
+      - name: wasms
+        path: /wasms
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          key: "my-artifacts/filtered"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    outputs:
+      artifacts:
+      - name: data
+        path: /{{inputs.parameters.dbconn}}_t1.zip
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "my-artifacts/datas"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: csv
+        path: /{{inputs.parameters.dbconn}}_t1.csv
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "my-artifacts/csvs"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    script:
+    
+      image: jacarte/obf-image:code
+      command: [bash]
+      source: |
+         # Update with latest version
+         git pull
+         git submodule update --recursive
+
+         # Ok compile the right version
+         $HOME/.cargo/bin/cargo build --release --features "{{inputs.parameters.features}}" 
+
+         # Now run the analysis 
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t1" extract -t 2 -s 1 -d 2 --input "/wasms" 
+        
+         # Get some data
+          RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn  "datas/{{inputs.parameters.dbconn}}_t1" export --level 2 -c "/{{inputs.parameters.dbconn}}_t1.csv"
+
+         # Now save the datas folder
+         7z a  -tzip /{{inputs.parameters.dbconn}}_t1.zip "datas/{{inputs.parameters.dbconn}}_t1"
