@@ -301,7 +301,7 @@ pub fn get_wasm_info(
                                 signal.store(false, Ordering::SeqCst);
                                 sample = sample * 2;
                                 seed += 1; // like a nonce
-                                if sample > 512 {
+                                if sample > 1024 {
                                     log::error!("The binary {} cannot be processed", fcp2.clone().display());
                                     break;
                                 }
