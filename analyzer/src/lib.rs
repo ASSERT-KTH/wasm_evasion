@@ -51,6 +51,8 @@ pub struct State {
     pub seed: u64,
     pub timeout: u32,
     pub sample_ratio: u32,
+    pub snapshot: Option<String>,
+    pub snapshot_time: Option<u32>
 }
 
 #[macro_export]

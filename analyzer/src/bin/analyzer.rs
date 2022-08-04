@@ -55,7 +55,9 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
         patch_metadata: false,
         sample_ratio: 1,
         seed: 0,
-        timeout: 0
+        timeout: 0,
+        snapshot: None,
+        snapshot_time: None
     };
 
     match matches.subcommand() {
@@ -73,6 +75,14 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
 
             if args.is_present("seed") {
                 state.seed = value_t!(args.value_of("seed"), u64).unwrap();
+            }
+
+            if args.is_present("snapshot") {
+                state.snapshot = Some(args.value_of("snapshot").unwrap().into());
+            }
+
+            if args.is_present("snapshot-time") {
+                state.snapshot_time = Some(value_t!(args.value_of("snapshot-time"), u32).unwrap());
             }
 
             if args.is_present("sample") {
@@ -185,7 +195,9 @@ pub mod tests {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
-            timeout: 10
+            timeout: 10,
+            snapshot: None,
+            snapshot_time: None
         };
         extract(Arc::new(state), "./tests".to_string()).unwrap();
     }
@@ -211,7 +223,9 @@ pub mod tests {
             sample_ratio: 1,
             patch_metadata: false,
             seed: 0,
-            timeout: 5, // 5 secs per binary
+            timeout: 5,
+            snapshot: None,
+            snapshot_time: None
         };
         extract(Arc::new(state), "./tests/wasms".to_string()).unwrap();
     }

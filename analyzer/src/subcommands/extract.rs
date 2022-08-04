@@ -5,7 +5,7 @@ use std::{
     cell::RefCell,
     collections::HashMap,
     fs,
-    io::Read,
+    io::{Read, Write},
     path::PathBuf,
     sync::{
         atomic::{AtomicBool, AtomicU32, Ordering},
@@ -22,7 +22,7 @@ use crate::{
     errors::{AResult, CliError},
     info::InfoExtractor,
     meta::{self, Meta},
-    State, NO_WORKERS,
+    State, NO_WORKERS, subcommands::export::create_chunk,
 };
 
 
@@ -246,7 +246,8 @@ pub fn get_wasm_info(
     state: Arc<State>,
     chunk: Arc<Mutex<Vec<PathBuf>>>,
     workerid: u32,
-    total: usize
+    total: usize,
+    snapsignal: Arc<Mutex<bool>>
 ) -> AResult<Vec<PathBuf>> {
     loop {
         if chunk.lock().unwrap().is_empty() {
@@ -265,6 +266,10 @@ pub fn get_wasm_info(
             let mut sample = cp.sample_ratio;
             let mut seed = cp.seed;
             loop {
+                // Check if it is time for snapshot
+                {
+                    let d = snapsignal.lock().unwrap();
+                }
                 let movecp = cp.clone();
                 let fcp = f.clone();
                 let fcp2 = f.clone();
@@ -356,17 +361,63 @@ pub fn get_only_wasm(
 
     let mut jobs = vec![];
     let total = filtered.len();
+    let snapsignal = Arc::new(Mutex::new(true));
     for j in 0..NO_WORKERS {
         let cp2 = cp.clone();
         let cp3 = alljobs.clone();
-        let th = spawn(move || get_wasm_info(cp2, cp3, j as u32, total));
+        let cp4 = snapsignal.clone();
+        let th = spawn(move || get_wasm_info(cp2, cp3, j as u32, total, cp4));
         
         jobs.push(th);
     }
 
+    // Create snapshot thread 
+    let stopsignal = Arc::new(AtomicBool::new(false));
+    log::debug!("Snapshot {:?} {:?}", state.snapshot, state.snapshot_time);
+    if let Some(snapshotfile) = &state.snapshot  {
+
+        if let Some(snaptime) = &state.snapshot_time {
+
+            let stime = snaptime.clone();
+            let snapfile = snapshotfile.clone();
+            let stopsignalcp = stopsignal.clone();
+            let statecp = state.clone();
+            log::debug!("Creating snapshot thread");
+            let snapth = spawn(move || {
+                loop {
+                    // Sleep the interval time
+                    std::thread::sleep(Duration::from_secs(stime as u64));
+                    let d = snapsignal.lock().unwrap();
+                    log::debug!("Saving snapshot {}", snapfile.clone() );
+                    
+                    let mut outfile = std::fs::File::create(snapfile.clone()).unwrap();
+
+                    outfile.write_all(
+                        "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,class_name,mutable_count\n".as_bytes()
+                     ).unwrap();
+
+                     for m in statecp.dbclient.as_ref().unwrap().get_all::<Meta>().unwrap() {
+                        let ch = create_chunk(m, 2);
+                        outfile.write_all(&ch.as_bytes()).unwrap();
+                     }
+                     
+                    std::thread::sleep(Duration::from_secs(60)); // Simulate 1 minute exporting
+                    log::debug!("Saved {:?}", d);
+
+                    if !stopsignalcp.load(Ordering::Relaxed) {
+                        break
+                    }
+                    
+                }
+            });
+
+        }
+    };
+
     for j in jobs {
         let _ = j.join().map_err(|x| CliError::Any(format!("{:#?}", x)))?;
     }
+    stopsignal.store(false, Ordering::SeqCst);
 
     log::debug!(
         "{} processed {} in {}ms",

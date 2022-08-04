@@ -33,7 +33,19 @@ subcommands:
             value_name: "timeout"
             long: timeout
             help: "Timeout to process a binary. If the timeout is reached the sample ratio is divided by 2 until 1/128 is reached. Thus a bianry will be in the processing queue for no more than t*7 seconds."
-        
+        - snapshot:
+            short: h
+            long: snapshot
+            required: false
+            help: "Takes snapshot every x seconds time (snapshot-time option)"
+            takes_value: true
+        - snapshot-time:
+            long: snapshot-time
+            required: false
+            help: "Snapshot time in seconds"
+            takes_value: true
+            default_value: "60" # every minute
+            
         - sample:
             short: s
             required: false
