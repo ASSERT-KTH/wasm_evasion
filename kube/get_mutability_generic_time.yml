@@ -21,7 +21,7 @@ spec:
             value: "{{item.features}}"
         withItems:
 
-          - {   dbconn: "remove_item_function", features: "wasm-mutate/remove_item,wasm-mutate/remove_item_function"  }
+          # - {   dbconn: "remove_item_function", features: "wasm-mutate/remove_item,wasm-mutate/remove_item_function"  }
           - {   dbconn: "container-x-nop", features: "wasm-mutate/peep_hole,wasm-mutate/container-x-nop"  }
           - {   dbconn: "container-drop-i32.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i32.rand-x"  }
           - {   dbconn: "container-drop-i64.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i64.rand-x"  }
@@ -192,8 +192,8 @@ spec:
       command: [bash]
       resources:
         requests:
-          memory: 2G
-          cpu: 2
+          memory: "0"
+          cpu: 3.5
       source: |
          # Install mc client to save snapshot
           mkdir -p $HOME/minio-binaries
@@ -223,13 +223,21 @@ spec:
 
           # launch watchdog
           touch "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv"
+          touch "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt"
           bash watchdog_interval.sh "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" 900 &
           watchID=$!
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt" 900 &
+          watchID2=$!
+
+          # Save memory compsumption
+
 
          # Now run the analysis 
-         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" extract --snapshot "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" --snapshot-time 1800 -t 2 -s 1 -d 2 --input "/wasms" 
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" extract --snapshot "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" --snapshot-time 300 -t 2 -s 1 -d 2 --input "/wasms" 2>"{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt" 
         
          kill -9 $watchID
+         kill -9 $watchID2
+
          # Get some data
           RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn  "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" export --level 2 -c "/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.csv"
 
