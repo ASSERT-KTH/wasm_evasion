@@ -19,7 +19,9 @@ The tool provides a cli to perform mutation analysis on binaries. To access the 
 
 ### Notebooks
 
-We continuously update our experiments insights using the notebooks [here](./notebooks). Our experiments are based on the [wasmbench](todo) dataset.
+We continuously update our experiments insights using the notebooks [here](./notebooks). Our experiments are based on the [wasmbench](todo) dataset. In the following figure we plot a sample of the wasmbench dataset mutability. The x axis ticks represent different mutators, the bar height represent how man binaries are subceptible (can be mutated by the x mutator).
+
+![mutable](notebooks/mutable.png)
 
 ### Featurized wasm-mutate
 
