@@ -21,3 +21,4 @@ create_csv.sh
 data.zip
 deploy_to_release.sh
 *.svg
+datasets.zip
