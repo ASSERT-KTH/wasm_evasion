@@ -42,7 +42,8 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
     let yaml = load_yaml!("config.yml");
     let matches = App::from_yaml(yaml).get_matches();
     let dbconn = arg_or_error!(matches, "dbconn");
-    let dbclient = DB::new(string_to_static_str(dbconn.clone()))?;
+    let cachesize = value_t!(matches.value_of("cachesize"), u64).expect("Invalid cache size conversion");
+    let dbclient = DB::new(string_to_static_str(dbconn.clone()), cachesize)?;
     let mut state = State {
         dbclient: Some(dbclient.clone()),
         process: AtomicU32::new(0),
@@ -184,7 +185,7 @@ pub mod tests {
         Builder::from_env(env).init();  
 
         let state = State {
-            dbclient: Some(DB::new("test_db").unwrap()),
+            dbclient: Some(DB::new("test_db", 10000).unwrap()),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
@@ -212,7 +213,7 @@ pub mod tests {
         Builder::from_env(env).init();  
 
         let state = State {
-            dbclient: Some(DB::new("test_db").unwrap()),
+            dbclient: Some(DB::new("test_db", 10000).unwrap()),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),

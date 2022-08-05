@@ -268,7 +268,14 @@ pub fn get_wasm_info(
             loop {
                 // Check if it is time for snapshot
                 {
-                    let d = snapsignal.lock().unwrap();
+                    let d = snapsignal.lock();
+
+                    match d {
+                        Err(e) => println!("{}", e),
+                        Ok(_) => {
+
+                        }
+                    }
                 }
                 let movecp = cp.clone();
                 let fcp = f.clone();
@@ -401,10 +408,6 @@ pub fn get_only_wasm(
                         outfile.write_all(&ch.as_bytes()).unwrap();
                      }
                      
-                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
-                    let flushed  = statecp.dbclient.as_ref().unwrap().db.flush().unwrap();
-                    println!("Flushed {}", flushed);
-                    println!("Size on disk {}", statecp.dbclient.as_ref().unwrap().db.size_on_disk().unwrap());
                     log::debug!("Saved {:?}", d);
 
                     if !stopsignalcp.load(Ordering::Relaxed) {
