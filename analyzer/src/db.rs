@@ -17,10 +17,10 @@ pub struct DB<'a> {
 }
 
 impl<'a> DB<'a> {
-    pub fn new(f: &'a str) -> AResult<Self> {
+    pub fn new(f: &'a str, cache_size: u64) -> AResult<Self> {
         let config = sled::Config::default()
         .path(f.to_owned())
-        .cache_capacity(4_294_967_296);
+        .cache_capacity(cache_size);
         
         
         Ok(DB {
@@ -104,13 +104,13 @@ pub mod tests {
 
     #[test]
     pub fn test_save() {
-        let t = DB::new("test_db").unwrap();
+        let t = DB::new("test_db", 10000).unwrap();
         t.set(&"K1", &"K2").unwrap();
     }
 
     #[test]
     pub fn test_load() {
-        let t = DB::new("test_db").unwrap();
+        let t = DB::new("test_db", 10000).unwrap();
         let h: String = t.get(&"K1").unwrap();
 
         println!("{:?}", h);
@@ -118,7 +118,7 @@ pub mod tests {
 
     #[test]
     pub fn count() {
-        let t = DB::new("test_db").unwrap();
+        let t = DB::new("test_db", 10000).unwrap();
 
         println!("count {:?}", t.get_count());
     }

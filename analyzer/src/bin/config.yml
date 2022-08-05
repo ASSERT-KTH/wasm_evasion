@@ -129,4 +129,12 @@ args:
       help: "Sled db folder address"
       value_name: "dbconn"
       takes_value: true
+  - cachesize:
+      short: c
+      long: cachesize
+      takes_value: true
+      help: "Size of the cache in memory"
+      value_name: "cachesize"
+      required: false
+      default_value: "4294967296"
       
