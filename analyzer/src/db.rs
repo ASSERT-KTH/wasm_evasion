@@ -97,29 +97,3 @@ impl<'a> DB<'a> {
         Ok(item)
     }
 }
-
-#[cfg(test)]
-pub mod tests {
-    use super::DB;
-
-    #[test]
-    pub fn test_save() {
-        let t = DB::new("test_db", 10000).unwrap();
-        t.set(&"K1", &"K2").unwrap();
-    }
-
-    #[test]
-    pub fn test_load() {
-        let t = DB::new("test_db", 10000).unwrap();
-        let h: String = t.get(&"K1").unwrap();
-
-        println!("{:?}", h);
-    }
-
-    #[test]
-    pub fn count() {
-        let t = DB::new("test_db", 10000).unwrap();
-
-        println!("count {:?}", t.get_count());
-    }
-}

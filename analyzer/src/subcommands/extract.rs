@@ -415,6 +415,19 @@ pub fn get_only_wasm(
                     }
                     
                 }
+                let mut outfile = std::fs::File::create(snapfile.clone()).unwrap();
+
+                outfile.write_all(
+                    "id,num_tags,num_functions,num_globals,num_tables,num_elements,num_data,num_types,num_memory,num_instructions,class_name,mutable_count\n".as_bytes()
+                 ).unwrap();
+
+                 for m in statecp.dbclient.as_ref().unwrap().get_all::<Meta>().unwrap() {
+                    let ch = create_chunk(m, 2);
+                    outfile.write_all(&ch.as_bytes()).unwrap();
+                 }
+                 
+                log::debug!("Saved");
+                // One last time after all finished
             });
 
         }
