@@ -113,6 +113,57 @@ subcommands:
     - clean:
         about: Hard reset the database
     
+    - mutate:
+        about: Mutate an input binary until the oracle return non zero result
+        args:
+
+          - input:
+              required: true
+              short: f
+              long: input
+              help: "File to mutate"
+              value_name: "file"
+
+            
+          - oracle:
+              required: true
+              short: o
+              long: oracle
+              help: "Oracle command. The oracle should expect a binary as the stdin 'oracle.sh < <input>.wasm'. The other way is to connec the c/cpp library directly as a fuzz target or a test of this tool."
+              value_name: "oracle_command"
+
+          - seed:
+              required: false
+              takes_value: true
+              value_name: "seed"
+              long: seed
+              default_value: "0"
+              help: "Seed for the mutators"
+
+          - attemps:
+              short: t
+              required: false
+              takes_value: true
+              value_name: "attemps"
+              long: attemps
+              help: "Attemps to process a binary. If the attemps number is reached the mutation process stops."
+
+          - exit_on_found:
+              short: e
+              required: false
+              long: exit-on-found
+              help: "Exit as soon as the oracle found and interesting point. Otherwise it will return all intersting points until timeout"
+
+          - peek_count:
+              short: p
+              required: false
+              default_value: 1
+              long: peek_count
+              help: "Number of binaries to take per mutator iterator."
+
+        
+
+
     - reduce:
         about: Reduce binary to its minimal expression according to wasm-mutate implementation
 
