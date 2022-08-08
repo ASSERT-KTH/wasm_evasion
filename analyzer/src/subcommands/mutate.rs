@@ -115,7 +115,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
 
     for (s, elapsed, idx, stdout, stderr, newbin) in hist {
         let fname = format!("{session_folder}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
-        fs::create_dir(fname.clone())?;
+        fs::create_dir(fname.clone());
         fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
         let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
@@ -123,6 +123,8 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
         f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
         f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
         f.write_all(format!("idx: {}\n", idx).as_bytes())?;
+        f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
+        // TODO Add Meta info of the variant ?
 
         fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
         fs::write(format!("{}/variant.wasm", fname), &newbin)?;
