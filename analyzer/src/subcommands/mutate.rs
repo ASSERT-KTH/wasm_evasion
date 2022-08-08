@@ -85,6 +85,10 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             }
         }
 
+        if worklist.len() == 0 {
+            elapsed += 1;
+        }
+
         while let Some((newbin, idx)) = worklist.pop() {
 
             swap(&mut bin, newbin.clone());
