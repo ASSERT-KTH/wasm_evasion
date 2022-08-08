@@ -6,9 +6,17 @@ use core::hash::Hash;
 use crate::{errors::{AResult, CliError}, State};
 
 
-pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, timeout_seconds: u64) -> AResult<()> {
+pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64) -> AResult<()> {
     log::debug!("Mutating binary {}", path);
     let mut file = fs::File::open(path.clone())?;
+    let session_folder = format!("{}/{}_{}_a{}_p{}", state.dbclient.as_ref().unwrap().f, 
+        command.replace("/", "_"), 
+        args.iter().map(|f| f.replace("/", "_")).collect::<Vec<_>>().join("_"), 
+        attemps, 
+        peek_count);
+    fs::create_dir(session_folder.clone());
+    log::debug!("Saving session in {}", session_folder.clone());
+
 
     // Filter first the header to check for Wasm
     let mut buf = [0; 4];
@@ -106,7 +114,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     log::debug!("Saving interesting {}", hist.len());
 
     for (s, elapsed, idx, stdout, stderr, newbin) in hist {
-        let fname = format!("{}/s{}_e{}_i{}", state.dbclient.as_ref().unwrap().f, s, elapsed, idx);
+        let fname = format!("{session_folder}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
         fs::create_dir(fname.clone())?;
         fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
@@ -187,6 +195,6 @@ pub mod tests {
 
         mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
             "tests/oracle_size.sh".into()
-        ],600,true, 1, 0, 20).unwrap()
+        ],600,false, 1, 0).unwrap()
     }
 }
