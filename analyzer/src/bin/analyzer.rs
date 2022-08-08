@@ -2,6 +2,7 @@
 
 use analyzer::db::DB;
 use analyzer::errors::CliError;
+use analyzer::subcommands::mutate::mutate;
 use analyzer::{arg_or_error, arge, State};
 use clap::{load_yaml, value_t, App};
 use env_logger::{Builder, Env};
@@ -62,6 +63,39 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
     };
 
     match matches.subcommand() {
+        ("mutate", Some(args)) => {
+            let mut seed = 0;
+            let mut attemps = 0;
+            let mut peek_count = 0;
+
+            if args.is_present("seed") {
+                seed = value_t!(args.value_of("seed"), u64).unwrap();
+            }
+
+            if args.is_present("attempts") {
+                attemps = value_t!(args.value_of("attempts"), u64).unwrap();
+            }
+
+
+            if args.is_present("peek_count") {
+                peek_count = value_t!(args.value_of("peek_count"), u64).unwrap();
+            }
+
+            let exit_on_found = args.is_present("exit_on_found");
+
+            let oracle: Vec<_> = args.values_of("oracle").unwrap().collect();
+
+            let command = oracle[0];
+            let input = args.value_of("input").unwrap();
+            let args = &oracle[1..];
+
+            mutate(Arc::new(state), 
+                input.into(), 
+                    command.into(), 
+                    args.iter().map(|f|f.clone().into()).collect::<Vec<_>>(), 
+                    attemps as u32, 
+                    exit_on_found, peek_count, seed)?;
+        }
         ("extract", Some(args)) => {
             let reset = args.is_present("reset");
             if reset {

@@ -129,6 +129,8 @@ subcommands:
               required: true
               short: o
               long: oracle
+              multiple: true
+              min_values: 1
               help: "Oracle command. The oracle should expect a binary as the stdin 'oracle.sh < <input>.wasm'. The other way is to connec the c/cpp library directly as a fuzz target or a test of this tool."
               value_name: "oracle_command"
 
@@ -140,12 +142,12 @@ subcommands:
               default_value: "0"
               help: "Seed for the mutators"
 
-          - attemps:
+          - attempts:
               short: t
               required: false
               takes_value: true
-              value_name: "attemps"
-              long: attemps
+              value_name: "attempts"
+              long: attempts
               help: "Attemps to process a binary. If the attemps number is reached the mutation process stops."
 
           - exit_on_found:
@@ -157,7 +159,7 @@ subcommands:
           - peek_count:
               short: p
               required: false
-              default_value: 1
+              default_value: "1"
               long: peek_count
               help: "Number of binaries to take per mutator iterator."
 
