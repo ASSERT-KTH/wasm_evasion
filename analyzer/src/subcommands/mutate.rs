@@ -47,13 +47,13 @@ fn open_socket() -> AResult<String> {
                     wait = true;
                 }
                 _ => {
-                    buff.push_str(&"\n");
                     if wait {
                         f.flush()?;
                         fs::copy(outfile.clone(), buff)?;
                         f = fs::File::create(outfile.clone())?;
                         wait = false;
                     } else {
+                        buff.push_str(&"\n");
                         f.write_all(&buff.as_bytes())?;
                     }
                 }
