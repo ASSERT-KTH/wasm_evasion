@@ -1,0 +1,40 @@
+name: Build docker
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - analyzer/**
+      - wasm-tools
+      - .github/**
+      - Dockerfile
+      - oracles/**
+
+jobs:
+  build:
+    name: Build docker
+    # This job runs on Linux
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl docker.io
+
+
+      - name: Build binaries
+        run: |
+          cd analyzer
+          docker build --no-cache -t jacarte/obf-image:latest -f Dockerfile .
+
+      
+      - name: Push images CROW
+        run: |
+          docker login -u="$user" -p="$pass" && docker push jacarte/obf-image:latest
+        env:
+          user: ${{secrets.DOCKER_USER}}
+          pass: ${{secrets.DOCKER_PASS}}
+          
