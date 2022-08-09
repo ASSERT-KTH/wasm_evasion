@@ -68,16 +68,7 @@ fn open_socket() -> AResult<String> {
 pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, peek_count: u32, seed: u64, tree_size: u32) -> AResult<()> {
 
 
-    let statecp = state.clone();
-    let pathcp = path.clone();
-    let commandcp = command.clone();
-    let argsclone = args.clone();
-    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attemps, true, peek_count as u64, seed, tree_size)?;
-        
-    if interesting_count == 0 {
-        panic!("Ensure the first config find interesting points in the oracle")
-    }
-
+    
     let mut dimensions = vec![
         (0, tree_size*2, tree_size, "tree_size"),
         (0, attemps*2, attemps, "attempts"),
