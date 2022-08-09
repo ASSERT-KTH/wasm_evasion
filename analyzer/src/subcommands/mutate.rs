@@ -286,7 +286,7 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
 
             swap(&mut bin, newbin.clone());
             // TODO Move this to parallel execution
-            let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone());
+            let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone())?;
 
             let (interesting, out) = if r.success() {
                 
@@ -355,7 +355,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     Ok(())
 }
 
-fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> (ExitStatus, Vec<u8>, Vec<u8>) {
+fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> AResult<(ExitStatus, Vec<u8>, Vec<u8>)> {
 // Write file to tmparg
     std::fs::write("temp.wasm", &bin.clone()).unwrap();
     let output = std::process::Command::new(&command)
@@ -365,14 +365,11 @@ fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> (ExitStatus
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .output()
-        .with_context(|| {
-            format!(
-                "Failed to run predicate script '{}'",
-                command
-            )
-        }).unwrap();
+        .map_err(|e| CliError::Any(format!("Failed to run command {}. Error {}", command, e)));
 
-    (output.status, output.stdout, output.stderr)
+    let output = output?;
+
+    Ok((output.status, output.stdout, output.stderr))
 }
 
 fn swap(a: &mut Vec<u8>, b:  Vec<u8>) {

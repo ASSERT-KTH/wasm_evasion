@@ -13,6 +13,7 @@ pub enum CliError {
     #[error("{0}")]
     Any(String),
 
+
     #[error("key not found {0}")]
     KeyNotFound(String),
 
