@@ -200,11 +200,11 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
 
 
     let mut file = fs::File::open(path.clone())?;
-    let session_folder = format!("{}/{}_{}_a{}_p{}", state.dbclient.as_ref().unwrap().f, 
+    let session_folder = format!("{}/{}_{}_a{}_p{}_ts{}", state.dbclient.as_ref().unwrap().f, 
         command.replace("/", "_"), 
         args.iter().map(|f| f.replace("/", "_")).collect::<Vec<_>>().join("_"), 
         attemps, 
-        peek_count);
+        peek_count,tree_size);
     fs::create_dir(session_folder.clone());
     log::debug!("Saving session in {}", session_folder.clone());
 
