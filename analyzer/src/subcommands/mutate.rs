@@ -326,7 +326,7 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
                 break 'attempts;
             }
 
-            if elapsed % 100 == 99 {
+            if elapsed % 10 == 9 {
                 println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
             }
         }
