@@ -1,0 +1,353 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-mutate-
+spec:
+  entrypoint: obfuscator-mutate
+  parallelism: 20
+  arguments:
+    parameters:
+    - name: attempts
+    - name: treesize
+    - name: peek
+    - name: file
+    - name: oracle
+  templates:
+  - name: obfuscator-mutate
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: features
+            value: "{{item.features}}"
+          - name: dbconn
+            value: "{{item.dbconn}}"
+        withItems:
+          - { features: "wasm-mutate/all", dbconn: "all" }
+          - { dbconn: "c0", features: "wasm-mutate/i32.add-commutes,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c1", features: "wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c2", features: "wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c3", features: "wasm-mutate/f64.add_0,wasm-mutate/i32.shr_s_by_0,wasm-mutate/i32.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c4", features: "wasm-mutate/f64.mul-commutes,wasm-mutate/i32.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c5", features: "wasm-mutate/i32.mul-by-2,wasm-mutate/peep_hole" }
+          - { dbconn: "c6", features: "wasm-mutate/modify_custom_section_name,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c7", features: "wasm-mutate/i64.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c8", features: "wasm-mutate/i64.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c9", features: "wasm-mutate/i32.add-commutes,wasm-mutate/i32.shl_by_0,wasm-mutate/i64.mul-by-2,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c10", features: "wasm-mutate/select-invert,wasm-mutate/peep_hole" }
+          - { dbconn: "c11", features: "wasm-mutate/i32.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c12", features: "wasm-mutate/add_function,wasm-mutate/i32.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c13", features: "wasm-mutate/i32.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c14", features: "wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c15", features: "wasm-mutate/f32.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c16", features: "wasm-mutate/i32.mul-by-8,wasm-mutate/i64.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c17", features: "wasm-mutate/add_function" }
+          - { dbconn: "c18", features: "wasm-mutate/i32.shl_by_0,wasm-mutate/i32.use_of_global,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c19", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c20", features: "wasm-mutate/i32.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c21", features: "wasm-mutate/i32.and-commutes,wasm-mutate/i32.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c22", features: "wasm-mutate/add_type,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c23", features: "wasm-mutate/i32.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c24", features: "wasm-mutate/i32.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c25", features: "wasm-mutate/container-nop-x,wasm-mutate/f32.add-commutes,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c26", features: "wasm-mutate/i64.mul-by-4,wasm-mutate/peep_hole" }
+          - { dbconn: "c27", features: "wasm-mutate/f64.mul_1,wasm-mutate/peep_hole" }
+          - { dbconn: "c28", features: "wasm-mutate/i32.shr_u_by_0,wasm-mutate/i32.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c29", features: "wasm-mutate/add_function,wasm-mutate/i64.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c30", features: "wasm-mutate/f32.use_of_global,wasm-mutate/f64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c31", features: "wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c32", features: "wasm-mutate/i32.add-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c33", features: "wasm-mutate/i32.and-commutes,wasm-mutate/i32.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c34", features: "wasm-mutate/i32.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c35", features: "wasm-mutate/i64.or-commutes,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c36", features: "wasm-mutate/code_motion_ifs,wasm-mutate/code_motion" }
+          - { dbconn: "c37", features: "wasm-mutate/code_motion_loops,wasm-mutate/i32.shr_s_by_0,wasm-mutate/i32.unfold,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c38", features: "wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c39", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/peep_hole" }
+          - { dbconn: "c40", features: "wasm-mutate/i32.eq_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c41", features: "wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c42", features: "wasm-mutate/i32.add-commutes,wasm-mutate/i32.xor-commutes,wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c43", features: "wasm-mutate/i64.mul-by-2,wasm-mutate/peep_hole" }
+          - { dbconn: "c44", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c45", features: "wasm-mutate/i32.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c46", features: "wasm-mutate/i32.mul-by-2,wasm-mutate/i64.mul-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c47", features: "wasm-mutate/container-nop-x,wasm-mutate/i32.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c48", features: "wasm-mutate/i32.or-commutes,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c49", features: "wasm-mutate/i32.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c50", features: "wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c51", features: "wasm-mutate/container-x-nop,wasm-mutate/i64.and-commutes,wasm-mutate/i64.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c52", features: "wasm-mutate/i64.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c53", features: "wasm-mutate/add_type,wasm-mutate/container-nop-x,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c54", features: "wasm-mutate/i32.or-associates,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c55", features: "wasm-mutate/i32.add_0,wasm-mutate/i32.and-commutes,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c56", features: "wasm-mutate/container-x-nop,wasm-mutate/f32.add_0,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c57", features: "wasm-mutate/i32.drop-x,wasm-mutate/peep_hole" }
+          - { dbconn: "c58", features: "wasm-mutate/i64.add_0,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c59", features: "wasm-mutate/code_motion_loops,wasm-mutate/i64.eq_0,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c60", features: "wasm-mutate/i64.mul_1,wasm-mutate/peep_hole" }
+          - { dbconn: "c61", features: "wasm-mutate/container-nop-x,wasm-mutate/peep_hole" }
+          - { dbconn: "c62", features: "wasm-mutate/modify_custom_section_data,wasm-mutate/container-x-nop,wasm-mutate/peep_hole,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c63", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/select-invert,wasm-mutate/peep_hole" }
+          - { dbconn: "c64", features: "wasm-mutate/i32.mul-by-8,wasm-mutate/peep_hole" }
+          - { dbconn: "c65", features: "wasm-mutate/i32.eq_0,wasm-mutate/i32.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c66", features: "wasm-mutate/f64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c67", features: "wasm-mutate/i32.xor-commutes,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c68", features: "wasm-mutate/f64.add_0,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c69", features: "wasm-mutate/container-x-nop,wasm-mutate/peep_hole" }
+          - { dbconn: "c70", features: "wasm-mutate/f64.add-commutes,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c71", features: "wasm-mutate/i32.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c72", features: "wasm-mutate/i32.add-associates,wasm-mutate/i64.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c73", features: "wasm-mutate/i64.or-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c74", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c75", features: "wasm-mutate/i32.mul-by-2,wasm-mutate/i64.mul_1,wasm-mutate/peep_hole" }
+          - { dbconn: "c76", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c77", features: "wasm-mutate/add_type,wasm-mutate/f64.mul_1,wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c78", features: "wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c79", features: "wasm-mutate/i32.xor-commutes,wasm-mutate/i64.operator_or_commutative,wasm-mutate/i64.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c80", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c81", features: "wasm-mutate/i32.operator_or_commutative,wasm-mutate/i64.add-commutes,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c82", features: "wasm-mutate/f64.use_of_global,wasm-mutate/i32.shr_s_by_0,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c83", features: "wasm-mutate/add_type,wasm-mutate/i32.add_0,wasm-mutate/i32.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c84", features: "wasm-mutate/container-nop-x,wasm-mutate/container-x-drop-i32.rand,wasm-mutate/peep_hole" }
+          - { dbconn: "c85", features: "wasm-mutate/i32.and-commutes,wasm-mutate/i32.operator_and_commutative,wasm-mutate/i64.add-commutes,wasm-mutate/i64.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c86", features: "wasm-mutate/add_function,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c87", features: "wasm-mutate/i64.mul_1,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c88", features: "wasm-mutate/i32.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c89", features: "wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c90", features: "wasm-mutate/i32.add_0,wasm-mutate/i32.mul-by-8,wasm-mutate/i32.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c91", features: "wasm-mutate/code_motion_loops,wasm-mutate/code_motion" }
+          - { dbconn: "c92", features: "wasm-mutate/i64.xor-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c93", features: "wasm-mutate/f32.mul-commutes,wasm-mutate/i32.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c94", features: "wasm-mutate/i32.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c95", features: "wasm-mutate/i32.mul-by-4,wasm-mutate/i32.shr_s_by_0,wasm-mutate/i32.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c96", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i32.add-commutes,wasm-mutate/i32.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c97", features: "wasm-mutate/code_motion_loops,wasm-mutate/i32.unfold,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c98", features: "wasm-mutate/modify_custom_section_data,wasm-mutate/i32.operator_or_commutative,wasm-mutate/peep_hole,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c99", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c100", features: "wasm-mutate/f32.mul-commutes,wasm-mutate/i32.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c101", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c102", features: "wasm-mutate/container-x-nop,wasm-mutate/i32.add-commutes,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c103", features: "wasm-mutate/i32.mul-by-8,wasm-mutate/i32.xor-commutes,wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c104", features: "wasm-mutate/add_type" }
+          - { dbconn: "c105", features: "wasm-mutate/i64.shr_u_by_0,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c106", features: "wasm-mutate/i32.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c107", features: "wasm-mutate/i64.shl_by_0,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c108", features: "wasm-mutate/i32.add_0,wasm-mutate/i32.eq_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c109", features: "wasm-mutate/f32.add_0,wasm-mutate/i32.add-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c110", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c111", features: "wasm-mutate/add_function,wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c112", features: "wasm-mutate/add_type,wasm-mutate/code_motion_loops,wasm-mutate/i32.operator_or_commutative,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c113", features: "wasm-mutate/f32.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c114", features: "wasm-mutate/f64.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c115", features: "wasm-mutate/i64.shr_s_by_0,wasm-mutate/i64.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c116", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c117", features: "wasm-mutate/i32.shr_s_by_0,wasm-mutate/i64.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c118", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i32.add-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c119", features: "wasm-mutate/i32.shl_by_0,wasm-mutate/i32.xor_0,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c120", features: "wasm-mutate/i64.add_0,wasm-mutate/i64.eq-commutes,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c121", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c122", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c123", features: "wasm-mutate/i32.eq_0,wasm-mutate/i64.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c124", features: "wasm-mutate/i32.use_of_global,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c125", features: "wasm-mutate/i64.eq-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c126", features: "wasm-mutate/i64.eq_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c127", features: "wasm-mutate/modify_custom_section_name,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c128", features: "wasm-mutate/f32.mul_1,wasm-mutate/i32.add-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c129", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c130", features: "wasm-mutate/modify_custom_section_name,wasm-mutate/container-nop-x,wasm-mutate/peep_hole,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c131", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/i32.drop-x,wasm-mutate/i32.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c132", features: "wasm-mutate/i32.drop-x,wasm-mutate/i32.eq-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c133", features: "wasm-mutate/f64.mul_1,wasm-mutate/i32.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c134", features: "wasm-mutate/f64.add-commutes,wasm-mutate/i64.add-commutes,wasm-mutate/i64.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c135", features: "wasm-mutate/i32.shr_u_by_0,wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c136", features: "wasm-mutate/code_motion_loops,wasm-mutate/i32.sub_zero,wasm-mutate/i64.add-commutes,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c137", features: "wasm-mutate/container-drop-i64.rand-x,wasm-mutate/peep_hole" }
+          - { dbconn: "c138", features: "wasm-mutate/i64.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c139", features: "wasm-mutate/i32.mul-by-4,wasm-mutate/peep_hole" }
+          - { dbconn: "c140", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/i32.add_0,wasm-mutate/i32.eq-commutes,wasm-mutate/i32.sub_zero,wasm-mutate/i32.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c141", features: "wasm-mutate/i32.xor_0,wasm-mutate/i64.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c142", features: "wasm-mutate/i32.operator_and_commutative,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c143", features: "wasm-mutate/f32.mul-commutes,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c144", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c145", features: "wasm-mutate/i32.and-commutes,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c146", features: "wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c147", features: "wasm-mutate/i64.add-commutes,wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c148", features: "wasm-mutate/i32.add-associates,wasm-mutate/i32.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c149", features: "wasm-mutate/i32.operator_or_commutative,wasm-mutate/i32.shr_u_by_0,wasm-mutate/i64.sub_zero,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c150", features: "wasm-mutate/container-x-drop-i32.rand,wasm-mutate/peep_hole" }
+          - { dbconn: "c151", features: "wasm-mutate/container-nop-x,wasm-mutate/i64.eq_0,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c152", features: "wasm-mutate/i32.eq_0,wasm-mutate/i32.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c153", features: "wasm-mutate/i32.or-commutes,wasm-mutate/i64.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c154", features: "wasm-mutate/i32.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c155", features: "wasm-mutate/modify_custom_section_data,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c156", features: "wasm-mutate/i32.add_0,wasm-mutate/i32.mul_1_t5.snapshot,wasm-mutate/i32.shr_s_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c157", features: "wasm-mutate/i32.xor_0,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c158", features: "wasm-mutate/i64.add-commutes,wasm-mutate/i64.xor-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c159", features: "wasm-mutate/i64.unfold,wasm-mutate/select-invert,wasm-mutate/peep_hole" }
+          - { dbconn: "c160", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c161", features: "wasm-mutate/modify_custom_section_name,wasm-mutate/i32.eq_0,wasm-mutate/i32.mul-by-8,wasm-mutate/peep_hole,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c162", features: "wasm-mutate/i64.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c163", features: "wasm-mutate/container-x-nop,wasm-mutate/i32.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c164", features: "wasm-mutate/i32.add-commutes,wasm-mutate/i64.shr_u_by_0,wasm-mutate/select-invert,wasm-mutate/peep_hole" }
+          - { dbconn: "c165", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c166", features: "wasm-mutate/i64.operator_and_commutative,wasm-mutate/remove_item_global,wasm-mutate/peep_hole,wasm-mutate/remove_item" }
+          - { dbconn: "c167", features: "wasm-mutate/i32.use_of_global,wasm-mutate/i32.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c168", features: "wasm-mutate/i64.eq-commutes,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c169", features: "wasm-mutate/i64.eq_0,wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c170", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c171", features: "wasm-mutate/i32.mul-by-4,wasm-mutate/i64.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c172", features: "wasm-mutate/i32.shr_s_by_0,wasm-mutate/i32.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c173", features: "wasm-mutate/container-x-nop,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c174", features: "wasm-mutate/i32.shr_s_by_0,wasm-mutate/i32.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c175", features: "wasm-mutate/add_type,wasm-mutate/f32.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c176", features: "wasm-mutate/i32.and-associates,wasm-mutate/peep_hole" }
+          - { dbconn: "c177", features: "wasm-mutate/modify_custom_section_name,wasm-mutate/container-x-nop,wasm-mutate/peep_hole,wasm-mutate/modify_custom_section" }
+          - { dbconn: "c178", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i64.or-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c179", features: "wasm-mutate/add_type,wasm-mutate/code_motion_ifs,wasm-mutate/container-drop-i32.rand-x,wasm-mutate/f64.use_of_global,wasm-mutate/i32.mul_1_t5.snapshot,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c180", features: "wasm-mutate/i32.sub_zero,wasm-mutate/i64.eq-commutes,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c181", features: "wasm-mutate/add_type,wasm-mutate/f32.mul-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c182", features: "wasm-mutate/i32.drop-x,wasm-mutate/i32.mul-by-8,wasm-mutate/peep_hole" }
+          - { dbconn: "c183", features: "wasm-mutate/i32.and-commutes,wasm-mutate/i32.operator_and_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c184", features: "wasm-mutate/f64.mul_1,wasm-mutate/i32.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c185", features: "wasm-mutate/add_type,wasm-mutate/i32.xor-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c186", features: "wasm-mutate/i64.add_0,wasm-mutate/i64.sub_zero,wasm-mutate/peep_hole" }
+          - { dbconn: "c187", features: "wasm-mutate/container-x-nop,wasm-mutate/i32.add_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c188", features: "wasm-mutate/f64.mul_1,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c189", features: "wasm-mutate/i32.mul-by-4,wasm-mutate/i64.shl_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c190", features: "wasm-mutate/select-invert,wasm-mutate/remove_item_function,wasm-mutate/peep_hole,wasm-mutate/remove_item" }
+          - { dbconn: "c191", features: "wasm-mutate/i32.mul-by-4,wasm-mutate/i32.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c192", features: "wasm-mutate/i32.mul_1_t5.snapshot,wasm-mutate/i64.and-commutes,wasm-mutate/i64.unfold,wasm-mutate/peep_hole" }
+          - { dbconn: "c193", features: "wasm-mutate/container-nop-x,wasm-mutate/i32.use_of_global,wasm-mutate/peep_hole" }
+          - { dbconn: "c194", features: "wasm-mutate/i32.eq-commutes,wasm-mutate/i32.unfold,wasm-mutate/i64.xor_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c195", features: "wasm-mutate/code_motion_ifs,wasm-mutate/i32.eq-commutes,wasm-mutate/peep_hole,wasm-mutate/code_motion" }
+          - { dbconn: "c196", features: "wasm-mutate/container-x-nop,wasm-mutate/i64.mul-by-8,wasm-mutate/i64.operator_or_commutative,wasm-mutate/peep_hole" }
+          - { dbconn: "c197", features: "wasm-mutate/container-x-drop-i64.rand,wasm-mutate/i32.mul-by-2,wasm-mutate/i64.and-commutes,wasm-mutate/peep_hole" }
+          - { dbconn: "c198", features: "wasm-mutate/i32.xor-commutes,wasm-mutate/i64.shr_u_by_0,wasm-mutate/peep_hole" }
+          - { dbconn: "c199", features: "wasm-mutate/i32.add_0,wasm-mutate/i64.add-commutes,wasm-mutate/peep_hole" }
+        continueOn:
+          failed: true
+   
+  - name: analyzer-template
+
+    inputs:
+      parameters:
+      - name: dbconn
+      - name: features
+      artifacts:
+      - name: data
+        path: /input.wasm
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "wasms/{{workflow.parameters.file}}"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    outputs:
+      artifacts:
+      - name: data
+        path: /{{inputs.parameters.dbconn}}.zip
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/mutate_datas/{{inputs.parameters.dbconn}}.zip"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: logs
+        path: /{{inputs.parameters.dbconn}}.logs.txt
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "datalogs_mutate/{{inputs.parameters.dbconn}}.logs.txt"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: stats
+        path: /{{inputs.parameters.dbconn}}.stats.txt
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/logs_mutate/{{inputs.parameters.dbconn}}.stats.txt"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    script:
+    
+      image: jacarte/obf-image:687cfe1
+      command: [bash]
+      resources:
+        requests:
+          memory: "0"
+          cpu: 1
+      source: |
+         # Install mc client to save snapshot
+          mkdir -p $HOME/minio-binaries
+          wget -O $HOME/minio-binaries/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          ls
+          echo "======"
+          chmod +x $HOME/minio-binaries/mc
+          export PATH=$PATH:$HOME/minio-binaries/
+         
+          mc config host add exp http://minio-service.minio:3434 minio minio123
+          # Now copy this into /wasms
+
+         # Update with latest version
+         git pull
+         git submodule update --recursive
+
+         ls -R ../oracles
+         pip3 install -r ../oracles/requirements.txt
+
+         # Ok compile the right version
+         $HOME/.cargo/bin/cargo build --release --features "{{inputs.parameters.features}}" 
+
+          # launch watchdog
+          touch "{{inputs.parameters.dbconn}}.stats.txt"
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 &
+          watchID=$!
+
+          touch "{{inputs.parameters.dbconn}}.logs.txt"
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 &
+          watchID2=$!
+
+         echo "Oracle {{workflow.parameters.oracle}}"
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate -s {{workflow.parameters.treesize}} -e --attempts {{workflow.parameters.attempts}} -p {{workflow.parameters.peek}}  --input /input.wasm --oracle {{workflow.parameters.oracle}} 1> {{inputs.parameters.dbconn}}.stats.txt 2> {{inputs.parameters.dbconn}}.logs.txt 
+         
+         kill -9 $watchID
+         kill -9 $watchID2
+
+         cp {{inputs.parameters.dbconn}}.logs.txt  /{{inputs.parameters.dbconn}}.logs.txt 
+         cp {{inputs.parameters.dbconn}}.stats.txt  /{{inputs.parameters.dbconn}}.stats.txt 
+
+         # Now save the datas folder
+         7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"
