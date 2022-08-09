@@ -22,7 +22,7 @@ jobs:
           submodules: 'true'
       - name: Install deps
         run: |
-          sudo apt-get update && sudo apt-get install -y curl docker
+          sudo apt-get update && sudo apt-get install -y curl docker.io
           docker --version
 
       - name: Build binaries
