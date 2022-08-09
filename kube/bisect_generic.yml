@@ -148,7 +148,7 @@ spec:
           watchID2=$!
 
          echo "Oracle {{workflow.parameters.oracle}}"
-         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate -s {{inputs.parameters.peek}} -e --attempts {{inputs.parameters.peek}} -p {{inputs.parameters.peek}} -b --input /input.wasm --oracle {{workflow.parameters.oracle}} 1> {{inputs.parameters.dbconn}}.stats.txt 2> {{inputs.parameters.dbconn}}.logs.txt 
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate -p {{inputs.parameters.peek}} -e --attempts {{inputs.parameters.attempts}} -s {{inputs.parameters.treesize}} -b --input /input.wasm --oracle {{workflow.parameters.oracle}} 1> {{inputs.parameters.dbconn}}.stats.txt 2> {{inputs.parameters.dbconn}}.logs.txt 
          
          kill -9 $watchID
          kill -9 $watchID2
