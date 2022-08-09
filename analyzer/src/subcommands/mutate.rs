@@ -1,11 +1,18 @@
 use std::{sync::{Arc, atomic::{AtomicBool, Ordering}}, fs, io::{Read, Write}, process::ExitStatus, collections::HashSet, path::Path, os::unix::net::UnixListener, thread::spawn};
 use anyhow::Context;
 use rand::{rngs::SmallRng, SeedableRng, Rng};
+use sled::Mode;
 use wasm_mutate::WasmMutate;
 use core::hash::Hash;
 
 use crate::{errors::{AResult, CliError}, State, SOCKET_PATH, send_signal_to_probes_socket};
 use std::thread;
+
+#[derive(Debug)]
+pub enum MODE {
+    SEQUENTIAL,
+    BISECT(u32,u32)
+}
 
 fn open_socket() -> AResult<String> {
 
@@ -58,7 +65,44 @@ fn open_socket() -> AResult<String> {
     Ok(outfile)
 }
 
-pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<()> {
+pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<()> {
+    let mut low = 0;
+    let mut high = tree_size*2;
+    let mut last_size = 0;
+    loop {
+        if high - low <= 1 {
+            break
+        }
+        let tsize = (low + high) / 2;
+        log::debug!("Going mutate for tree_size {}", tsize);
+        let statecp = state.clone();
+        let pathcp = path.clone();
+        let commandcp = command.clone();
+        let argsclone = args.clone();
+        
+
+        let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attemps, true, peek_count, seed, tsize)?;
+
+        log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
+        if interesting_count == 0 {
+            if high == tree_size {
+                panic!("Ensure that the first config already get interesting points from the oracle")
+            } else {
+                // Go lower
+                high = (low + high)/2;
+            }
+        } else {
+            // Go higher
+            last_size = tsize;
+            high = (high + low)/2;
+        }
+    }
+    println!("Minimum tree size {}", last_size);
+    Ok(())
+}
+
+
+pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<(u32, u32)> {
     log::debug!("Mutating binary {}", path);
     let th = spawn(move || {
         open_socket()
@@ -82,7 +126,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     let mut bin = match &buf {
         // Filter first the header to check for Wasm
         b"\0asm" => {
-            fs::read(path)?
+            fs::read(path.clone())?
         }
         _ => {
             return Err(CliError::Any("Invalid Wasm header".into()))
@@ -96,7 +140,6 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     let mut collision_count = 0;
     let mut interesting_count = 0;
     let mut parent = String::new();
-    
     'attempts: while elapsed < attemps {
         // mutated = m 
         let s = gn.gen();
@@ -148,6 +191,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             elapsed += 1;
         }
 
+
         while let Some((newbin, idx)) = worklist.pop() {
 
             swap(&mut bin, newbin.clone());
@@ -155,14 +199,14 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone());
 
             let (interesting, out) = if r.success() {
+                
                 let fname = format!("{session_folder}/non_interesting");                
                 fs::create_dir(fname.clone());
                 (false, fname)
-            } else {      
+            } else {
                 interesting_count += 1;   
                 let fname = format!("{session_folder}/interesting");   
-                fs::create_dir(fname.clone());   
-                (true, fname)
+                fs::create_dir(fname.clone());                   (true, fname)
             };
     
             let fname = format!("{out}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
@@ -197,7 +241,6 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             }
         }
 
-
     }
     
     println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
@@ -205,8 +248,21 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     // Now save the session to a folder ?
     send_signal_to_probes_socket("STOP".into());
     let outfile = th.join().unwrap()?;
-    Ok(())
+    Ok((elapsed, interesting_count))
+}
 
+pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32, mode: MODE) -> AResult<()> {
+    
+    match mode {
+        MODE::SEQUENTIAL => {
+            mutate_sequential(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size)?;
+        }
+        MODE::BISECT(_, _) => {
+            mutate_bisect(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size)?;
+        }
+    };
+
+    Ok(())
 }
 
 fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> (ExitStatus, Vec<u8>, Vec<u8>) {
@@ -239,10 +295,11 @@ pub mod tests {
     use std::sync::{atomic::{AtomicU32, AtomicBool}, Arc};
 
     use env_logger::{Env, Builder};
+    use sled::Mode;
 
     use crate::{db::DB, State};
 
-    use super::mutate;
+    use super::{mutate, MODE};
 
 
 
@@ -272,6 +329,6 @@ pub mod tests {
 
         mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
             "tests/oracle_size.sh".into()
-        ],600,false, 1, 0, 1).unwrap()
+        ],600,false, 1, 0, 1, MODE::SEQUENTIAL).unwrap()
     }
 }
