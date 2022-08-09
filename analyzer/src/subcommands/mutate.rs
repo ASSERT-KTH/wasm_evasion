@@ -65,39 +65,138 @@ fn open_socket() -> AResult<String> {
     Ok(outfile)
 }
 
-pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<()> {
-    let mut low = 0;
-    let mut high = tree_size*2;
-    let mut last_size = 0;
-    loop {
-        if high - low <= 1 {
-            break
-        }
-        let tsize = (low + high) / 2;
-        log::debug!("Going mutate for tree_size {}", tsize);
-        let statecp = state.clone();
-        let pathcp = path.clone();
-        let commandcp = command.clone();
-        let argsclone = args.clone();
+pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, peek_count: u32, seed: u64, tree_size: u32) -> AResult<()> {
+
+
+    let statecp = state.clone();
+    let pathcp = path.clone();
+    let commandcp = command.clone();
+    let argsclone = args.clone();
+    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attemps, true, peek_count as u64, seed, tree_size)?;
         
-
-        let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attemps, true, peek_count, seed, tsize)?;
-
-        log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
-        if interesting_count == 0 {
-            if high == tree_size {
-                panic!("Ensure that the first config already get interesting points from the oracle")
-            } else {
-                // Go lower
-                high = (low + high)/2;
-            }
-        } else {
-            // Go higher
-            last_size = tsize;
-            high = (high + low)/2;
-        }
+    if interesting_count == 0 {
+        panic!("Ensure the first config find interesting points in the oracle")
     }
-    println!("Minimum tree size {}", last_size);
+
+    let mut dimensions = vec![
+        (0, tree_size*2, tree_size, "tree_size"),
+        (0, attemps*2, attemps, "attempts"),
+        (0, peek_count*2, peek_count, "peek")
+    ];
+    let mut finished = vec![
+        false,
+        false,
+        false
+    ];
+    let mut dimindex = 0;
+    loop {
+        if finished.iter().all(|f|*f) {
+            break;
+        }
+        // Iterate through dimensions until all finished
+        loop {
+            let mut dim = &dimensions[dimindex];            
+            println!("dim {:?}", dim);
+            match dimindex {
+                0 => {
+                    let ( mut low, mut high, mut last_success,  _)  = dim;
+                    if high - low <= 1 {
+                        finished[dimindex] = true;
+                        break
+                    }
+                    let tsize = (low + high) / 2;
+                    log::debug!("Going mutate for tree_size {}", tsize);
+                    let statecp = state.clone();
+                    let pathcp = path.clone();
+                    let commandcp = command.clone();
+                    let argsclone = args.clone();
+                    let lastattempts = dimensions[1].2;
+                    let lastpeek = dimensions[2].2;
+            
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattempts, true, lastpeek as u64, seed, tsize)?;
+            
+                    log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
+                    if interesting_count == 0 {
+                        // Go lower
+                        let dim = ((low+high)/2, high, last_success, "tree");
+                        dimensions[dimindex] = dim;
+                    
+                    } else {
+                        // Go higher
+                        let dim = (low, (low+high)/2, tsize, "tree");
+                        dimensions[dimindex] = dim;
+                    }
+                }
+                1 => {
+                    let (mut low, mut high, mut last_success, _) = dim;
+                    if high - low <= 1 {
+                        finished[dimindex] = true;
+                        break
+                    }
+                    let attempts = (low + high) / 2;
+                    log::debug!("Going mutate for attempt {}", attempts);
+                    let statecp = state.clone();
+                    let pathcp = path.clone();
+                    let commandcp = command.clone();
+                    let argsclone = args.clone();
+                    let lastsize = dimensions[0].2;
+                    let lastpeek = dimensions[2].2;
+            
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attempts, true, lastpeek as u64, seed, lastsize)?;
+            
+                    log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
+                    if interesting_count == 0 {
+                        
+                        // Go lower
+                        let dim = ((low+high)/2, high, last_success, "attempts");
+                        dimensions[dimindex] = dim;
+                        
+                    } else {
+                        // Go higher
+                        let dim = (low, (low+high)/2, attempts, "attempts");
+                        dimensions[dimindex] = dim;
+                    }
+                }
+                2 => {
+                    let (mut low, mut high, mut last_success, _) = dim;
+                    if high - low <= 1 {
+                        finished[dimindex] = true;
+                        break
+                    }
+                    let peeks = (low + high) / 2;
+                    log::debug!("Going mutate for peeks {}", peeks);
+                    let statecp = state.clone();
+                    let pathcp = path.clone();
+                    let commandcp = command.clone();
+                    let argsclone = args.clone();
+                    let lastsize = dimensions[0].2;
+                    let lastattemps = dimensions[1].2;
+                    
+            
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattemps, true, peeks as u64, seed, lastsize)?;
+            
+                    log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
+                    if interesting_count == 0 {
+                        
+                        // Go lower
+                        let dim = ((low+high)/2, high, last_success, "peek");
+                        dimensions[dimindex] = dim;
+                        
+                    } else {
+                        // Go higher
+                        let dim = (low, (low+high)/2, peeks, "peek");
+                        dimensions[dimindex] = dim;
+                    }
+                }
+                _ => {
+                    panic!("Invalid dimension")
+                }
+            }
+            
+        }
+        dimindex = (dimindex + 1) % dimensions.len();
+    }
+    println!("Minimum config {:?}", dimensions);
     Ok(())
 }
 
@@ -258,7 +357,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             mutate_sequential(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size)?;
         }
         MODE::BISECT(_, _) => {
-            mutate_bisect(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size)?;
+            mutate_bisect(state, path, command, args, attemps, peek_count as u32, seed, tree_size)?;
         }
     };
 
