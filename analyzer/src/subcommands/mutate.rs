@@ -365,7 +365,7 @@ fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> AResult<(Ex
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .output()
-        .map_err(|e| CliError::Any(format!("Failed to run command {}. Error {}", command, e)));
+        .map_err(|e| CliError::Any(format!("Failed to run command {} args {:?}. Error {}", command, args, e)));
 
     let output = output?;
 
