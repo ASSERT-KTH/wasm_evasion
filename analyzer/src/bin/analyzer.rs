@@ -3,7 +3,7 @@
 use analyzer::db::DB;
 use analyzer::errors::CliError;
 use analyzer::logger::FilterLogger;
-use analyzer::subcommands::mutate::mutate;
+use analyzer::subcommands::mutate::{mutate, MODE};
 use analyzer::{arg_or_error, arge, State};
 use clap::{load_yaml, value_t, App};
 use env_logger::{Builder, Env};
@@ -89,7 +89,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
             let exit_on_found = args.is_present("exit_on_found");
 
             let oracle: Vec<_> = args.values_of("oracle").unwrap().collect();
-
+            let mode = if args.is_present("bisect") {  MODE::BISECT(0, tree_size*2)} else {MODE::SEQUENTIAL}; 
             let command = oracle[0];
             let input = args.value_of("input").unwrap();
             let args = &oracle[1..];
@@ -99,7 +99,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
                     command.into(), 
                     args.iter().map(|f|f.clone().into()).collect::<Vec<_>>(), 
                     attemps as u32, 
-                    exit_on_found, peek_count, seed, tree_size)?;
+                    exit_on_found, peek_count, seed, tree_size, mode)?;
         }
         ("extract", Some(args)) => {
             let reset = args.is_present("reset");

@@ -150,11 +150,26 @@ subcommands:
               long: attempts
               help: "Attemps to process a binary. If the attemps number is reached the mutation process stops."
 
+          - tree_size:
+              short: s
+              required: false
+              takes_value: true
+              value_name: "size"
+              default_value: "1"
+              long: tree-size
+              help: "Peephole replacement size."
+
           - exit_on_found:
               short: e
               required: false
               long: exit-on-found
               help: "Exit as soon as the oracle found and interesting point. Otherwise it will return all intersting points until timeout"
+
+          - bisect:
+              short: b
+              required: false
+              long: bisect
+              help: "(Experimental) Only uses the peep_hole feature to bisect which tree size is the miinimum needed to break the oracle."
 
           - peek_count:
               short: p
