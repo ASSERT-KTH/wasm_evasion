@@ -2,6 +2,7 @@
 
 use analyzer::db::DB;
 use analyzer::errors::CliError;
+use analyzer::logger::FilterLogger;
 use analyzer::subcommands::mutate::mutate;
 use analyzer::{arg_or_error, arge, State};
 use clap::{load_yaml, value_t, App};
@@ -24,6 +25,7 @@ use std::collections::HashMap;
 #[macro_use]
 extern crate log;
 
+
 use analyzer::subcommands::export::export;
 use analyzer::subcommands::extract::extract;
 use analyzer::subcommands::reduce::reduce;
@@ -32,12 +34,11 @@ fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
 }
 
-pub fn main() -> Result<(), analyzer::errors::CliError> {
+pub fn main() -> Result<(), analyzer::errors::CliError> {    
     let env = Env::default()
-        //.filter_or("LOG_LEVEL", "trace")
-        .filter("RUST_LOG")
+        .filter_or("LOG_LEVEL", "debug")
+        .filter("RUST_LOG")        
         .write_style_or("LOG_STYLE", "never");
-
     Builder::from_env(env).init();
 
     let yaml = load_yaml!("config.yml");
