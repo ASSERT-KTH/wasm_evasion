@@ -1,13 +1,70 @@
-use std::{sync::Arc, fs, io::{Read, Write}, process::ExitStatus, collections::HashSet};
+use std::{sync::{Arc, atomic::{AtomicBool, Ordering}}, fs, io::{Read, Write}, process::ExitStatus, collections::HashSet, path::Path, os::unix::net::UnixListener, thread::spawn};
 use anyhow::Context;
 use rand::{rngs::SmallRng, SeedableRng, Rng};
 use wasm_mutate::WasmMutate;
 use core::hash::Hash;
-use crate::{errors::{AResult, CliError}, State};
 
+use crate::{errors::{AResult, CliError}, State, SOCKET_PATH, send_signal_to_probes_socket};
+use std::thread;
+
+fn open_socket() -> AResult<String> {
+
+    let outfile = format!("probes.logs.txt");
+    let mut f = fs::File::create(outfile.clone())?;
+
+    log::debug!("Opening probes sockets in {}", SOCKET_PATH);
+
+    let socket = Path::new(SOCKET_PATH);
+
+    if socket.exists() {
+        log::debug!("File exist");
+        fs::remove_file(SOCKET_PATH)?;
+        // fs::unlink(&socket)?
+    }
+
+    let stream = UnixListener::bind(&socket)?;
+
+    log::debug!("Socket waiting for probe messages");
+
+    let mut wait = false;
+    'always_listening: loop {
+
+        for (mut stream, _) in stream.accept() {
+            let mut buff =  String::new();
+            stream.read_to_string(&mut buff)?;
+
+            match buff.as_str()  {
+                "STOP" => { break 'always_listening }
+                "SAVE" => {
+                    // Wait next message to be the file
+                    wait = true;
+                }
+                _ => {
+                    println!("wait {:?}", wait);
+                    if wait {
+                        f.flush()?;
+                        fs::copy(outfile.clone(), buff)?;
+                        f = fs::File::create(outfile.clone())?;
+                        wait = false;
+                    } else {
+                        f.write_all(&buff.as_bytes())?;
+                    }
+                }
+            }
+
+        }
+    }
+
+    Ok(outfile)
+}
 
 pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64) -> AResult<()> {
     log::debug!("Mutating binary {}", path);
+    let th = spawn(move || {
+        open_socket()
+    });
+
+
     let mut file = fs::File::open(path.clone())?;
     let session_folder = format!("{}/{}_{}_a{}_p{}", state.dbclient.as_ref().unwrap().f, 
         command.replace("/", "_"), 
@@ -33,11 +90,12 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     };
     
     let mut elapsed = 0;
-    let mut hist = vec![];
     let mut gn = SmallRng::seed_from_u64(seed);
 
     let mut seen: HashSet<blake3::Hash> = HashSet::new();
     let mut collision_count = 0;
+    let mut interesting_count = 0;
+    let mut parent = String::new();
     
     'attempts: while elapsed < attemps {
         // mutated = m 
@@ -95,45 +153,53 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             // TODO Move this to parallel execution
             let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone());
 
-            if r.success() {
-                // continue since it is not interesting
-            } else {               
-                hist.push((s, elapsed, idx, stdout, stderr, newbin));
+            let interesting = if r.success() {
+                false
+            } else {      
+                interesting_count += 1;         
+                true
+            };
     
-                if exit_on_found {
-                    break 'attempts;
-                }
-            }
-    
+            let fname = format!("{session_folder}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
+            fs::create_dir(fname.clone());
+            fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
+
+            let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
+            f.write_all(format!("seed: {}\n", seed).as_bytes())?;
+            f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
+            f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
+            f.write_all(format!("idx: {}\n", idx).as_bytes())?;
+            f.write_all(format!("interesting: {}\n", interesting).as_bytes())?;
+            f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
+            f.write_all(format!("parent: {}\n", parent).as_bytes())?;
+            // TODO Add Meta info of the variant ?
+
+            fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
+            fs::write(format!("{}/variant.wasm", fname), &newbin)?;
+
+            send_signal_to_probes_socket("SAVE".into());
+            // Send filena name
+            send_signal_to_probes_socket(format!("{}/probes.logs.txt", fname));
             elapsed += 1;
+            parent = fname;
+
+            if exit_on_found && interesting {
+                break 'attempts;
+            }
 
             if elapsed % 100 == 99 {
-                log::debug!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, hist.len());
+                println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
             }
         }
 
 
     }
     
-    log::debug!("Saving interesting {}", hist.len());
+    println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
 
-    for (s, elapsed, idx, stdout, stderr, newbin) in hist {
-        let fname = format!("{session_folder}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
-        fs::create_dir(fname.clone());
-        fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
-
-        let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
-        f.write_all(format!("seed: {}\n", seed).as_bytes())?;
-        f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
-        f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
-        f.write_all(format!("idx: {}\n", idx).as_bytes())?;
-        f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
-        // TODO Add Meta info of the variant ?
-
-        fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
-        fs::write(format!("{}/variant.wasm", fname), &newbin)?;
-    }
     // Now save the session to a folder ?
+    send_signal_to_probes_socket("STOP".into());
+    let outfile = th.join().unwrap()?;
     Ok(())
 
 }
