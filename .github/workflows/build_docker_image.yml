@@ -27,9 +27,15 @@ jobs:
           docker build --no-cache -t jacarte/obf-image:latest -f Dockerfile .
 
       
+      - name: Build docker image ref
+        run: |
+          git_hash=$(git rev-parse --short HEAD)
+          docker build --no-cache -t jacarte/obf-image:$git_hash -f Dockerfile .
+
       - name: Push images
         run: |
-          docker login -u="$user" -p="$pass" && docker push jacarte/obf-image:latest
+          git_hash=$(git rev-parse --short HEAD)
+          docker login -u="$user" -p="$pass" && docker push jacarte/obf-image:latest && docker push jacarte/obf-image:$git_hash
         env:
           user: ${{secrets.DOCKER_USER}}
           pass: ${{secrets.DOCKER_PASS}}
