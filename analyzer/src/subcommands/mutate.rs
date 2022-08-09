@@ -40,7 +40,7 @@ fn open_socket() -> AResult<String> {
                     wait = true;
                 }
                 _ => {
-                    println!("wait {:?}", wait);
+                    buff.push_str(&"\n");
                     if wait {
                         f.flush()?;
                         fs::copy(outfile.clone(), buff)?;
@@ -58,7 +58,7 @@ fn open_socket() -> AResult<String> {
     Ok(outfile)
 }
 
-pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64) -> AResult<()> {
+pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<()> {
     log::debug!("Mutating binary {}", path);
     let th = spawn(move || {
         open_socket()
@@ -102,6 +102,7 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
         let s = gn.gen();
         let mut config = WasmMutate::default();
         config.preserve_semantics(true);
+        config.peephole_size(tree_size);
         config.seed(s);
         //let stinfo = config
         //.setup(&bin)
@@ -153,14 +154,18 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
             // TODO Move this to parallel execution
             let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone());
 
-            let interesting = if r.success() {
-                false
+            let (interesting, out) = if r.success() {
+                let fname = format!("{session_folder}/non_interesting");                
+                fs::create_dir(fname.clone());
+                (false, fname)
             } else {      
-                interesting_count += 1;         
-                true
+                interesting_count += 1;   
+                let fname = format!("{session_folder}/interesting");   
+                fs::create_dir(fname.clone());   
+                (true, fname)
             };
     
-            let fname = format!("{session_folder}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
+            let fname = format!("{out}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
             fs::create_dir(fname.clone());
             fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
@@ -267,6 +272,6 @@ pub mod tests {
 
         mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
             "tests/oracle_size.sh".into()
-        ],600,false, 1, 0).unwrap()
+        ],600,false, 1, 0, 1).unwrap()
     }
 }
