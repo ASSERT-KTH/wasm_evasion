@@ -22,12 +22,12 @@ jobs:
           submodules: 'true'
       
 
-      - name: Build binaries
+      - name: Build docker image
         run: |
           docker build --no-cache -t jacarte/obf-image:latest -f Dockerfile .
 
       
-      - name: Push images CROW
+      - name: Push images
         run: |
           docker login -u="$user" -p="$pass" && docker push jacarte/obf-image:latest
         env:
