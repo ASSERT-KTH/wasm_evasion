@@ -15,15 +15,15 @@ jobs:
   build:
     name: Build docker
     # This job runs on Linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: 'true'
       - name: Install deps
         run: |
-          sudo apt-get update && sudo apt-get install -y curl docker.io
-
+          sudo apt-get update && sudo apt-get install -y curl docker
+          docker --version
 
       - name: Build binaries
         run: |
