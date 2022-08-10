@@ -53,7 +53,7 @@ fn open_socket() -> AResult<String> {
                 _ => {
                     buff.push_str(&"\n");
                     f.write_all(&buff.as_bytes())?;
-                    
+                    f.flush()?;
                 }
             }
 
