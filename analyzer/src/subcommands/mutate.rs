@@ -277,11 +277,6 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
             }
         }
 
-        if worklist.len() == 0 {
-            elapsed += 1;
-        }
-
-
         while let Some((newbin, idx)) = worklist.pop() {
 
             swap(&mut bin, newbin.clone());
@@ -319,18 +314,19 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
             send_signal_to_probes_socket("SAVE".into());
             // Send filena name
             send_signal_to_probes_socket(format!("{}/probes.logs.txt", fname));
-            elapsed += 1;
             parent = fname;
 
             if exit_on_found && interesting {
                 break 'attempts;
             }
-
-            if elapsed % 10 == 9 {
-                println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
-            }
         }
 
+        elapsed += 1;
+
+
+        if elapsed % 10 == 9 {
+            println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
+        }
     }
     
     println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
