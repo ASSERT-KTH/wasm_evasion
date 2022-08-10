@@ -33,7 +33,6 @@ fn open_socket() -> AResult<String> {
 
     log::debug!("Socket waiting for probe messages");
 
-    let mut wait = false;
     'always_listening: loop {
 
         for (mut stream, _) in stream.accept() {
@@ -44,11 +43,10 @@ fn open_socket() -> AResult<String> {
             match splat[0]  {
                 "STOP" => { break 'always_listening }
                 "SAVE" => {
-                    f.flush()?;
                     f.write_all(&"NEW VARIANT\n".as_bytes());
                     f.write_all(&splat[1].as_bytes());
                     f.write_all(&"\n".as_bytes());
-                    wait = false;
+                    f.flush()?;
                 }
                 _ => {
                     buff.push_str(&"\n");
