@@ -304,7 +304,7 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
             fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
             let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
-            f.write_all(format!("seed: {}\n", seed).as_bytes())?;
+            f.write_all(format!("seed: {}\n", s).as_bytes())?;
             f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
             f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
             f.write_all(format!("idx: {}\n", idx).as_bytes())?;
