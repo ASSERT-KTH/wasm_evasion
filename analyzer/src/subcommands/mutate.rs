@@ -39,23 +39,21 @@ fn open_socket() -> AResult<String> {
         for (mut stream, _) in stream.accept() {
             let mut buff =  String::new();
             stream.read_to_string(&mut buff)?;
+            let splat = buff.split("][").collect::<Vec<_>>();
 
-            match buff.as_str()  {
+            match splat[0]  {
                 "STOP" => { break 'always_listening }
                 "SAVE" => {
-                    // Wait next message to be the file
-                    wait = true;
+                    f.flush()?;
+                    f.write_all(&"NEW VARIANT\n".as_bytes());
+                    f.write_all(&splat[1].as_bytes());
+                    f.write_all(&"\n".as_bytes());
+                    wait = false;
                 }
                 _ => {
-                    if wait {
-                        f.flush()?;
-                        fs::copy(outfile.clone(), buff)?;
-                        f = fs::File::create(outfile.clone())?;
-                        wait = false;
-                    } else {
-                        buff.push_str(&"\n");
-                        f.write_all(&buff.as_bytes())?;
-                    }
+                    buff.push_str(&"\n");
+                    f.write_all(&buff.as_bytes())?;
+                    
                 }
             }
 
@@ -311,9 +309,8 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
             fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
             fs::write(format!("{}/variant.wasm", fname), &newbin)?;
 
-            send_signal_to_probes_socket("SAVE".into());
+            send_signal_to_probes_socket(format!("SAVE][{}/probes.logs.txt", fname));
             // Send filena name
-            send_signal_to_probes_socket(format!("{}/probes.logs.txt", fname));
             parent = fname;
 
             if exit_on_found && interesting {
