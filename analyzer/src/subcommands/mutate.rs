@@ -48,9 +48,6 @@ fn open_socket() -> AResult<String> {
                     f.write_all(&"\n".as_bytes());
                     f.flush()?;
                 }
-                "RESET" => {
-                    f = fs::File::create(outfile.clone())?;
-                }
                 _ => {
                     buff.push_str(&"\n");
                     f.write_all(&buff.as_bytes())?;
@@ -196,7 +193,12 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
     let th = spawn(move || {
         open_socket()
     });
-
+    loop {
+        if Path::new("probes.logs.txt").exists() {
+            log::debug!("Probes file exists");
+            break
+        }
+    }
 
     let mut file = fs::File::open(path.clone())?;
     let session_folder = format!("{}/{}_{}_a{}_p{}_ts{}", state.dbclient.as_ref().unwrap().f, 
