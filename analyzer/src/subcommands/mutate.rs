@@ -43,10 +43,13 @@ fn open_socket() -> AResult<String> {
             match splat[0]  {
                 "STOP" => { break 'always_listening }
                 "SAVE" => {
-                    f.write_all(&"NEW VARIANT\n".as_bytes());
+                    f.write_all(&"New variant\n".as_bytes());
                     f.write_all(&splat[1].as_bytes());
                     f.write_all(&"\n".as_bytes());
                     f.flush()?;
+                }
+                "RESET" => {
+                    f = fs::File::create(outfile.clone())?;
                 }
                 _ => {
                     buff.push_str(&"\n");
@@ -254,7 +257,6 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
                         },
                         Ok(b) => {
                             // FIXME, Prevent to save a previous seen binary
-                            
                             // TODO, validate as well
                             let hash = blake3::hash(&b.clone());
 
@@ -264,6 +266,7 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
                                 ));
                                 seen.insert(hash);
                             } else {
+                                log::debug!("Binary already seen");
                                 collision_count += 1;
                             }
                             
@@ -272,7 +275,13 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
                 }
             }
         }
-
+        log::debug!("Worklist size {}", worklist.len());
+        if worklist.len() == 0 {
+            // Reset the probes file
+            elapsed += 1;
+            send_signal_to_probes_socket(format!("No mutation"));
+            continue;
+        }
         while let Some((newbin, idx)) = worklist.pop() {
 
             swap(&mut bin, newbin.clone());
@@ -312,6 +321,7 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
             parent = fname;
 
             if exit_on_found && interesting {
+                elapsed += 1;
                 break 'attempts;
             }
         }
