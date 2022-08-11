@@ -195,7 +195,8 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
     });
     loop {
         if Path::new("probes.logs.txt").exists() {
-            log::debug!("Probes file exists");
+            log::debug!("Probes file exists. Waiting for setle down 30s");
+            thread::sleep(std::time::Duration::from_secs(30));
             break
         }
     }
