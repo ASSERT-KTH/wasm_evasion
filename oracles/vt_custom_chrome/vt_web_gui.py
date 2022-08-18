@@ -220,9 +220,26 @@ def check_file(driver, filename, prev = {}):
     print(inpt)
     inpt.send_keys(os.path.abspath(filename))
 
+    # Now confirm the upload if needed
+    times = 0
+    while True:
+        try:
+            btn = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#confirmUpload')")
+            if btn:
+                print("Confirming upload")
+                driver.execute_script("arguments[0].click();", btn)
+                break
+            times += 1
+            if times > 1000:
+                break
+        except Exception as e:
+            print(e) 
+            pass
+
     content_text = ""
 
     # input()
+    time.sleep(5)
     times = 0
     while "Undetected" not in content_text:
         #print("Getting")
@@ -239,6 +256,12 @@ def check_file(driver, filename, prev = {}):
                 time.sleep(40)
                 raise Exception("Blocked. Restarting tor ?")
             image = fullpage_screenshot(driver, f"out/{name}snapshot.png")
+
+    while "Analysing" in content_text:
+        print("Yet analysing...")
+        content = driver.find_element(By.TAG_NAME, 'body')
+        content_text = expand_element(driver, content, {})
+
 
     fd = open(f"out/{name}.logs.txt", "w")
     fd.write(content_text)
