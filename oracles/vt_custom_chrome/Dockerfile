@@ -17,22 +17,28 @@ RUN mkdir /vt_oracle
 WORKDIR /vt_oracle
 
 COPY vt_web_gui.py .
+COPY vt_web_api.py .
+COPY parse_result.py .
 COPY tor.sh .
 COPY requirements.txt .
 COPY test.wasm /data/test.wasm
+COPY entrypoint.sh .
 RUN mkdir out
+RUN mkdir upload
 
 RUN pip3 install -r requirements.txt
 RUN wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/104.0.5112.79/chromedriver_linux64.zip
 RUN unzip chromedriver.zip
 RUN rm chromedriver.zip
-RUN mv chromedriver /bin/chromedriver
+# RUN mv chromedriver /bin/chromedriver
 RUN touch name.socket
 
 RUN ls .
 
 ENV NO_WORKERS "8"
+ENV WEB_USER "admin"
+ENV WEB_PASS  "admin"
 
-CMD /bin/bash -c "/bin/bash tor.sh & \
- python3 vt_web_gui.py /data"
+
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 # Download the driver
