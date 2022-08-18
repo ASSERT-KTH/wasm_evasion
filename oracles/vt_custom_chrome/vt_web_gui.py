@@ -2,22 +2,17 @@ from difflib import diff_bytes
 import sys
 
 from selenium import webdriver
-import unittest
 import os
 from PIL import Image
 import time
-import numpy as np
-from subprocess import check_output
-import shutil
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-import cv2
-import pytesseract
-import socket,os
 from selenium.webdriver.common.keys import Keys
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
-
+import random
+import queue
+import threading
 
 def fullpage_screenshot(driver, file):
 
@@ -88,9 +83,15 @@ def setUp():
     os.putenv('PREDEF_FILE', os.path.abspath("name.socket"))
     os.environ['PREDEF_FILE'] = os.path.abspath("name.socket")
     options = webdriver.ChromeOptions()
-    options.binary_location = '/Users/javierca/Documents/Develop/chromium/src/out/Default/Chromium.app/Contents/MacOS/Chromium'
+    PROXY = "socks5://127.0.0.1:9050" # IP:PORT or HOST:PORT
+    options.add_argument('--proxy-server=%s' % PROXY)
+    options.add_argument("disable-infobars"); # disabling infobars
+    options.add_argument("--disable-extensions"); # disabling extensions
+    options.add_argument("--disable-gpu"); # applicable to windows os only
+    options.add_argument("--disable-dev-shm-usage"); # overcome limited resource problems
+    options.add_argument("--no-sandbox"); #Bypass OS security model
     options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument('window-size=1200x1000')
     path = os.path.join(os.path.dirname(__file__), "chromedriver")
     
@@ -100,40 +101,66 @@ def setUp():
 
 def check_files(files):
 
+    WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "2"))
+
+    worklist = queue.Queue()
+
     prev = {}
-    times = 0
-    pool = ThreadPoolExecutor(1)
 
-    jobs = []
+    def process():
 
-    def process(i, filename):
+        while True:
+            s = worklist.qsize()
+            if s == 0:
+                print("Worklist empty, returning")
+                break
+
+            filename = worklist.get()
+            worklist.task_done()
+            print("Work count", s)
+            times = 0        
+            driver = setUp()
+
+            done = False
+            while times < 3:
+                try:
+                    check_file(driver, filename, prev = prev)        
+                    print(f"{i}/{len(files)} {filename}")
+                    done = True
+                    break
+                except Exception as e:
+                    print(e)
+                    times += 1
+                    time.sleep(4*times)
+            if not done:
+                # requeue the page
+                worklist.put(filename)
+
+    C = 0
+    for i, filename in enumerate(files):
         # Check if exist
         content = open(filename, "rb").read()
-
         hash = hashlib.sha256(content).hexdigest()
-
         if os.path.exists(f"out/{hash}.wasm.logs.txt"):
-            print(f"File {i}/{len(files)} {filename} already checked")
-            return 
+            print(f"{C} File {filename} already checked")
+            C += 1
+            continue 
 
-        times = 0        
-        driver = setUp()
+        worklist.put(filename)
 
-        while times < 3:
-            try:
-                check_file(driver, filename, prev = prev)        
-                print(f"{i}/{len(files)} {filename}")
-                break
-            except Exception as e:
-                print(e)
-                times += 1
-                time.sleep(4*times)
+    print(f"Files count {worklist.qsize()}. Launching {WORKERS_NUMBER} workers")
 
-    for i, filename in enumerate(files):
-        jobs.append(pool.submit(process, i, filename))
+    workers = []
+    for _ in range(WORKERS_NUMBER):
+        th = threading.Thread(target=process)
+        workers.append(th)
+        th.start()
 
-    for j in jobs:
-        j.result()
+    for th in workers:
+        th.join()
+
+    #for j in jobs:
+    #    j.result()
         
 
 def expand_element(driver, element, visited):
@@ -169,19 +196,18 @@ def expand_shadow_element(driver, element):
 
 def check_file(driver, filename, prev = {}):
     name = os.path.basename(filename)
-    try:
-        os.remove("name.socket")
-    except OSError:
-        pass
-
-    fifo = open("name.socket", "w")
-    fifo.write(os.path.abspath(filename))
-    fifo.write("\n")
-    fifo.close()
+   
     url = "https://www.virustotal.com/gui/home/upload"
     driver.delete_all_cookies()
+
+    # To avoid bot
+    time.sleep(random.randint(1,5))
+
     driver.get(url)
     
+    # To avoid bot
+    time.sleep(random.randint(1,5))
+
     while True:
         # Detect where the button is
         # #infoIcon
@@ -196,15 +222,29 @@ def check_file(driver, filename, prev = {}):
 
     content_text = ""
 
+    # input()
+    times = 0
     while "Undetected" not in content_text:
-        print("Getting")
+        #print("Getting")
         content = driver.find_element(By.TAG_NAME, 'body')
         content_text = expand_element(driver, content, {})
+        times += 1
+
+        if times %100 == 99:
+            # Take an screenshot and see what is happening
+            print(f"It seems like the bot is blocked ({times})")
+            print(driver.current_url)
+            if "captcha" in driver.current_url or times >= 500:
+                open("name.socket", 'w').write("RESTART")
+                time.sleep(40)
+                raise Exception("Blocked. Restarting tor ?")
+            image = fullpage_screenshot(driver, f"out/{name}snapshot.png")
 
     fd = open(f"out/{name}.logs.txt", "w")
     fd.write(content_text)
     fd.close()
     image = fullpage_screenshot(driver, f"out/{name}recogn.png")
+    print(f"Done {name}")
 
 
 if __name__ == "__main__":
