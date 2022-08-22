@@ -178,6 +178,14 @@ subcommands:
               long: peek_count
               help: "Number of binaries to take per mutator iterator."
 
+
+          - bulk_size:
+              short: b
+              required: false
+              default_value: "1"
+              long: bulk-size
+              help: "Number of items to send at the same time to the oracle."
+
         
 
 
