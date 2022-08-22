@@ -25,6 +25,9 @@ COPY test.wasm /data/test.wasm
 COPY entrypoint.sh .
 RUN mkdir out
 RUN mkdir upload
+RUN mkdir wrong
+RUN mkdir snapshots
+
 
 RUN pip3 install -r requirements.txt
 RUN wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/104.0.5112.79/chromedriver_linux64.zip

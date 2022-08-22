@@ -4,3 +4,4 @@ pandas==1.3.5
 flask
 flask_httpauth
 requests
+filelock

@@ -13,16 +13,23 @@ import hashlib
 import random
 import queue
 import threading
+import traceback
+import re
+import filelock
 
-def fullpage_screenshot(driver, file):
+#31
+#/ 60
+engines_re = r"(\d+)\n/ (\d+)"
 
-        print("Starting chrome full page screenshot workaround ...")
+def fullpage_screenshot(driver, name, file, from_=""):
+
+        print(f"Starting chrome full page screenshot workaround ... {driver.current_url}. From {from_}")
 
         total_width = driver.execute_script("return document.body.offsetWidth")
         total_height = driver.execute_script("return document.body.parentNode.scrollHeight")
         viewport_width = driver.execute_script("return document.body.clientWidth")
         viewport_height = driver.execute_script("return window.innerHeight")
-        print("Total: ({0}, {1}), Viewport: ({2},{3})".format(total_width, total_height,viewport_width,viewport_height))
+        #print("Total: ({0}, {1}), Viewport: ({2},{3})".format(total_width, total_height,viewport_width,viewport_height))
         rectangles = []
 
         i = 0
@@ -39,7 +46,7 @@ def fullpage_screenshot(driver, file):
                 if top_width > total_width:
                     top_width = total_width
 
-                print("Appending rectangle ({0},{1},{2},{3})".format(ii, i, top_width, top_height))
+                #print("Appending rectangle ({0},{1},{2},{3})".format(ii, i, top_width, top_height))
                 rectangles.append((ii, i, top_width,top_height))
 
                 ii = ii + viewport_width
@@ -53,11 +60,11 @@ def fullpage_screenshot(driver, file):
         for rectangle in rectangles:
             if not previous is None:
                 driver.execute_script("window.scrollTo({0}, {1})".format(rectangle[0], rectangle[1]))
-                print("Scrolled To ({0},{1})".format(rectangle[0], rectangle[1]))
+                #print("Scrolled To ({0},{1})".format(rectangle[0], rectangle[1]))
                 time.sleep(0.2)
 
-            file_name = "part_{0}.png".format(part)
-            print("Capturing {0} ...".format(file_name))
+            file_name = f"part_{name}{part}.png"
+            #print("Capturing {0} ...".format(file_name))
 
             driver.get_screenshot_as_file(file_name)
             screenshot = Image.open(file_name)
@@ -67,7 +74,7 @@ def fullpage_screenshot(driver, file):
             else:
                 offset = (rectangle[0], rectangle[1])
 
-            print("Adding to stitched image with offset ({0}, {1})".format(offset[0],offset[1]))
+            #print("Adding to stitched image with offset ({0}, {1})".format(offset[0],offset[1]))
             stitched_image.paste(screenshot, offset)
 
             del screenshot
@@ -76,7 +83,7 @@ def fullpage_screenshot(driver, file):
             previous = rectangle
 
         stitched_image.save(file, optimize=True, quality=95)
-        print("Finishing chrome full page screenshot workaround...")
+        #print("Finishing chrome full page screenshot workaround...")
         return stitched_image
 
 def setUp():
@@ -101,7 +108,7 @@ def setUp():
 
 def check_files(files):
 
-    WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "2"))
+    WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "12"))
 
     worklist = queue.Queue()
 
@@ -122,7 +129,7 @@ def check_files(files):
             driver = setUp()
 
             done = False
-            while times < 3:
+            while times < 2:
                 try:
                     check_file(driver, filename, prev = prev)        
                     print(f"{i}/{len(files)} {filename}")
@@ -130,13 +137,30 @@ def check_files(files):
                     break
                 except Exception as e:
                     print(e)
+                    print(traceback.format_exc())
+                    if "net::ERR_PROXY_CONNECTION_FAILED" in traceback.format_exc():
+                        print("Trying to access file")
+                        with filelock.FileLock("name.socket.lock"):
+                            # Restart proxy
+                            print("Restarting")
+                            f = open("name.socket", 'r+')
+                            content = f.read()
+                            if not "RESTART" in content:
+                                f.seek(0)
+                                f.write("RESTART")
+                                f.close()
+                            else:
+                                print("Already restarting tor")
+
+                            # Give time to restart
+                            time.sleep(3 + 0.01*random.randint(1, 300))
                     times += 1
-                    time.sleep(4*times)
             if not done:
                 # requeue the page
                 worklist.put(filename)
 
     C = 0
+    C2 = 0
     for i, filename in enumerate(files):
         # Check if exist
         content = open(filename, "rb").read()
@@ -145,7 +169,9 @@ def check_files(files):
             print(f"{C} File {filename} already checked")
             C += 1
             continue 
-
+        C2 += 1
+        if C2 % 100 == 99:
+            print(f"{C2}/{len(files)}")
         worklist.put(filename)
 
     print(f"Files count {worklist.qsize()}. Launching {WORKERS_NUMBER} workers")
@@ -194,35 +220,73 @@ def expand_shadow_element(driver, element):
         print(e)
         return None
 
+def break_if_captcha(driver, name):
+    #image = fullpage_screenshot(driver, name, f"snapshots/{name}.analysis.png")
+
+    if "captcha" in driver.current_url:
+
+        print("Trying to access file")
+        with filelock.FileLock("name.socket.lock"):
+            print("Restarting")
+            f= open("name.socket", 'r+')
+            content = f.read()
+            if not "RESTART" in content:
+                f.seek(0)
+                f.write("RESTART")
+                f.close()
+            else:
+                print("Already restarting tor")
+            raise Exception("Blocked. Restarting tor ?") 
+
+
 def check_file(driver, filename, prev = {}):
     name = os.path.basename(filename)
    
     url = "https://www.virustotal.com/gui/home/upload"
     driver.delete_all_cookies()
 
-    # To avoid bot
-    time.sleep(random.randint(1,5))
 
+    print(f"Taking {name}")
     driver.get(url)
     
     # To avoid bot
-    time.sleep(random.randint(1,5))
-
+    # . time.sleep(random.randint(1,3))
+    break_if_captcha(driver, name)
+    times = 0
+    print("Waiting for upload btn")
     while True:
+        time.sleep(0.34)
+        times += 1
+
+        if times >= 500:
+            print("Restarting")
+            raise Exception("Too many times")
         # Detect where the button is
         # #infoIcon
+        break_if_captcha(driver, name)
+        # fullpage_screenshot(driver, name, f"snapshots/{name}.upload.png",from_="Waiting from upload btn")
         try:
             inpt = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#fileSelector')")
             break
         except: 
+            #print(traceback.format_exc())
+
             pass
     driver.execute_script("arguments[0].style.display = 'block';", inpt)
-    print(inpt)
+    #print(inpt)
     inpt.send_keys(os.path.abspath(filename))
 
+    time.sleep(2)
     # Now confirm the upload if needed
     times = 0
+    print("Checking if confirm button")
     while True:
+        if "file" in driver.current_url:
+            break
+        time.sleep(0.05)
+        break_if_captcha(driver, name)
+        # fullpage_screenshot(driver, name, f"snapshots/{name}.upload2.png",from_="Waiting from confirming btn")
+
         try:
             btn = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#confirmUpload')")
             if btn:
@@ -234,41 +298,79 @@ def check_file(driver, filename, prev = {}):
                 break
         except Exception as e:
             print(e) 
+            print(traceback.format_exc())
+
             pass
 
     content_text = ""
 
-    # input()
-    time.sleep(5)
+    time.sleep(4)
+    print("Wait for the analysis")
     times = 0
-    while "Undetected" not in content_text:
-        #print("Getting")
-        content = driver.find_element(By.TAG_NAME, 'body')
-        content_text = expand_element(driver, content, {})
+    while "/file-analysis/" in driver.current_url:
         times += 1
 
-        if times %100 == 99:
-            # Take an screenshot and see what is happening
-            print(f"It seems like the bot is blocked ({times})")
-            print(driver.current_url)
-            if "captcha" in driver.current_url or times >= 500:
-                open("name.socket", 'w').write("RESTART")
-                time.sleep(40)
-                raise Exception("Blocked. Restarting tor ?")
-            image = fullpage_screenshot(driver, f"out/{name}snapshot.png")
+        if times >= 300:
+            raise Exception("Too many times")
 
-    while "Analysing" in content_text:
-        print("Yet analysing...")
+        break_if_captcha(driver, name)
+        time.sleep(1)
+        print("Yet analysing...", driver.current_url)
         content = driver.find_element(By.TAG_NAME, 'body')
         content_text = expand_element(driver, content, {})
+        # image = fullpage_screenshot(driver, name, f"wrong/{name}.analysis.png",from_="Waiting from analysis")
 
 
-    fd = open(f"out/{name}.logs.txt", "w")
-    fd.write(content_text)
-    fd.close()
-    image = fullpage_screenshot(driver, f"out/{name}recogn.png")
-    print(f"Done {name}")
+    times = 0
+    print("Getting info from file hash address",driver.current_url)
+    while "/file/" not in driver.current_url:
+        break_if_captcha(driver, name)
+        print(driver.current_url, times)
+        time.sleep(0.6)   
+        times += 1
+        if times >= 1000: #600s
+            raise Exception("Wait too much") 
+    
+    #time.sleep(2)
+    # / 54
+    if "file" in driver.current_url:
+        times = 0
+        while True:
+            time.sleep(0.3)
+            break_if_captcha(driver, name)
+            # Done
+            content = driver.find_element(By.TAG_NAME, 'body')
+            content_text = expand_element(driver, content, {})
+            times += 1
+            if times >= 2000: # 600s 10mins
+                raise Exception("Waiting too much")
 
+            matches = re.findall(engines_re, content_text)
+            if matches:
+                print("Analysis", name, matches, times)
+                positives = matches[0][0]
+                positives = int(positives)
+                all = matches[0][1]
+                all = int(all)
+
+                if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
+                    print("Returning")
+                    time.sleep(2)
+                else:
+                    continue
+
+                fd = open(f"out/{name}.logs.txt", "w")
+                fd.write(content_text)
+                fd.close()
+                image = fullpage_screenshot(driver, name, f"out/{name}recogn.png",from_="Waiting from file hash")
+                print(f"Done {name}")
+                return
+       
+
+    print("Wrong result")
+    #time.sleep(3)
+    image = fullpage_screenshot(driver, name, f"wrong/{name}wrong.png",from_="wrong result")
+    raise Exception("Wrong result")
 
 if __name__ == "__main__":
     files = os.listdir(sys.argv[1])

@@ -9,6 +9,7 @@ import threading
 import hashlib
 import time
 from io import StringIO
+import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def server():
@@ -38,7 +39,7 @@ def server():
     def upload_file():
         if request.method == 'POST':
             # check if the post request has the file part
-            print(request, request.data)
+            print(request)
             if 'file' not in request.files:
                 return 'No file provided', 500
             file = request.files['file']
@@ -56,12 +57,14 @@ def server():
                 file.close()
                 print(hash)
                 # Adding to queue
-
-                if os.path.exists(f"out/{hash}.wasm.logs.txt"):
-                    print("Not queued")
-                else:
-                    print("Adding to queue")
-                    worklist.put(os.path.join("upload", newname))
+                try:
+                    if os.path.exists(f"out/{hash}.wasm.logs.txt"):
+                        print("Not queued")
+                    else:
+                        print("Adding to queue")
+                        worklist.put(os.path.join("upload", newname))
+                except Exception as e:
+                    print(e)
                 return hash 
         return 'Enqueue a file'
 
@@ -105,7 +108,9 @@ def server():
                 s = worklist.qsize()
                 if s == 0:
                     print("Worklist empty, returning. Sleeping for a while")
+                    #worklist.task_done()
                     time.sleep(5)
+                    continue
 
                 filename = worklist.get()
                 content = open(filename, "rb").read()
@@ -127,6 +132,13 @@ def server():
                         break
                     except Exception as e:
                         print(e)
+                        print(traceback.format_exc())
+                        if "net::ERR_PROXY_CONNECTION_FAILED" in traceback.format_exc():
+                            # Restart proxy
+                            print("Restarting")
+                            open("name.socket", 'w').write("RESTART")
+                            # Give time to restart
+                            time.sleep(30)
                         times += 1
                         time.sleep(4*times)
                 if not done:
