@@ -100,7 +100,7 @@ pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec
                     let lastattempts = dimensions[1].2;
                     let lastpeek = dimensions[2].2;
             
-                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattempts, true, lastpeek as u64, seed, tsize)?;
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattempts, true, lastpeek as u64, seed, tsize, 1)?;
             
                     log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
                     if interesting_count == 0 {
@@ -129,7 +129,7 @@ pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec
                     let lastsize = dimensions[0].2;
                     let lastpeek = dimensions[2].2;
             
-                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attempts, true, lastpeek as u64, seed, lastsize)?;
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, attempts, true, lastpeek as u64, seed, lastsize, 1)?;
             
                     log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
                     if interesting_count == 0 {
@@ -160,7 +160,7 @@ pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec
                     let lastattemps = dimensions[1].2;
                     
             
-                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattemps, true, peeks as u64, seed, lastsize)?;
+                    let (elapsed, interesting_count) = mutate_sequential(statecp, pathcp, commandcp, argsclone, lastattemps, true, peeks as u64, seed, lastsize, 1)?;
             
                     log::debug!("Elapsed {}, interesting count {}", elapsed, interesting_count);
                     if interesting_count == 0 {
@@ -188,7 +188,7 @@ pub fn mutate_bisect(state: Arc<State>, path: String, command: String, args: Vec
 }
 
 
-pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32) -> AResult<(u32, u32)> {
+pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32, bulk_limit: usize) -> AResult<(u32, u32)> {
     log::debug!("Mutating binary {}", path);
     let th = spawn(move || {
         open_socket()
@@ -232,7 +232,10 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
     let mut collision_count = 0;
     let mut interesting_count = 0;
     let mut parent = String::new();
-    'attempts: while elapsed < attemps {
+    let mut buffer = vec![];
+    let mut try_until_the_end = false;
+
+    'attempts: while true {
         // mutated = m 
         let s = gn.gen();
         let mut config = WasmMutate::default();
@@ -278,78 +281,98 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
                 }
             }
         }
-        log::debug!("Worklist size {}", worklist.len());
+        // log::debug!("Worklist size {}", worklist.len());
         if worklist.len() == 0 {
             // Reset the probes file
             elapsed += 1;
             send_signal_to_probes_socket(format!("No mutation"));
             continue;
         }
+
         while let Some((newbin, idx)) = worklist.pop() {
 
-            swap(&mut bin, newbin.clone());
             // TODO Move this to parallel execution
-            let (r, stdout, stderr) = check_binary(bin.clone(), command.clone(), args.clone())?;
+            // TODO move this to bulk execution
+            buffer.push((newbin.clone(), idx, s));
+            log::debug!("Size of bulk {}", buffer.len());
+            swap(&mut bin, newbin.clone());
+            if buffer.len() >= bulk_limit {
+                let results = check_binary(buffer.clone(), command.clone(), args.clone(), bulk_limit > 1)?;
 
-            let (interesting, out) = if r.success() {
+                log::debug!("Size of results {}", results.len());
+                for ((newbin, idx, s), result) in buffer.iter().zip(results){
+
+                    let (r, stdout, stderr) = result;
+                    let (interesting, out) = if r.success() {
                 
-                let fname = format!("{session_folder}/non_interesting");                
-                fs::create_dir(fname.clone());
-                (false, fname)
-            } else {
-                interesting_count += 1;   
-                let fname = format!("{session_folder}/interesting");   
-                fs::create_dir(fname.clone());                   (true, fname)
-            };
-    
-            let fname = format!("{out}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
-            fs::create_dir(fname.clone());
-            fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
+                        let fname = format!("{session_folder}/non_interesting");                
+                        fs::create_dir(fname.clone());
+                        (false, fname)
+                    } else {
+                        interesting_count += 1;   
+                        let fname = format!("{session_folder}/interesting");   
+                        fs::create_dir(fname.clone());                   (true, fname)
+                    };
+            
+                    let fname = format!("{out}/e{:0width$}_s{}_i{}", elapsed,  s, idx, width=10);
+                    fs::create_dir(fname.clone());
+                    fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
+        
+                    let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
+                    f.write_all(format!("seed: {}\n", s).as_bytes())?;
+                    f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
+                    f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
+                    f.write_all(format!("idx: {}\n", idx).as_bytes())?;
+                    f.write_all(format!("interesting: {}\n", interesting).as_bytes())?;
+                    f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
+                    f.write_all(format!("parent: {}\n", parent).as_bytes())?;
+                    // TODO Add Meta info of the variant ?
+        
+                    fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
+                    fs::write(format!("{}/variant.wasm", fname), &newbin)?;
+        
+                    send_signal_to_probes_socket(format!("SAVE][{}/probes.logs.txt", fname));
+                    // Send filena name
+                    parent = fname;
+        
+                    if exit_on_found && interesting {
+                        elapsed += 1;
+                        try_until_the_end = true;
+                        break 'attempts;
+                    }
 
-            let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
-            f.write_all(format!("seed: {}\n", s).as_bytes())?;
-            f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
-            f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
-            f.write_all(format!("idx: {}\n", idx).as_bytes())?;
-            f.write_all(format!("interesting: {}\n", interesting).as_bytes())?;
-            f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
-            f.write_all(format!("parent: {}\n", parent).as_bytes())?;
-            // TODO Add Meta info of the variant ?
 
-            fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
-            fs::write(format!("{}/variant.wasm", fname), &newbin)?;
+                    elapsed += 1;
 
-            send_signal_to_probes_socket(format!("SAVE][{}/probes.logs.txt", fname));
-            // Send filena name
-            parent = fname;
+                    if elapsed >= attemps as usize {
+                        break 'attempts;
+                    }
 
-            if exit_on_found && interesting {
-                elapsed += 1;
-                break 'attempts;
+
+                    if elapsed % 10 == 9 {
+                        println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
+                    }
+                }
+
+                buffer.clear();
             }
-        }
-
-        elapsed += 1;
-
-
-        if elapsed % 10 == 9 {
-            println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
+            
         }
     }
-    
+
     println!("Elapsed {}/{}. Collision count {}. Interesting count {}", elapsed, attemps, collision_count, interesting_count);
 
     // Now save the session to a folder ?
     send_signal_to_probes_socket("STOP".into());
     let outfile = th.join().unwrap()?;
-    Ok((elapsed, interesting_count))
+    Ok((elapsed as u32, interesting_count))
 }
 
-pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32, mode: MODE) -> AResult<()> {
+pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String>,attemps: u32, exit_on_found: bool, peek_count: u64, seed: u64, tree_size: u32, mode: MODE, bulk_limit: usize) -> AResult<()> {
     
     match mode {
         MODE::SEQUENTIAL => {
-            mutate_sequential(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size)?;
+            mutate_sequential(state, path, command, args, attemps, exit_on_found, peek_count, seed, tree_size, bulk_limit)?;
         }
         MODE::BISECT(_, _) => {
             mutate_bisect(state, path, command, args, attemps, peek_count as u32, seed, tree_size)?;
@@ -359,21 +382,56 @@ pub fn mutate(state: Arc<State>, path: String, command: String, args: Vec<String
     Ok(())
 }
 
-fn check_binary(bin: Vec<u8>, command: String, args: Vec<String>) -> AResult<(ExitStatus, Vec<u8>, Vec<u8>)> {
-// Write file to tmparg
-    std::fs::write("temp.wasm", &bin.clone()).unwrap();
-    let output = std::process::Command::new(&command)
+/// Return bulk calling of the oracle each one with the binary passed
+fn check_binary(bins: Vec<(Vec<u8>, usize, u64)>, command: String, args: Vec<String>, bulk: bool) -> AResult<Vec<(ExitStatus, Vec<u8>, Vec<u8>)>> {
+    // Write file to tmparg
+
+    let mut r = vec![];
+    let mut results = vec![];
+    for (i, (bin, _, _)) in bins.iter().enumerate() {
+        let fname = format!("tmparg{}.wasm", i);
+        fs::write(fname.clone(), bin)?;
+
+        if ! bulk {
+            let output = std::process::Command::new(&command)
+                .args(args.clone())
+                .arg(fname)
+                .stdin(std::process::Stdio::null())
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::piped())
+                .output()
+                .map_err(|e| CliError::Any(format!("Failed to run command {} args {:?}. Error {}", command, args, e)))?;
+
+            results.push((output.status, output.stdout, output.stderr));
+
+            if ! output.status.success() {
+                return Ok(results)
+            }
+
+        } else {
+            r.push(fname);
+        }
+    }
+
+    if bulk {
+        let output = std::process::Command::new(&command)
         .args(args.clone())
-        .arg("temp.wasm")
+        .args(r)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .output()
-        .map_err(|e| CliError::Any(format!("Failed to run command {} args {:?}. Error {}", command, args, e)));
+        .map_err(|e| CliError::Any(format!("Failed to run command {} args {:?}. Error {}", command, args, e)))?;
 
-    let output = output?;
+        let cp = output.clone();
+        let mp = bins.iter().map(move |_|  (output.status, cp.stdout.clone(), cp.stderr.clone())).collect::<Vec<_>>();
+        // Copy the result and set to all
 
-    Ok((output.status, output.stdout, output.stderr))
+        return Ok(mp)
+    }
+
+    // Return all ok
+    return Ok(results)
 }
 
 fn swap(a: &mut Vec<u8>, b:  Vec<u8>) {
@@ -402,7 +460,7 @@ pub mod tests {
         Builder::from_env(env).init();  
 
         let state = State {
-            dbclient: Some(DB::new("test_db", 10000).unwrap()),
+            dbclient: Some(DB::new("test_db/t1", 10000).unwrap()),
             process: AtomicU32::new(0),
             error: AtomicU32::new(0),
             parsing_error: AtomicU32::new(0),
@@ -420,6 +478,66 @@ pub mod tests {
 
         mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
             "tests/oracle_size.sh".into()
-        ],600,false, 1, 0, 1, MODE::SEQUENTIAL).unwrap()
+        ],5,false, 1, 0, 100, MODE::SEQUENTIAL, 3).unwrap()
+    }
+
+
+    #[test]
+    pub fn test2() {
+
+        let env = Env::default()
+            //.filter_or("LOG_LEVEL", "bench,analyzer,wasm-mutate=debug")
+            .write_style_or("LOG_STYLE", "always");
+        Builder::from_env(env).init();  
+
+        let state = State {
+            dbclient: Some(DB::new("test_db/t2", 10000).unwrap()),
+            process: AtomicU32::new(0),
+            error: AtomicU32::new(0),
+            parsing_error: AtomicU32::new(0),
+            out_folder: None,
+            save_logs: false,
+            finish: AtomicBool::new(false),
+            depth: 2,
+            sample_ratio: 1,
+            patch_metadata: false,
+            seed: 0,
+            timeout: 5,
+            snapshot: None,
+            snapshot_time: None
+        };
+
+        mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
+            "tests/oracle_size.sh".into()
+        ],7,true, 1, 0, 100, MODE::SEQUENTIAL, 3).unwrap()
+    }
+
+
+    #[test]
+    pub fn test3() {
+        let env = Env::default()
+            //.filter_or("LOG_LEVEL", "bench,analyzer,wasm-mutate=debug")
+            .write_style_or("LOG_STYLE", "always");
+        Builder::from_env(env).init();  
+        let state = State {
+            dbclient: Some(DB::new("test_db/t3", 10000).unwrap()),
+            process: AtomicU32::new(0),
+            error: AtomicU32::new(0),
+            parsing_error: AtomicU32::new(0),
+            out_folder: None,
+            save_logs: false,
+            finish: AtomicBool::new(false),
+            depth: 2,
+            sample_ratio: 1,
+            patch_metadata: false,
+            seed: 0,
+            timeout: 5,
+            snapshot: None,
+            snapshot_time: None
+        };
+
+        mutate(Arc::new(state), "tests/1.wasm".into(), "/bin/bash".into(),  vec![ 
+            "tests/oracle_size.sh".into()
+        ],7,true, 1, 0, 100, MODE::SEQUENTIAL, 1).unwrap()
     }
 }

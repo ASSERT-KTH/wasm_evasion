@@ -69,6 +69,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
             let mut attemps = 0;
             let mut peek_count = 0;
             let mut tree_size = 1;
+            let mut bulk_size = 1;
 
             if args.is_present("seed") {
                 seed = value_t!(args.value_of("seed"), u64).unwrap();
@@ -86,6 +87,11 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
             if args.is_present("tree_size") {
                 tree_size = value_t!(args.value_of("tree_size"), u32).unwrap();
             }
+
+            if args.is_present("bulk_size") {
+                bulk_size = value_t!(args.value_of("bulk_size"), usize).unwrap();
+            }
+
             let exit_on_found = args.is_present("exit_on_found");
 
             let oracle: Vec<_> = args.values_of("oracle").unwrap().collect();
@@ -99,7 +105,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
                     command.into(), 
                     args.iter().map(|f|f.clone().into()).collect::<Vec<_>>(), 
                     attemps as u32, 
-                    exit_on_found, peek_count, seed, tree_size, mode)?;
+                    exit_on_found, peek_count, seed, tree_size, mode, bulk_size)?;
         }
         ("extract", Some(args)) => {
             let reset = args.is_present("reset");
