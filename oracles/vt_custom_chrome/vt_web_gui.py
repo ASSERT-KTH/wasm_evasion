@@ -239,7 +239,7 @@ def break_if_captcha(driver, name):
             raise Exception("Blocked. Restarting tor ?") 
 
 
-def check_file(driver, filename, prev = {}):
+def check_file(driver, filename, prev = {}, out="out"):
     name = os.path.basename(filename)
    
     url = "https://www.virustotal.com/gui/home/upload"
@@ -359,10 +359,10 @@ def check_file(driver, filename, prev = {}):
                 else:
                     continue
 
-                fd = open(f"out/{name}.logs.txt", "w")
+                fd = open(f"{out}/{name}.logs.txt", "w")
                 fd.write(content_text)
                 fd.close()
-                image = fullpage_screenshot(driver, name, f"out/{name}recogn.png",from_="Waiting from file hash")
+                image = fullpage_screenshot(driver, name, f"{out}/{name}recogn.png",from_="Waiting from file hash")
                 print(f"Done {name}")
                 return
        
