@@ -34,10 +34,15 @@ def server():
     def index():
         return f'Workcount {worklist.qsize()}'
 
-    @app.route('/upload_file', methods=['GET', 'POST'])
+    @app.route('/upload_file/<outfolder>', methods=['GET', 'POST'])
     @auth.login_required
-    def upload_file():
+    def upload_file(outfolder):
         if request.method == 'POST':
+            if not os.path.exists(f"data/{outfolder}"):
+                os.makedirs(f"data/{outfolder}")
+
+            if not os.path.exists(f"data/upload/{outfolder}"):
+                os.makedirs(f"data/upload/{outfolder}")
             # check if the post request has the file part
             print(request)
             if 'file' not in request.files:
@@ -52,47 +57,60 @@ def server():
                 hash = hashlib.sha256(content).hexdigest()
 
                 newname = f"{hash}.wasm"
-                file = open(os.path.join("upload", newname), 'wb')
+
+                file = open(os.path.join(f"data/upload/{outfolder}", newname), 'wb')
                 file.write(content)
                 file.close()
                 print(hash)
                 # Adding to queue
                 try:
-                    if os.path.exists(f"out/{hash}.wasm.logs.txt"):
+                    if os.path.exists(f"data/upload/{outfolder}/{hash}.wasm.logs.txt"):
                         print("Not queued")
                     else:
                         print("Adding to queue")
-                        worklist.put(os.path.join("upload", newname))
+                        worklist.put([os.path.join(f"data/upload/{outfolder}", newname), f"data/{outfolder}" ])
                 except Exception as e:
                     print(e)
                 return hash 
         return 'Enqueue a file'
 
-    @app.route('/get_result/<hash>')
+    @app.route('/get_result/<out>/<hash>')
     @auth.login_required
-    def get_analysis_result(hash):
-        if os.path.exists(f"out/{hash}.wasm.logs.txt"):
-            print("Loading result")
-            f = parse_result.parse_result(f"out/{hash}.wasm.logs.txt")
-            f.to_csv(f"upload/{hash}.csv")
+    def get_analysis_result(out, hash):
 
-            output = make_response(open(f"upload/{hash}.csv", "r").read())
-            output.headers["Content-Disposition"] = f"attachment; filename=upload/{hash}.csv"
+        if not os.path.exists(out):
+            os.makedirs(out)
+
+        if os.path.exists(f"data/{out}/{hash}.wasm.logs.txt"):
+            print("Loading result")
+            f, _ = parse_result.parse_result(f"data/{out}/{hash}.wasm.logs.txt")
+
+            if not os.path.exists(f"data/upload/{out}/"):
+                os.makedirs(f"data/upload/{out}/")
+                
+            f.to_csv(f"data/upload/{out}/{hash}.csv")
+
+            output = make_response(open(f"data/upload/{out}/{hash}.csv", "r").read())
+            output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/{hash}.csv"
             output.headers["Content-type"] = "text/csv"
             return output
 
         # Return none if the hash was not yet added to the queue
         return 'INVALID'
     
-    @app.route('/get_all_results')
+    @app.route('/get_all_results/<out>')
     @auth.login_required
-    def get_all_results():
-        print("Loading result")
-        f = parse_result.parse_all_results_in_folder(f"out")
-        f.to_csv(f"upload/all.csv")
+    def get_all_results(out):
 
-        output = make_response(open(f"upload/all.csv", "r").read())
-        output.headers["Content-Disposition"] = f"attachment; filename=upload/all.csv"
+        if not os.path.exists(f"data/upload/{out}"):
+            os.makedirs(f"data/upload/{out}")
+
+        print("Loading result")
+        f = parse_result.parse_all_results_in_folder(out)
+        f.to_csv(f"data/upload/{out}/all.csv")
+
+        output = make_response(open(f"data/upload/{out}/all.csv", "r").read())
+        output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/all.csv"
         output.headers["Content-type"] = "text/csv"
         return output
 
@@ -112,10 +130,10 @@ def server():
                     time.sleep(5)
                     continue
 
-                filename = worklist.get()
+                filename, outfolder = worklist.get()
                 content = open(filename, "rb").read()
                 hash = hashlib.sha256(content).hexdigest()
-                if os.path.exists(f"out/{hash}.wasm.logs.txt"):
+                if os.path.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
                     print(f"File {filename} already checked")
                     continue 
 
@@ -127,7 +145,7 @@ def server():
                 done = False
                 while times < 3:
                     try:
-                        vt_web_gui.check_file(driver, filename, prev = prev)        
+                        vt_web_gui.check_file(driver, filename, prev = prev, out=outfolder)        
                         done = True
                         break
                     except Exception as e:
