@@ -1,0 +1,33 @@
+[package]
+name = "souperify"
+version = "0.1.0"
+edition = "2018"
+publish = false
+build = "build.rs"
+
+[dependencies]
+anyhow = "1.0"
+arbitrary = "1.0"
+num_cpus = "1.13"
+rand = { version = "0.7.3", features = ["small_rng"] }
+wasm-mutate = { path = '../wasm-tools/crates/wasm-mutate' }
+wasmprinter = { path = '../wasm-tools/crates/wasmprinter' }
+wasmparser = { path = "../wasm-tools/crates/wasmparser" }
+clap = { version = "3.0", features = ["yaml", "derive"] }
+wasmtime = "0.32.0"
+env_logger = "0.8"
+itertools = "0.10.0"
+log = "0.4"
+egg = "0.6.0"
+libc = "0.2.0"
+
+
+[dev-dependencies]
+wat = { path = "../wasm-tools/crates/wat" }
+
+[lib]
+doctest = false
+test = false
+
+[profile.dev]
+rpath = true
