@@ -13,8 +13,8 @@
 
 
 mod error;
-mod info;
-mod module;
+pub mod info;
+pub mod module;
 pub mod mutators;
 
 pub use error::*;
