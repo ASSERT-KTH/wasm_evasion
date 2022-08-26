@@ -29,7 +29,7 @@ jobs:
 
       - name: Build binaries
         run: |
-          cd analyzer
+          cd crates/analyzer
           cargo build --release
 
       
