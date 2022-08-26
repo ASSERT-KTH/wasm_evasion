@@ -3,9 +3,10 @@ use std::{
     borrow::Borrow,
     cell::RefCell,
     fmt::Debug,
-    io::{BufReader, Read},
+    io::{BufReader, Read}, fs,
 };
 
+use anyhow::Context;
 use serde::{de::DeserializeOwned, Deserialize, Deserializer, Serialize};
 
 use crate::errors::{AResult, CliError};
@@ -13,7 +14,8 @@ use crate::errors::{AResult, CliError};
 #[derive(Debug, Clone)]
 pub struct DB<'a> {
     pub(crate) f: &'a str,
-    pub(crate) db: sled::Db,
+    pub(crate) config: sled::Config,
+    pub(crate) db: Option<sled::Db>,
 }
 
 impl<'a> DB<'a> {
@@ -21,30 +23,42 @@ impl<'a> DB<'a> {
         let config = sled::Config::default()
         .path(f.to_owned())
         .cache_capacity(cache_size);
-        
-        
+
         Ok(DB {
             f: f.clone(),
-            db: config.open()?,
+            config,
+            db: None
         })
     }
 
+    pub fn open(&mut self) -> AResult<bool> {
+        log::debug!("Opening db");
+        self.db = Some(self.config.open()?);
+        Ok(true)
+    }
+
+    pub fn create(&self) -> AResult<bool> {
+        log::debug!("Creating db");
+        fs::create_dir(self.f);
+        Ok(true)
+    }
+
     pub fn save(&self) -> AResult<bool> {
-        self.db.flush()?;
+        self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?.flush()?;
         Ok(true)
     }
 
     pub fn get_count(&self) -> AResult<usize> {
-        Ok(self.db.len())
+        Ok(self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?.len())
     }
 
     pub fn set<T>(&self, k: &AsRef<[u8]>, v: T) -> AResult<bool>
     where
         T: Serialize,
     {
-        self.db
+        self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?
             .insert(k, serde_json::to_string_pretty(&v)?.as_bytes())?;
-        self.db.flush()?;
+        self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?.flush()?;
         Ok(true)
     }
 
@@ -52,7 +66,7 @@ impl<'a> DB<'a> {
     where
         K: AsRef<[u8]> + Debug,
     {
-        let kvalue = self.db.get(k)?;
+        let kvalue = self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?.get(k)?;
 
         match kvalue {
             None => return Err(CliError::KeyNotFound(format!("{:?}", k))),
@@ -64,7 +78,7 @@ impl<'a> DB<'a> {
     where
         K: AsRef<[u8]> + Debug,
     {
-        let kv = self.db.contains_key(k)?;
+        let kv = self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?.contains_key(k)?;
         Ok(kv)
     }
 
@@ -72,8 +86,7 @@ impl<'a> DB<'a> {
     where
         T: DeserializeOwned + 'static,
     {
-        let it = self
-            .db
+        let it = self.db.as_ref().ok_or(CliError::Any("Non existing db".into()))?
             .iter()
             .filter_map(|f| f.ok())
             .map(move |(_, v)| {

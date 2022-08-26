@@ -233,7 +233,6 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
     let mut interesting_count = 0;
     let mut parent = String::new();
     let mut buffer = vec![];
-    let mut try_until_the_end = false;
 
     'attempts: while true {
         // mutated = m 
@@ -242,9 +241,6 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
         config.preserve_semantics(true);
         config.peephole_size(tree_size);
         config.seed(s);
-        //let stinfo = config
-        //.setup(&bin)
-        //.map_err(|x| CliError::Any(format!("{:#?}", x)))?;
 
         let cp = bin.clone();
 
@@ -337,7 +333,6 @@ pub fn mutate_sequential(state: Arc<State>, path: String, command: String, args:
         
                     if exit_on_found && interesting {
                         elapsed += 1;
-                        try_until_the_end = true;
                         break 'attempts;
                     }
 
@@ -453,7 +448,7 @@ pub mod tests {
 
 
     #[test]
-    pub fn test() {
+    pub fn test1() {
         let env = Env::default()
             //.filter_or("LOG_LEVEL", "bench,analyzer,wasm-mutate=debug")
             .write_style_or("LOG_STYLE", "always");

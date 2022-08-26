@@ -106,7 +106,7 @@ def server():
             os.makedirs(f"data/upload/{out}")
 
         print("Loading result")
-        f = parse_result.parse_all_results_in_folder(out)
+        f = parse_result.parse_all_results_in_folder(f"data/{out}")
         f.to_csv(f"data/upload/{out}/all.csv")
 
         output = make_response(open(f"data/upload/{out}/all.csv", "r").read())
@@ -161,7 +161,7 @@ def server():
                         time.sleep(4*times)
                 if not done:
                     # requeue the page
-                    worklist.put(filename)
+                    worklist.put((filename, outfolder))
 
         workers = []
         for _ in range(WORKERS_NUMBER):

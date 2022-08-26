@@ -1,0 +1,3868 @@
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/29
+Mutating opcode 27/58
+Original expression (i32.load.0.2.0 local.get.1)
+New expression (container
+  (container
+    nop
+    (i32.add
+      (i32.or
+        (container
+          (drop i64.rand)
+          (container
+            (container
+              (container
+                (i32.load.0.2.0 (container local.get.1 (drop i64.rand)))
+                nop)
+              nop)
+            (drop i32.rand)))
+        (i32.or
+          (i32.xor
+            (i32.and
+              (i32.shr_s
+                (i32.mul
+                  (i32.and
+                    (i32.load.0.2.0 local.get.1)
+                    (i32.load.0.2.0 local.get.1))
+                  i32.const.1)
+                i32.const.0)
+              (i32.xor
+                (container
+                  nop
+                  (i32.use_of_global (i32.load.0.2.0 local.get.1)))
+                i32.const.0))
+            i32.const.0)
+          (container
+            (drop i64.rand)
+            (i32.load.0.2.0
+              (container
+                (drop i32.rand)
+                (i32.use_of_global (container local.get.1 (drop i32.rand))))))))
+      i32.const.0))
+  nop)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 6/29
+Mutating opcode 14/51
+Original expression local.get.1
+New expression (i32.shr_s
+  (i32.mul
+    (container (drop i64.rand) local.get.1)
+    i32.const.1)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 9/29
+Mutating opcode 61/153
+Original expression (i32.load.2048.2.0
+  (i32.shl
+    (i32.and (i32.shr_u local.get.4 i32.const.8) i32.const.255)
+    i32.const.2))
+New expression (i32.xor
+  (container
+    (i32.shl
+      (container
+        (container
+          (i32.sub
+            (container
+              (drop i32.rand)
+              (container
+                (i32.shr_u
+                  (i32.add
+                    (i32.load.2048.2.0
+                      (i32.shl
+                        (i32.and (i32.shr_u local.get.4 i32.const.8) i32.const.255)
+                        i32.const.2))
+                    i32.const.0)
+                  i32.const.0)
+                (drop i32.rand)))
+            i32.const.0)
+          (drop i64.rand))
+        nop)
+      i32.const.0)
+    nop)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[I32, ExternRef, V128, I32, ExternRef, F32, F32, I64, I32, F32, F32, I32, FuncRef, V128, V128, I64, FuncRef] results: [I32, I64, F64, F64, FuncRef, ExternRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 20/29
+Mutating opcode 174/417
+Original expression (i64.shr_u local.get.14 i64.const.33)
+New expression (i64.use_of_global
+  (container
+    (drop i64.rand)
+    (i64.add
+      (container
+        (drop i32.rand)
+        (container
+          (container
+            (i64.and
+              (i64.sub
+                (i64.shr_s
+                  (i64.shl (i64.shr_u local.get.14 i64.const.33) i64.const.0)
+                  i64.const.0)
+                i64.const.0)
+              (container
+                (container
+                  nop
+                  (container
+                    (drop i32.rand)
+                    (i64.shr_u local.get.14 i64.const.33)))
+                (drop i32.rand)))
+            (drop i32.rand))
+          (drop i32.rand)))
+      i64.const.0)))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 21/29
+Mutating opcode 417/718
+Original expression local.get.3
+New expression (i32.shr_s
+  (container
+    (drop i64.rand)
+    (i32.shr_s (i32.shr_u local.get.3 i32.const.0) i32.const.0))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 0/29
+Mutating opcode 428/1754
+Original expression (i32.load.36.2.0 local.get.1)
+New expression (i32.or
+  (i32.mul
+    (i32.shr_s
+      (container
+        nop
+        (i32.xor
+          (i32.shr_s
+            (i32.shr_u
+              (i32.sub
+                (container
+                  (drop i64.rand)
+                  (container (i32.load.36.2.0 local.get.1) (drop i32.rand)))
+                i32.const.0)
+              i32.const.0)
+            i32.const.0)
+          i32.const.0))
+      i32.const.0)
+    i32.const.1)
+  (i32.xor
+    (i32.and
+      (container
+        nop
+        (container
+          (drop i64.rand)
+          (i32.add
+            (i32.use_of_global
+              (i32.load.36.2.0
+                (i32.or
+                  (i32.shr_s local.get.1 i32.const.0)
+                  (i32.and local.get.1 local.get.1))))
+            i32.const.0)))
+      (container
+        (container
+          nop
+          (i32.and
+            (i32.shr_u
+              (i32.add
+                (i32.mul
+                  (i32.shr_u (i32.load.36.2.0 local.get.1) i32.const.0)
+                  i32.const.1)
+                i32.const.0)
+              i32.const.0)
+            (i32.shr_s
+              (i32.sub
+                (i32.sub
+                  (container (drop i64.rand) (i32.load.36.2.0 local.get.1))
+                  i32.const.0)
+                i32.const.0)
+              i32.const.0)))
+        (drop i32.rand)))
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 25/29
+Mutating opcode 148/395
+Original expression (i32.store.0.2.0
+  local.get.4
+  (i32.add local.get.9 i32.const.-8))
+New expression (container
+  (container
+    (drop i32.rand)
+    (container
+      (drop i64.rand)
+      (container
+        (i32.store.0.2.0
+          (container
+            (container
+              (i32.use_of_global
+                (container
+                  (container local.get.4 (drop i32.rand))
+                  (drop i64.rand)))
+              nop)
+            (drop i32.rand))
+          (i32.use_of_global
+            (i32.and
+              (i32.or
+                (container
+                  (i32.add (i32.add local.get.9 i32.const.-8) i32.const.0)
+                  (drop i32.rand))
+                (container
+                  nop
+                  (i32.shr_u (i32.add local.get.9 i32.const.-8) i32.const.0)))
+              (i32.or
+                (i32.add
+                  (i32.shl local.get.9 i32.const.0)
+                  (i32.and i32.const.-8 i32.const.-8))
+                (i32.or
+                  (container (i32.add local.get.9 i32.const.-8) nop)
+                  (container (i32.add local.get.9 i32.const.-8) nop))))))
+        (drop i64.rand))))
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 13/29
+Mutating opcode 656/2968
+Original expression (i64.and
+  (i64.shr_u local.get.27 i64.const.1)
+  i64.const.6148914691236517205)
+New expression (i64.mul
+  (i64.shr_s
+    (i64.and
+      (container
+        (drop i32.rand)
+        (container
+          (i64.xor
+            (i64.mul
+              (container
+                nop
+                (i64.add
+                  (i64.sub i64.const.6148914691236517205 i64.const.0)
+                  i64.const.0))
+              (i64.shr_u
+                (i64.shr_s (i64.xor i64.const.1 i64.const.0) i64.const.0)
+                i64.const.0))
+            i64.const.0)
+          (drop i32.rand)))
+      (i64.mul
+        (i64.or
+          (i64.sub
+            (i64.shr_s
+              (i64.xor
+                (i64.use_of_global (i64.shr_u local.get.27 i64.const.1))
+                i64.const.0)
+              i64.const.0)
+            i64.const.0)
+          (i64.add
+            (container
+              (drop i32.rand)
+              (container
+                (drop i64.rand)
+                (i64.xor
+                  (i64.or
+                    (i64.shr_u local.get.27 i64.const.1)
+                    (i64.shr_u local.get.27 i64.const.1))
+                  i64.const.0)))
+            i64.const.0))
+        (container
+          (container
+            (i64.shr_u
+              (container
+                (drop i64.rand)
+                (i64.or
+                  (container i64.const.1 (drop i32.rand))
+                  (container (drop i32.rand) i64.const.1)))
+              i64.const.0)
+            (drop i64.rand))
+          (drop i64.rand))))
+    i64.const.0)
+  (i64.shr_u
+    (container
+      (i64.use_of_global
+        (container
+          nop
+          (container
+            (i64.shr_u
+              (i64.add
+                (i64.shr_s (container i64.const.1 nop) i64.const.0)
+                i64.const.0)
+              i64.const.0)
+            nop)))
+      nop)
+    i64.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 1/29
+Mutating opcode 1412/2127
+Original expression (local.tee.4
+  (i32.shl (i32.load8_u.30.0.0 local.get.0) i32.const.1))
+New expression (local.tee.4
+  (container
+    (drop i64.rand)
+    (i32.shl
+      (i32.shr_s
+        (container
+          nop
+          (container
+            nop
+            (i32.use_of_global
+              (i32.sub
+                (i32.and
+                  (container (drop i32.rand) (i32.load8_u.30.0.0 local.get.0))
+                  (i32.use_of_global (i32.load8_u.30.0.0 local.get.0)))
+                i32.const.0))))
+        i32.const.0)
+      (i32.shl i32.const.1 i32.const.0))))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000003_s8251690495967107212_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000004_s8100708189767581495_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000005_s16548187137891372853_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000006_s17394354212723026293_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000007_s10849406535690575840_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000008_s7289123318998479596_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000009_s15105133814341793997_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000010_s4443956744663406983_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000011_s18011067234754793872_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000012_s11889236205242225219_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::remove_section::RemoveSection`
+mutator `wasm_mutate::mutators::remove_section::RemoveSection` succeeded
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 12/30
+Mutating opcode 71/743
+Original expression local.get.0
+New expression (i32.and
+  (container
+    (i32.shr_s
+      (container
+        (i32.mul
+          (container
+            (i32.add
+              (i32.add
+                (i32.mul (i32.and local.get.0 local.get.0) i32.const.1)
+                i32.const.0)
+              i32.const.0)
+            (drop i64.rand))
+          i32.const.1)
+        (drop i32.rand))
+      i32.const.0)
+    (drop i32.rand))
+  (i32.or
+    (i32.use_of_global
+      (i32.sub
+        (container
+          (i32.or
+            (i32.add
+              (i32.sub
+                (container (i32.shr_s local.get.0 i32.const.0) nop)
+                i32.const.0)
+              i32.const.0)
+            (container
+              (i32.shr_u
+                (container (i32.or local.get.0 local.get.0) (drop i32.rand))
+                i32.const.0)
+              nop))
+          (drop i64.rand))
+        i32.const.0))
+    (container nop local.get.0)))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 22/30
+Mutating opcode 3/52
+Original expression local.get.0
+New expression (i32.sub
+  (container
+    (drop i32.rand)
+    (container
+      nop
+      (i32.shr_u
+        (i32.sub
+          (container
+            (container
+              (drop i32.rand)
+              (container
+                nop
+                (container
+                  (drop i64.rand)
+                  (i32.shl local.get.0 i32.const.0))))
+            (drop i64.rand))
+          i32.const.0)
+        i32.const.0)))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 8/30
+Mutating opcode 113/154
+Original expression (i32.add local.get.1 i32.const.64)
+New expression (i32.mul
+  (i32.add
+    (i32.sub
+      (i32.shr_u
+        (i32.add
+          (container
+            (i32.sub
+              (i32.add
+                (i32.shr_u
+                  (container (i32.add local.get.1 i32.const.64) nop)
+                  i32.const.0)
+                i32.const.0)
+              i32.const.0)
+            (drop i64.rand))
+          i32.const.0)
+        i32.const.0)
+      i32.const.0)
+    i32.const.0)
+  i32.const.1)
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 20/31
+Mutating opcode 436/444
+Original expression i32.const.2097536
+New expression (i32.or
+  (container
+    (drop i32.rand)
+    (i32.or
+      i32.const.2097536
+      (i32.mul
+        (container
+          (i32.xor
+            (i32.xor
+              (container
+                nop
+                (container
+                  (drop i64.rand)
+                  (i32.sub i32.const.2097536 i32.const.0)))
+              i32.const.0)
+            i32.const.0)
+          (drop i64.rand))
+        i32.const.1)))
+  (i32.shr_s
+    (i32.sub
+      (i32.add
+        (container
+          nop
+          (container
+            (drop i32.rand)
+            (i32.use_of_global
+              (container
+                (drop i64.rand)
+                (container
+                  (drop i64.rand)
+                  (i32.use_of_global i32.const.2097536))))))
+        i32.const.0)
+      i32.const.0)
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 21/31
+Mutating opcode 506/726
+Original expression (i32.store.0.2.0 local.get.0 local.get.6)
+New expression (container
+  (container
+    (container
+      (container
+        nop
+        (container
+          (container
+            (container
+              (container
+                (container
+                  (i32.store.0.2.0 local.get.0 local.get.6)
+                  (drop i32.rand))
+                nop)
+              (drop i32.rand))
+            (drop i64.rand))
+          (drop i64.rand)))
+      nop)
+    (drop i64.rand))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/31
+Mutating opcode 81/101
+Original expression i32.const.0
+New expression (container (container i32.const.0 nop) (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 29/31
+Mutating opcode 0/2
+Original expression i32.const.0
+New expression (container i32.const.0 (drop i32.rand))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000016_s1007360513922935712_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000017_s4152500704908756320_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000018_s4281408470417072604_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000019_s14533051175324270976_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000020_s13360830384061143856_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000021_s10738650489958407492_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000022_s4684108645582243529_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000023_s15948827439793864409_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000024_s7200438589518101728_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000025_s16612335488165945302_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/31
+Mutating opcode 20/104
+Original expression local.get.3
+New expression (container
+  (drop i32.rand)
+  (i32.or
+    (i32.xor
+      (container
+        (drop i32.rand)
+        (container
+          (i32.or
+            (i32.xor
+              (container
+                (container
+                  (i32.add local.get.3 i32.const.0)
+                  (drop i32.rand))
+                nop)
+              i32.const.0)
+            (container
+              (i32.shl
+                (i32.use_of_global (container local.get.3 (drop i64.rand)))
+                i32.const.0)
+              nop))
+          (drop i64.rand)))
+      i32.const.0)
+    (container
+      (i32.mul
+        (i32.add
+          (i32.or
+            (container
+              (drop i64.rand)
+              (container
+                (container (drop i64.rand) (i32.or local.get.3 local.get.3))
+                (drop i64.rand)))
+            (i32.shr_u local.get.3 i32.const.0))
+          i32.const.0)
+        i32.const.1)
+      nop)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 28/31
+Mutating opcode 4/14
+Original expression (i32.add global.get.4 local.get.0)
+New expression (i32.sub
+  (i32.and
+    (i32.mul
+      (i32.add
+        (container (i32.mul global.get.4 i32.const.1) nop)
+        (container
+          (i32.and
+            (i32.mul
+              (container
+                (i32.shr_u (i32.shr_u local.get.0 i32.const.0) i32.const.0)
+                (drop i64.rand))
+              i32.const.1)
+            (container
+              (i32.mul
+                (i32.shr_u (i32.or local.get.0 local.get.0) i32.const.0)
+                i32.const.1)
+              (drop i64.rand)))
+          (drop i64.rand)))
+      i32.const.1)
+    (i32.shr_u
+      (container
+        (drop i64.rand)
+        (i32.add
+          (i32.shr_u
+            (i32.and
+              (i32.sub
+                (i32.add (i32.add global.get.4 local.get.0) i32.const.0)
+                i32.const.0)
+              (i32.or
+                (i32.sub
+                  (i32.xor (i32.add global.get.4 local.get.0) i32.const.0)
+                  i32.const.0)
+                (container
+                  (container
+                    (i32.add global.get.4 local.get.0)
+                    (drop i32.rand))
+                  (drop i64.rand))))
+            i32.const.0)
+          i32.const.0))
+      i32.const.0))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 12/31
+Mutating opcode 509/788
+Original expression (i64.xor
+  (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+  local.get.30)
+New expression (i64.or
+  (container
+    (i64.add
+      (i64.shr_s
+        (container
+          nop
+          (i64.use_of_global
+            (i64.shr_s
+              (i64.xor
+                local.get.30
+                (i64.shr_u
+                  (i64.sub
+                    (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                    i64.const.0)
+                  i64.const.0))
+              i64.const.0)))
+        i64.const.0)
+      i64.const.0)
+    (drop i32.rand))
+  (container
+    (i64.or
+      (i64.and
+        (container
+          (i64.xor
+            (i64.shl
+              (container
+                nop
+                (container
+                  (drop i64.rand)
+                  (i64.sub
+                    (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                    i64.const.0)))
+              i64.const.0)
+            (container
+              (drop i64.rand)
+              (i64.shr_s (i64.shr_u local.get.30 i64.const.0) i64.const.0)))
+          (drop i64.rand))
+        (i64.and
+          (i64.shr_u
+            (i64.or
+              (container
+                nop
+                (i64.sub
+                  (i64.add
+                    (i64.xor
+                      (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                      local.get.30)
+                    i64.const.0)
+                  i64.const.0))
+              (i64.or
+                (i64.shl
+                  (i64.xor
+                    (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                    local.get.30)
+                  i64.const.0)
+                (i64.use_of_global
+                  (i64.or
+                    (i64.xor
+                      (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                      local.get.30)
+                    (i64.xor
+                      (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                      local.get.30)))))
+            i64.const.0)
+          (container
+            (drop i32.rand)
+            (i64.mul
+              (container
+                (drop i32.rand)
+                (container
+                  nop
+                  (i64.add
+                    (i64.xor
+                      (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                      local.get.30)
+                    i64.const.0)))
+              i64.const.1))))
+      (i64.sub
+        (i64.xor
+          (i64.xor
+            (container
+              (drop i32.rand)
+              (i64.and
+                (i64.shl
+                  (container
+                    (i64.xor
+                      (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                      local.get.30)
+                    (drop i32.rand))
+                  i64.const.0)
+                (i64.mul
+                  (i64.xor
+                    (i64.and local.get.31 (i64.xor local.get.28 i64.const.-1))
+                    local.get.30)
+                  i64.const.1)))
+            i64.const.0)
+          i64.const.0)
+        i64.const.0))
+    (drop i64.rand)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/31
+Mutating opcode 14/221
+Original expression (i32.add local.get.0 local.get.2)
+New expression (container
+  nop
+  (i32.and
+    (i32.add
+      (i32.use_of_global
+        (i32.mul
+          (i32.shl
+            (container
+              (drop i64.rand)
+              (i32.shr_u
+                (i32.sub (container nop local.get.2) i32.const.0)
+                i32.const.0))
+            i32.const.0)
+          i32.const.1))
+      (i32.shl
+        (i32.sub
+          (container
+            (i32.and
+              (container (i32.shr_u local.get.0 i32.const.0) nop)
+              local.get.0)
+            (drop i32.rand))
+          i32.const.0)
+        i32.const.0))
+    (i32.xor
+      (container
+        (drop i64.rand)
+        (container
+          (container
+            (drop i32.rand)
+            (i32.and
+              (i32.add
+                (i32.and
+                  (i32.add (i32.add local.get.0 local.get.2) i32.const.0)
+                  (i32.and
+                    (i32.add local.get.0 local.get.2)
+                    (i32.add local.get.0 local.get.2)))
+                i32.const.0)
+              (container
+                (drop i64.rand)
+                (container
+                  (drop i64.rand)
+                  (i32.add (i32.add local.get.0 local.get.2) i32.const.0)))))
+          nop))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[F64, FuncRef, I64, ExternRef, ExternRef, I32, I64, FuncRef, ExternRef, I32, F32, F32] results: [FuncRef, FuncRef, F64, F32]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 14/31
+Mutating opcode 2913/4156
+Original expression (i64.xor
+  (i64.or
+    (i64.shl local.get.14 i64.const.39)
+    (i64.shr_u local.get.14 i64.const.25))
+  local.get.21)
+New expression (i64.mul
+  (i64.and
+    (i64.xor
+      (i64.or
+        (container
+          (drop i64.rand)
+          (i64.shr_s
+            (i64.shr_u
+              (container
+                (drop i32.rand)
+                (i64.shl (i64.shr_s local.get.14 i64.const.0) i64.const.0))
+              (i64.or
+                (i64.shl (i64.xor i64.const.25 i64.const.0) i64.const.0)
+                (container
+                  (drop i32.rand)
+                  (i64.shl i64.const.25 i64.const.0))))
+            i64.const.0))
+        (i64.or
+          (i64.shr_s
+            (container
+              (i64.add
+                (container
+                  (drop i32.rand)
+                  (i64.sub (i64.shl local.get.14 i64.const.39) i64.const.0))
+                i64.const.0)
+              (drop i32.rand))
+            i64.const.0)
+          (container
+            (i64.shr_u
+              (i64.and
+                (i64.xor
+                  (i64.mul (i64.shl local.get.14 i64.const.39) i64.const.1)
+                  i64.const.0)
+                (i64.shr_u
+                  (container
+                    (i64.shl local.get.14 i64.const.39)
+                    (drop i64.rand))
+                  i64.const.0))
+              i64.const.0)
+            (drop i32.rand))))
+      (container
+        (container
+          (drop i64.rand)
+          (i64.mul
+            (i64.mul (container nop local.get.21) i64.const.1)
+            i64.const.1))
+        nop))
+    (container
+      (container
+        (drop i64.rand)
+        (i64.and
+          (i64.sub
+            (container
+              nop
+              (container
+                (i64.shr_s
+                  (container
+                    (i64.xor
+                      (i64.or
+                        (i64.shl local.get.14 i64.const.39)
+                        (i64.shr_u local.get.14 i64.const.25))
+                      local.get.21)
+                    nop)
+                  i64.const.0)
+                nop))
+            i64.const.0)
+          (container
+            (drop i32.rand)
+            (container
+              nop
+              (container
+                (drop i64.rand)
+                (container
+                  (drop i32.rand)
+                  (container
+                    (drop i64.rand)
+                    (i64.xor
+                      (i64.or
+                        (i64.shl local.get.14 i64.const.39)
+                        (i64.shr_u local.get.14 i64.const.25))
+                      local.get.21))))))))
+      (drop i32.rand)))
+  i64.const.1)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 18/31
+Mutating opcode 124/1288
+Original expression (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)
+New expression (i32.sub
+  (i32.xor
+    (container
+      (drop i64.rand)
+      (i32.shr_u
+        (i32.or
+          (i32.or
+            (i32.or
+              (container
+                (i32.use_of_global
+                  (i32.shr_u
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)
+                    i32.const.0))
+                nop)
+              (i32.use_of_global
+                (container
+                  (container
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)
+                    (drop i32.rand))
+                  (drop i64.rand))))
+            (i32.or
+              (i32.mul
+                (container
+                  (drop i32.rand)
+                  (container
+                    (drop i32.rand)
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)))
+                i32.const.1)
+              (container
+                (i32.mul
+                  (i32.shl
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)
+                    i32.const.0)
+                  i32.const.1)
+                nop)))
+          (i32.mul
+            (container
+              nop
+              (container
+                nop
+                (i32.shr_u
+                  (i32.and
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16)
+                    (i32.shl (i32.load8_u.25.0.0 local.get.1) i32.const.16))
+                  i32.const.0)))
+            i32.const.1))
+        i32.const.0))
+    i32.const.0)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 14/32
+Mutating opcode 3012/4256
+Original expression i64.const.1
+New expression (i64.add
+  (i64.sub
+    (i64.shl
+      (i64.and
+        (i64.shr_s
+          (i64.shl
+            (container
+              (drop i32.rand)
+              (container
+                (drop i32.rand)
+                (i64.xor (i64.or i64.const.1 i64.const.1) i64.const.0)))
+            i64.const.0)
+          i64.const.0)
+        (container
+          (i64.or
+            (container
+              (drop i64.rand)
+              (i64.xor
+                (container (drop i32.rand) (i64.use_of_global i64.const.1))
+                i64.const.0))
+            (container
+              nop
+              (i64.and
+                (container (container (drop i64.rand) i64.const.1) nop)
+                (container
+                  (i64.add i64.const.1 i64.const.0)
+                  (drop i32.rand)))))
+          (drop i32.rand)))
+      i64.const.0)
+    i64.const.0)
+  i64.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/32
+Mutating opcode 384/664
+Original expression local.get.4
+New expression (i32.or
+  (i32.or
+    (container
+      (i32.shr_s
+        (container
+          (drop i32.rand)
+          (i32.xor
+            (i32.and
+              (container
+                nop
+                (i32.shr_s (i32.shr_s local.get.4 i32.const.0) i32.const.0))
+              (i32.and
+                (container
+                  (drop i64.rand)
+                  (container local.get.4 (drop i64.rand)))
+                (i32.use_of_global (i32.sub local.get.4 i32.const.0))))
+            i32.const.0))
+        i32.const.0)
+      nop)
+    (i32.xor
+      (container
+        (drop i32.rand)
+        (i32.xor
+          (container
+            (drop i64.rand)
+            (i32.and
+              (container
+                (drop i64.rand)
+                (container
+                  (container (drop i64.rand) local.get.4)
+                  (drop i32.rand)))
+              (container
+                (container (drop i64.rand) (i32.or local.get.4 local.get.4))
+                (drop i64.rand))))
+          i32.const.0))
+      i32.const.0))
+  (i32.use_of_global
+    (container
+      (container
+        (drop i64.rand)
+        (container
+          (container
+            (i32.and
+              local.get.4
+              (container
+                (i32.mul (i32.or local.get.4 local.get.4) i32.const.1)
+                (drop i32.rand)))
+            (drop i64.rand))
+          (drop i32.rand)))
+      (drop i64.rand))))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000027_s17915805994204446403_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000028_s650600600823508633_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000029_s15084708574792438371_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000030_s8033582009182652018_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000031_s262828527681745992_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000032_s6382607434791778096_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000033_s17200733332885289378_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000034_s5441470393834538841_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000035_s6667401652160076408_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000036_s5245168357824063248_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 9/32
+Mutating opcode 0/171
+Original expression local.get.1
+New expression (i32.use_of_global
+  (i32.sub
+    (i32.shl
+      (container
+        (container
+          nop
+          (i32.xor
+            (container
+              (i32.shr_s
+                (i32.shr_s (i32.or local.get.1 local.get.1) i32.const.0)
+                i32.const.0)
+              (drop i64.rand))
+            i32.const.0))
+        (drop i32.rand))
+      i32.const.0)
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::codemotion::CodemotionMutator`
+Write if complement 33/57
+mutator `wasm_mutate::mutators::codemotion::CodemotionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 11/32
+Mutating opcode 59/506
+Original expression i64.const.0
+New expression (container
+  (container
+    (drop i32.rand)
+    (i64.or
+      (i64.shr_u
+        (i64.xor
+          (i64.use_of_global
+            (container
+              nop
+              (i64.xor
+                (i64.or
+                  (i64.xor i64.const.0 i64.const.0)
+                  (container nop i64.const.0))
+                (container nop (container i64.const.0 nop)))))
+          (container
+            (drop i64.rand)
+            (i64.shr_s
+              (i64.use_of_global
+                (i64.and
+                  (container (drop i32.rand) i64.const.0)
+                  (container i64.const.0 nop)))
+              (container
+                (container nop (i64.sub i64.const.0 i64.const.0))
+                (drop i64.rand)))))
+        (container
+          nop
+          (i64.add
+            (container
+              (i64.shr_u
+                (i64.use_of_global (i64.use_of_global i64.const.0))
+                (i64.mul (i64.and i64.const.0 i64.const.0) i64.const.1))
+              (drop i32.rand))
+            (container
+              (drop i64.rand)
+              (container
+                nop
+                (i64.shr_s
+                  (i64.shr_s i64.const.0 i64.const.0)
+                  (i64.and i64.const.0 i64.const.0)))))))
+      (i64.shr_s
+        (i64.sub
+          (container
+            (i64.use_of_global
+              (container
+                (i64.shl
+                  (container i64.const.0 (drop i64.rand))
+                  (i64.or i64.const.0 i64.const.0))
+                (drop i32.rand)))
+            nop)
+          (i64.or
+            (i64.shr_u
+              (container
+                (drop i32.rand)
+                (container (container i64.const.0 nop) nop))
+              (container
+                (drop i32.rand)
+                (i64.xor
+                  (i64.add i64.const.0 i64.const.0)
+                  (i64.add i64.const.0 i64.const.0))))
+            (i64.and
+              (container i64.const.0 nop)
+              (i64.sub
+                (container (i64.mul i64.const.0 i64.const.1) nop)
+                (container
+                  (i64.mul i64.const.0 i64.const.1)
+                  (drop i32.rand))))))
+        i64.const.0)))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 23/32
+Mutating opcode 435/768
+Original expression local.get.6
+New expression (i32.or
+  (i32.use_of_global
+    (container
+      (container
+        (i32.shl (i32.mul local.get.6 i32.const.1) i32.const.0)
+        (drop i32.rand))
+      (drop i64.rand)))
+  (container
+    nop
+    (i32.xor
+      (container
+        nop
+        (i32.shr_s
+          (i32.and
+            (i32.and
+              (i32.use_of_global
+                (i32.add (i32.add local.get.6 i32.const.0) i32.const.0))
+              (container
+                (container
+                  (i32.xor local.get.6 i32.const.0)
+                  (drop i64.rand))
+                nop))
+            (container
+              (i32.shl
+                (i32.mul
+                  (container local.get.6 (drop i32.rand))
+                  i32.const.1)
+                i32.const.0)
+              (drop i64.rand)))
+          i32.const.0))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 25/32
+Mutating opcode 427/443
+Original expression local.get.2
+New expression (i32.or
+  (container
+    (drop i64.rand)
+    (container
+      (i32.use_of_global
+        (i32.and
+          (i32.shl
+            (i32.shr_u
+              (container
+                (container
+                  (drop i32.rand)
+                  (i32.and local.get.2 local.get.2))
+                (drop i64.rand))
+              i32.const.0)
+            i32.const.0)
+          (i32.xor
+            (container
+              (container
+                (i32.xor
+                  (container local.get.2 (drop i32.rand))
+                  i32.const.0)
+                (drop i32.rand))
+              (drop i64.rand))
+            i32.const.0)))
+      (drop i64.rand)))
+  (i32.use_of_global
+    (container
+      (i32.shr_u
+        (container nop (i32.shr_s local.get.2 i32.const.0))
+        i32.const.0)
+      nop)))
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[F32, I32, I64, FuncRef, F32, I32, I64, V128, F64, I64, I32, FuncRef, F32, FuncRef, I32, V128, FuncRef, I32] results: [ExternRef, F64, ExternRef, ExternRef, V128, V128, ExternRef, F64, F32]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 12/33
+Mutating opcode 10/918
+Original expression (i32.add local.get.0 i32.const.16)
+New expression (container
+  (container
+    (i32.and
+      (i32.add
+        (container
+          (i32.add
+            (i32.add
+              (i32.xor
+                (i32.or
+                  (i32.sub i32.const.16 i32.const.0)
+                  (i32.or i32.const.16 i32.const.16))
+                i32.const.0)
+              (i32.and
+                (i32.shl (i32.shl local.get.0 i32.const.0) i32.const.0)
+                (i32.shr_u
+                  (container local.get.0 (drop i32.rand))
+                  i32.const.0)))
+            i32.const.0)
+          nop)
+        i32.const.0)
+      (i32.add
+        (container
+          (i32.add (i32.shr_s i32.const.16 i32.const.0) i32.const.0)
+          nop)
+        (i32.use_of_global
+          (container nop (i32.xor local.get.0 i32.const.0)))))
+    (drop i32.rand))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::codemotion::CodemotionMutator`
+Unroll loop 4/7
+mutator `wasm_mutate::mutators::codemotion::CodemotionMutator` succeeded
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000039_s12675686995409215715_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000040_s7561323271055078160_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000041_s395537765100826051_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000042_s12371661357837472478_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000043_s14497692382943006280_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000044_s6345123753859917447_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000045_s2545902570138704001_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000046_s8311078402904594571_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000047_s12771004166757861864_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000048_s7837482523670110725_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[I32, I64, FuncRef, ExternRef, V128, F64] results: [ExternRef, I32, F32, F32, F32, ExternRef, F64, V128, F32, F32, F64, ExternRef, ExternRef, V128, I32, F32, FuncRef, F64, FuncRef, FuncRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/34
+Mutating opcode 270/279
+Original expression local.get.1
+New expression (container
+  nop
+  (i32.shr_u
+    (i32.xor
+      (container
+        (drop i32.rand)
+        (container
+          nop
+          (container
+            (container
+              nop
+              (i32.use_of_global
+                (i32.sub (i32.use_of_global local.get.1) i32.const.0)))
+            nop)))
+      i32.const.0)
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 23/34
+Mutating opcode 100/809
+Original expression (local.set.0 (i32.add local.get.0 local.get.8))
+New expression (container
+  (container
+    (container
+      nop
+      (local.set.0
+        (i32.add
+          (container
+            (i32.xor
+              (container
+                (drop i32.rand)
+                (container (i32.mul local.get.8 i32.const.1) nop))
+              i32.const.0)
+            (drop i32.rand))
+          (container
+            (drop i32.rand)
+            (container
+              (i32.shr_u local.get.0 i32.const.0)
+              (drop i32.rand))))))
+    nop)
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 0/34
+Mutating opcode 363/1814
+Original expression (local.tee.2
+  (i32.xor
+    (i32.xor
+      (i32.xor
+        (i32.xor
+          (i32.load.0.2.0
+            (i32.add
+              (i32.shl (i32.and local.get.2 i32.const.255) i32.const.2)
+              i32.const.1024))
+          (i32.load.28.2.0 local.get.1))
+        (i32.load.0.2.0
+          (i32.add
+            (i32.shl
+              (i32.and (i32.shr_u local.get.6 i32.const.8) i32.const.255)
+              i32.const.2)
+            i32.const.2048)))
+      (i32.load.0.2.0
+        (i32.add
+          (i32.shl
+            (i32.and (i32.shr_u local.get.7 i32.const.16) i32.const.255)
+            i32.const.2)
+          i32.const.3072)))
+    (i32.load.0.2.0
+      (i32.add
+        (i32.shl (i32.shr_u local.get.8 i32.const.24) i32.const.2)
+        i32.const.4096))))
+New expression (i32.add
+  (i32.xor
+    (i32.xor
+      (i32.xor
+        (local.tee.2
+          (i32.xor
+            (container
+              (i32.sub
+                (container
+                  nop
+                  (container
+                    (i32.load.0.2.0
+                      (i32.add
+                        (i32.shl (i32.shr_u local.get.8 i32.const.24) i32.const.2)
+                        i32.const.4096))
+                    (drop i32.rand)))
+                i32.const.0)
+              (drop i32.rand))
+            (i32.shl
+              (i32.or
+                (container
+                  (i32.use_of_global
+                    (i32.xor
+                      (i32.xor
+                        (i32.xor
+                          (i32.load.0.2.0
+                            (i32.add
+                              (i32.shl (i32.and local.get.2 i32.const.255) i32.const.2)
+                              i32.const.1024))
+                          (i32.load.28.2.0 local.get.1))
+                        (i32.load.0.2.0
+                          (i32.add
+                            (i32.shl
+                              (i32.and i32.const.255 (i32.shr_u local.get.6 i32.const.8))
+                              i32.const.2)
+                            i32.const.2048)))
+                      (i32.load.0.2.0
+                        (i32.add
+                          (i32.shl
+                            (i32.and i32.const.255 (i32.shr_u local.get.7 i32.const.16))
+                            i32.const.2)
+                          i32.const.3072))))
+                  nop)
+                (i32.use_of_global
+                  (container
+                    (i32.xor
+                      (i32.xor
+                        (i32.xor
+                          (i32.load.0.2.0
+                            (i32.add
+                              (i32.shl (i32.and local.get.2 i32.const.255) i32.const.2)
+                              i32.const.1024))
+                          (i32.load.28.2.0 local.get.1))
+                        (i32.load.0.2.0
+                          (i32.add
+                            (i32.shl
+                              (i32.and i32.const.255 (i32.shr_u local.get.6 i32.const.8))
+                              i32.const.2)
+                            i32.const.2048)))
+                      (i32.load.0.2.0
+                        (i32.add
+                          (i32.shl
+                            (i32.and i32.const.255 (i32.shr_u local.get.7 i32.const.16))
+                            i32.const.2)
+                          i32.const.3072)))
+                    (drop i32.rand))))
+              i32.const.0)))
+        i32.const.0)
+      i32.const.0)
+    i32.const.0)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 5/34
+Mutating opcode 135/143
+Original expression (local.set.0 (i32.add local.get.0 i32.const.1))
+New expression (container
+  (container
+    (drop i64.rand)
+    (container
+      (drop i64.rand)
+      (container
+        (container
+          (drop i32.rand)
+          (container
+            (container
+              (drop i64.rand)
+              (container
+                (container
+                  (drop i32.rand)
+                  (container
+                    nop
+                    (local.set.0 (i32.add local.get.0 i32.const.1))))
+                (drop i64.rand)))
+            (drop i32.rand)))
+        nop)))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 8/34
+Mutating opcode 17/173
+Original expression (i64.and (i64.shr_u local.get.2 i64.const.3) i64.const.63)
+New expression (i64.add
+  (container
+    (drop i64.rand)
+    (i64.and
+      (i64.sub
+        (i64.sub
+          (i64.and
+            (container
+              (i64.mul
+                (i64.mul
+                  (container i64.const.63 (drop i64.rand))
+                  i64.const.1)
+                i64.const.1)
+              (drop i64.rand))
+            (container
+              (container
+                (container
+                  (i64.and i64.const.63 i64.const.63)
+                  (drop i32.rand))
+                (drop i32.rand))
+              (drop i64.rand)))
+          i64.const.0)
+        i64.const.0)
+      (container
+        (drop i32.rand)
+        (container
+          (container
+            (drop i32.rand)
+            (i64.sub
+              (i64.use_of_global
+                (i64.and
+                  (i64.or
+                    (i64.shr_u local.get.2 i64.const.3)
+                    (i64.shr_u local.get.2 i64.const.3))
+                  (i64.shl (i64.shr_u local.get.2 i64.const.3) i64.const.0)))
+              i64.const.0))
+          (drop i64.rand)))))
+  i64.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/34
+Mutating opcode 137/295
+Original expression local.get.1
+New expression (i32.xor local.get.1 i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/34
+Mutating opcode 146/297
+Original expression local.get.0
+New expression (i32.use_of_global
+  (i32.shr_s
+    (container
+      (i32.xor
+        (i32.sub
+          (i32.and
+            (i32.mul
+              (container
+                nop
+                (i32.add (i32.shr_s local.get.0 i32.const.0) i32.const.0))
+              i32.const.1)
+            (container
+              nop
+              (i32.shr_s
+                (i32.shr_s (i32.xor local.get.0 i32.const.0) i32.const.0)
+                i32.const.0)))
+          i32.const.0)
+        i32.const.0)
+      nop)
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/34
+Mutating opcode 243/565
+Original expression (i64.store8.223.0.0 local.get.3 local.get.7)
+New expression (container
+  (drop i64.rand)
+  (container
+    (drop i32.rand)
+    (container
+      nop
+      (container
+        nop
+        (container
+          (drop i32.rand)
+          (container
+            (drop i64.rand)
+            (container
+              (drop i64.rand)
+              (container
+                (drop i64.rand)
+                (container
+                  nop
+                  (container
+                    (drop i32.rand)
+                    (i64.store8.223.0.0 local.get.3 local.get.7)))))))))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 21/34
+Mutating opcode 306/741
+Original expression local.get.1
+New expression (i32.use_of_global
+  (container
+    (i32.shr_u
+      (container
+        (container
+          nop
+          (i32.shl
+            (container
+              (container
+                (i32.shr_u (i32.use_of_global local.get.1) i32.const.0)
+                (drop i32.rand))
+              (drop i32.rand))
+            i32.const.0))
+        (drop i32.rand))
+      i32.const.0)
+    nop))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000050_s15074662715043800638_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000051_s11604020937954584151_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000052_s1872524489939359359_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000053_s1719126215356403716_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000054_s17139397506722517961_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000055_s3496019292893766972_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000056_s2669326460208498213_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000057_s13684438766807059007_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000058_s3338086107563930140_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000059_s2627333780184032248_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/34
+Mutating opcode 140/147
+Original expression (local.set.1 (i32.load.0.2.0 local.get.4))
+New expression (container
+  nop
+  (local.set.1
+    (container
+      (drop i32.rand)
+      (i32.load.0.2.0
+        (i32.or
+          (i32.shr_u
+            (i32.sub
+              (container
+                (drop i64.rand)
+                (i32.or
+                  (i32.shr_s local.get.4 i32.const.0)
+                  (i32.and local.get.4 local.get.4)))
+              i32.const.0)
+            i32.const.0)
+          (container
+            (container
+              (drop i64.rand)
+              (i32.add
+                (container
+                  (i32.shr_u local.get.4 i32.const.0)
+                  (drop i32.rand))
+                i32.const.0))
+            (drop i64.rand)))))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/34
+Mutating opcode 627/732
+Original expression (local.tee.52
+  (i32.xor
+    (i32.xor
+      (i32.load.0.2.0 local.get.63)
+      (i32.load.0.2.0 local.get.16))
+    (i32.load.0.2.0 local.get.51)))
+New expression (i32.or
+  (container
+    (drop i64.rand)
+    (i32.or
+      (container
+        (i32.shl
+          (container
+            (container
+              (drop i64.rand)
+              (i32.xor
+                (i32.shr_u
+                  (i32.shr_s
+                    (local.tee.52
+                      (i32.xor
+                        (i32.xor
+                          (i32.load.0.2.0 local.get.63)
+                          (i32.load.0.2.0 local.get.16))
+                        (i32.load.0.2.0 local.get.51)))
+                    i32.const.0)
+                  i32.const.0)
+                i32.const.0))
+            (drop i32.rand))
+          i32.const.0)
+        nop)
+      (i32.shr_s
+        (i32.shl
+          (i32.shr_u
+            (i32.and
+              (container
+                (container
+                  (drop i32.rand)
+                  (local.tee.52
+                    (i32.xor
+                      (i32.xor
+                        (i32.load.0.2.0 local.get.63)
+                        (i32.load.0.2.0 local.get.16))
+                      (i32.load.0.2.0 local.get.51))))
+                (drop i64.rand))
+              (container
+                (drop i32.rand)
+                (container
+                  (drop i64.rand)
+                  (container
+                    (local.tee.52
+                      (i32.xor
+                        (i32.xor
+                          (i32.load.0.2.0 local.get.63)
+                          (i32.load.0.2.0 local.get.16))
+                        (i32.load.0.2.0 local.get.51)))
+                    (drop i64.rand)))))
+            i32.const.0)
+          i32.const.0)
+        i32.const.0)))
+  (container
+    (drop i32.rand)
+    (i32.shl
+      (i32.use_of_global
+        (container
+          (drop i32.rand)
+          (container
+            (i32.shr_s
+              (i32.shr_s
+                (i32.add
+                  (i32.shr_u
+                    (local.tee.52
+                      (i32.xor
+                        (i32.xor
+                          (i32.load.0.2.0 local.get.63)
+                          (i32.load.0.2.0 local.get.16))
+                        (i32.load.0.2.0 local.get.51)))
+                    i32.const.0)
+                  i32.const.0)
+                i32.const.0)
+              i32.const.0)
+            (drop i64.rand))))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 11/34
+Mutating opcode 480/611
+Original expression i32.const.4
+New expression (i32.shl
+  (container
+    nop
+    (container
+      (i32.xor
+        (container
+          (i32.add
+            (i32.shr_u
+              (container
+                (drop i32.rand)
+                (i32.shr_s i32.const.4 i32.const.0))
+              i32.const.0)
+            i32.const.0)
+          (drop i64.rand))
+        i32.const.0)
+      nop))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 18/34
+Mutating opcode 1106/1349
+Original expression (i32.add (i32.shl local.get.19 i32.const.2) i32.const.5392)
+New expression (container
+  (drop i32.rand)
+  (i32.add
+    (i32.sub
+      (i32.and
+        (i32.use_of_global
+          (i32.add
+            (container (drop i32.rand) i32.const.5392)
+            i32.const.0))
+        (container
+          nop
+          (container
+            (drop i64.rand)
+            (i32.use_of_global
+              (i32.or
+                (i32.and
+                  (container nop i32.const.5392)
+                  (i32.shr_s i32.const.5392 i32.const.0))
+                (container
+                  (drop i32.rand)
+                  (container (drop i32.rand) i32.const.5392)))))))
+      i32.const.0)
+    (container
+      nop
+      (i32.or
+        (i32.sub
+          (i32.add
+            (container
+              (container
+                (i32.shl
+                  (container (i32.shl local.get.19 i32.const.2) nop)
+                  i32.const.0)
+                (drop i64.rand))
+              nop)
+            i32.const.0)
+          i32.const.0)
+        (i32.shl
+          (container (drop i32.rand) local.get.19)
+          (container
+            (drop i32.rand)
+            (container
+              (i32.mul
+                (container (container i32.const.2 nop) nop)
+                i32.const.1)
+              (drop i32.rand))))))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 13/34
+Mutating opcode 2242/3045
+Original expression local.get.36
+New expression (container
+  (i64.mul
+    (container
+      (container
+        (i64.xor
+          (i64.and
+            (i64.or
+              local.get.36
+              (container
+                (i64.shl
+                  (container (drop i32.rand) local.get.36)
+                  i64.const.0)
+                (drop i64.rand)))
+            (container
+              nop
+              (i64.sub
+                (container
+                  (drop i64.rand)
+                  (i64.and local.get.36 local.get.36))
+                i64.const.0)))
+          i64.const.0)
+        (drop i64.rand))
+      nop)
+    i64.const.1)
+  nop)
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/34
+Mutating opcode 258/582
+Original expression local.get.3
+New expression (i32.shl
+  (i32.use_of_global
+    (i32.and
+      (container
+        (i32.add
+          (i32.and
+            (i32.add
+              (container
+                nop
+                (i32.sub (i32.shl local.get.3 i32.const.0) i32.const.0))
+              i32.const.0)
+            (i32.xor
+              (i32.add
+                (i32.sub (i32.mul local.get.3 i32.const.1) i32.const.0)
+                i32.const.0)
+              i32.const.0))
+          i32.const.0)
+        (drop i32.rand))
+      (i32.mul
+        (container
+          nop
+          (container
+            (container
+              (drop i64.rand)
+              (i32.mul
+                (i32.or
+                  (i32.xor local.get.3 i32.const.0)
+                  (i32.xor local.get.3 i32.const.0))
+                i32.const.1))
+            nop))
+        i32.const.1)))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 8/34
+Mutating opcode 96/219
+Original expression (i32.load.0.2.0 local.get.3)
+New expression (container
+  (drop i64.rand)
+  (i32.sub
+    (i32.or
+      (i32.shr_u
+        (i32.shr_u
+          (i32.xor
+            (container
+              (drop i32.rand)
+              (i32.sub
+                (i32.add
+                  (i32.and
+                    (i32.load.0.2.0 local.get.3)
+                    (i32.load.0.2.0 local.get.3))
+                  i32.const.0)
+                i32.const.0))
+            i32.const.0)
+          i32.const.0)
+        i32.const.0)
+      (i32.or
+        (container
+          (i32.load.0.2.0
+            (i32.or
+              (i32.and
+                (i32.mul
+                  (container (drop i64.rand) local.get.3)
+                  i32.const.1)
+                (i32.mul (i32.shr_u local.get.3 i32.const.0) i32.const.1))
+              (container
+                (container
+                  (drop i64.rand)
+                  (container local.get.3 (drop i32.rand)))
+                nop)))
+          (drop i64.rand))
+        (i32.sub
+          (i32.shr_s
+            (container
+              (container
+                (i32.shr_u
+                  (i32.shr_s (i32.load.0.2.0 local.get.3) i32.const.0)
+                  i32.const.0)
+                (drop i32.rand))
+              (drop i64.rand))
+            i32.const.0)
+          i32.const.0)))
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 31/34
+Mutating opcode 0/2
+Original expression i32.const.0
+New expression (i32.sub
+  (i32.mul
+    (container
+      nop
+      (i32.xor
+        (i32.shr_s
+          (container
+            (container
+              (i32.and
+                (container
+                  (i32.and i32.const.0 i32.const.0)
+                  (drop i64.rand))
+                (container (i32.mul i32.const.0 i32.const.1) nop))
+              (drop i64.rand))
+            (drop i32.rand))
+          (container
+            (i32.shl
+              (i32.mul
+                (container
+                  (drop i32.rand)
+                  (i32.sub i32.const.0 i32.const.0))
+                i32.const.1)
+              (container
+                (drop i64.rand)
+                (container nop (i32.and i32.const.0 i32.const.0))))
+            nop))
+        (container
+          (drop i32.rand)
+          (container
+            (drop i64.rand)
+            (container
+              nop
+              (container
+                (container (drop i32.rand) (container i32.const.0 nop))
+                nop))))))
+    i32.const.1)
+  (container
+    (container
+      (drop i64.rand)
+      (container
+        (i32.and
+          (i32.use_of_global (i32.shl i32.const.0 i32.const.0))
+          (i32.or
+            (i32.xor
+              (i32.use_of_global
+                (i32.or
+                  (i32.and i32.const.0 i32.const.0)
+                  (i32.shl i32.const.0 i32.const.0)))
+              (i32.xor
+                (i32.add
+                  (i32.mul i32.const.0 i32.const.1)
+                  (i32.shl i32.const.0 i32.const.0))
+                (i32.xor
+                  (i32.xor i32.const.0 i32.const.0)
+                  (i32.add i32.const.0 i32.const.0))))
+            (i32.and
+              (container
+                nop
+                (i32.add
+                  (container (drop i64.rand) i32.const.0)
+                  (container (drop i32.rand) i32.const.0)))
+              (container
+                (i32.and
+                  (container i32.const.0 (drop i32.rand))
+                  (i32.add i32.const.0 i32.const.0))
+                (drop i64.rand)))))
+        (drop i32.rand)))
+    (drop i64.rand)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 27/34
+Mutating opcode 727/1048
+Original expression local.get.0
+New expression (i32.shr_u (i32.add local.get.0 i32.const.0) i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 23/34
+Mutating opcode 630/828
+Original expression (i64.load.0.3.0 local.get.3)
+New expression (i64.or
+  (i64.and
+    (i64.or
+      (i64.or
+        (container
+          (drop i32.rand)
+          (container
+            (drop i64.rand)
+            (container
+              (i64.use_of_global
+                (container
+                  (i64.mul (i64.load.0.3.0 local.get.3) i64.const.1)
+                  nop))
+              (drop i64.rand))))
+        (i64.xor
+          (i64.or
+            (i64.mul
+              (i64.shr_u
+                (container
+                  (container (drop i32.rand) (i64.load.0.3.0 local.get.3))
+                  (drop i64.rand))
+                i64.const.0)
+              i64.const.1)
+            (container
+              (container
+                (container
+                  (i64.xor (i64.load.0.3.0 local.get.3) i64.const.0)
+                  nop)
+                (drop i32.rand))
+              (drop i64.rand)))
+          i64.const.0))
+      (i64.shl
+        (i64.xor
+          (i64.mul
+            (container
+              (container (container nop (i64.load.0.3.0 local.get.3)) nop)
+              (drop i64.rand))
+            i64.const.1)
+          i64.const.0)
+        i64.const.0))
+    (container
+      nop
+      (i64.or
+        (i64.load.0.3.0
+          (container
+            (drop i32.rand)
+            (i32.and
+              (container
+                (i32.or
+                  (i32.add local.get.3 i32.const.0)
+                  (i32.shr_s local.get.3 i32.const.0))
+                (drop i64.rand))
+              (i32.use_of_global local.get.3))))
+        (i64.use_of_global
+          (i64.or
+            (i64.sub
+              (container
+                (i64.sub
+                  (container (i64.load.0.3.0 local.get.3) nop)
+                  i64.const.0)
+                (drop i64.rand))
+              i64.const.0)
+            (i64.shl
+              (i64.shl
+                (i64.xor
+                  (container nop (i64.load.0.3.0 local.get.3))
+                  i64.const.0)
+                i64.const.0)
+              i64.const.0))))))
+  (i64.use_of_global
+    (i64.or
+      (i64.and
+        (i64.shr_u
+          (container
+            (container
+              nop
+              (i64.shl
+                (i64.use_of_global
+                  (i64.shr_u (i64.load.0.3.0 local.get.3) i64.const.0))
+                i64.const.0))
+            (drop i64.rand))
+          i64.const.0)
+        (i64.and
+          (container
+            nop
+            (container
+              (i64.shl
+                (i64.shr_u
+                  (container (drop i32.rand) (i64.load.0.3.0 local.get.3))
+                  i64.const.0)
+                i64.const.0)
+              (drop i64.rand)))
+          (i64.shr_u
+            (i64.mul
+              (i64.or
+                (i64.shr_u
+                  (container (i64.load.0.3.0 local.get.3) (drop i32.rand))
+                  i64.const.0)
+                (i64.xor
+                  (i64.sub (i64.load.0.3.0 local.get.3) i64.const.0)
+                  i64.const.0))
+              i64.const.1)
+            i64.const.0)))
+      (container
+        (drop i64.rand)
+        (i64.sub
+          (container
+            (drop i64.rand)
+            (container
+              (drop i32.rand)
+              (container
+                (drop i32.rand)
+                (i64.mul
+                  (container (i64.load.0.3.0 local.get.3) (drop i32.rand))
+                  i64.const.1))))
+          i64.const.0)))))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000062_s3253359633915032966_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000063_s17719902177768607787_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000064_s9324811991872929986_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000065_s11227058457462775992_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000066_s11445888944242099119_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000067_s2108401854414476777_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000068_s7304369476508388590_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000069_s11932221234120471018_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000070_s1011223863791499957_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000071_s15731268487448897229_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[ExternRef, F32, F32, ExternRef, I64, ExternRef, I32, F32, F64, ExternRef, F32, V128, F64, F64, I32, I64, I32, F64, I64] results: [F64, FuncRef, ExternRef, I32, ExternRef, I64, V128, FuncRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/34
+Mutating opcode 331/623
+Original expression (i64.store8.217.0.0
+  local.get.3
+  (i64.shr_u local.get.7 i64.const.48))
+New expression (container
+  (drop i32.rand)
+  (container
+    (container
+      (container
+        (drop i64.rand)
+        (container
+          (drop i32.rand)
+          (i64.store8.217.0.0
+            local.get.3
+            (container
+              (i64.shr_u
+                (i64.and
+                  (i64.use_of_global (i64.shr_u local.get.7 i64.const.48))
+                  (container nop (i64.shr_u local.get.7 i64.const.48)))
+                i64.const.0)
+              nop))))
+      (drop i64.rand))
+    nop))
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[ExternRef, V128, I64, ExternRef, F32, F32, V128, ExternRef, F64] results: [V128, V128, ExternRef, F64, ExternRef, V128, F32, ExternRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 30/34
+Mutating opcode 0/2
+Original expression i32.const.0
+New expression (container
+  (i32.use_of_global
+    (i32.shr_s
+      (i32.mul i32.const.0 i32.const.1)
+      (container
+        nop
+        (i32.xor
+          (container
+            nop
+            (container
+              (i32.mul
+                (i32.add
+                  (container nop i32.const.0)
+                  (i32.use_of_global i32.const.0))
+                i32.const.1)
+              (drop i32.rand)))
+          (i32.add
+            (i32.shr_s
+              (container
+                (container (i32.xor i32.const.0 i32.const.0) nop)
+                (drop i64.rand))
+              (i32.mul
+                (i32.shl
+                  (container i32.const.0 (drop i32.rand))
+                  (container (drop i64.rand) i32.const.0))
+                i32.const.1))
+            (container
+              (drop i32.rand)
+              (container
+                (drop i64.rand)
+                (i32.shr_u
+                  (i32.sub i32.const.0 i32.const.0)
+                  (container nop i32.const.0)))))))))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 3/34
+Mutating opcode 396/898
+Original expression local.get.3
+New expression (i32.mul
+  (i32.and
+    (i32.xor
+      (i32.xor
+        (i32.shr_s
+          (i32.shr_u
+            (i32.shr_s (i32.shr_u local.get.3 i32.const.0) i32.const.0)
+            i32.const.0)
+          i32.const.0)
+        i32.const.0)
+      i32.const.0)
+    (i32.shl
+      (i32.shl
+        (i32.or
+          (i32.shl
+            (i32.use_of_global
+              (i32.shl
+                (i32.sub (i32.shl local.get.3 i32.const.0) i32.const.0)
+                i32.const.0))
+            i32.const.0)
+          (container
+            (drop i32.rand)
+            (container
+              (drop i32.rand)
+              (i32.shl
+                (i32.xor (i32.shr_s local.get.3 i32.const.0) i32.const.0)
+                i32.const.0))))
+        i32.const.0)
+      i32.const.0))
+  i32.const.1)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/34
+Mutating opcode 157/174
+Original expression i32.const.0
+New expression (i32.shr_s
+  (container
+    (drop i32.rand)
+    (container
+      (drop i64.rand)
+      (i32.use_of_global
+        (container
+          (container
+            (drop i64.rand)
+            (i32.mul
+              (i32.sub
+                (i32.xor
+                  (i32.and i32.const.0 i32.const.0)
+                  (i32.and i32.const.0 i32.const.0))
+                (container (i32.use_of_global i32.const.0) (drop i32.rand)))
+              i32.const.1))
+          nop))))
+  (i32.use_of_global
+    (i32.xor
+      (container
+        nop
+        (container
+          (drop i64.rand)
+          (container
+            (container
+              (i32.and
+                (i32.use_of_global (container (drop i64.rand) i32.const.0))
+                (i32.mul (i32.xor i32.const.0 i32.const.0) i32.const.1))
+              nop)
+            nop)))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::codemotion::CodemotionMutator`
+Write if complement 12/21
+mutator `wasm_mutate::mutators::codemotion::CodemotionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[V128, FuncRef, I64, FuncRef, I32, I32, I64, I32, ExternRef, F64, I64, ExternRef, FuncRef] results: [I32]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 8/34
+Mutating opcode 191/275
+Original expression (local.set.5 (i32.add local.get.0 i32.const.52))
+New expression (container
+  (container
+    (local.set.5
+      (i32.add
+        (i32.sub
+          (i32.add
+            (i32.and
+              (i32.sub
+                (i32.or
+                  (i32.shl i32.const.52 i32.const.0)
+                  (container i32.const.52 nop))
+                i32.const.0)
+              (i32.shr_s
+                (i32.shl (i32.add i32.const.52 i32.const.0) i32.const.0)
+                i32.const.0))
+            (i32.shr_u local.get.0 i32.const.0))
+          i32.const.0)
+        i32.const.0))
+    (drop i32.rand))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/34
+Mutating opcode 472/642
+Original expression local.get.3
+New expression (i32.sub
+  (container
+    (container
+      (container
+        (drop i64.rand)
+        (container
+          (i32.shr_s
+            (i32.add
+              (container local.get.3 (drop i64.rand))
+              i32.const.0)
+            i32.const.0)
+          (drop i64.rand)))
+      (drop i64.rand))
+    (drop i64.rand))
+  i32.const.0)
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000073_s15217452334057808474_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000074_s7398229306652838706_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000075_s7966772933965743166_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000076_s14447924811733683039_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000077_s17455384886370203226_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000078_s17533639370664745470_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000079_s11312023927858652148_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000080_s18426654491119700191_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000081_s13931634050619090370_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000082_s9882855547281611687_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 9/34
+Mutating opcode 28/190
+Original expression local.get.2
+New expression (container
+  (drop i64.rand)
+  (i32.and
+    (container
+      (i32.xor
+        (i32.use_of_global
+          (container
+            (container
+              (i32.mul (i32.sub local.get.2 i32.const.0) i32.const.1)
+              nop)
+            nop))
+        i32.const.0)
+      (drop i64.rand))
+    (container
+      nop
+      (container
+        (container
+          (container
+            (i32.use_of_global
+              (i32.mul
+                (i32.sub
+                  (container local.get.2 (drop i32.rand))
+                  i32.const.0)
+                i32.const.1))
+            (drop i64.rand))
+          (drop i32.rand))
+        (drop i64.rand)))))
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[I32, V128, F64, I32, ExternRef, FuncRef, I64, FuncRef, FuncRef, F64, F64, F32, ExternRef, I64, FuncRef, I64, F32, I32, I32, I64] results: [ExternRef, F32, F32, I32, I32, I64, V128, V128, I32, F32]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 25/34
+Mutating opcode 454/481
+Original expression i64.const.6828858703874564891
+New expression (i64.shl
+  (i64.sub
+    (i64.mul
+      (i64.sub
+        (container
+          (i64.add
+            (i64.shr_s
+              (i64.and
+                (i64.xor
+                  (container i64.const.6828858703874564891 nop)
+                  i64.const.0)
+                (container
+                  (i64.shr_s i64.const.6828858703874564891 i64.const.0)
+                  (drop i64.rand)))
+              i64.const.0)
+            i64.const.0)
+          nop)
+        i64.const.0)
+      i64.const.1)
+    i64.const.0)
+  i64.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/34
+Mutating opcode 76/658
+Original expression (i64.load.0.0.0 i32.const.8096)
+New expression (i64.add
+  (i64.shr_u
+    (i64.and
+      (i64.mul
+        (container
+          (drop i32.rand)
+          (i64.add
+            (i64.shr_u
+              (container
+                nop
+                (i64.shr_u
+                  (i64.shr_u (i64.load.0.0.0 i32.const.8096) i64.const.0)
+                  i64.const.0))
+              i64.const.0)
+            i64.const.0))
+        i64.const.1)
+      (container
+        (container
+          (container
+            (container
+              (container
+                nop
+                (container
+                  (i64.shr_u (i64.load.0.0.0 i32.const.8096) i64.const.0)
+                  (drop i64.rand)))
+              nop)
+            (drop i32.rand))
+          nop)
+        (drop i32.rand)))
+    i64.const.0)
+  i64.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 3/34
+Mutating opcode 872/940
+Original expression local.get.1
+New expression (i32.and
+  (container
+    nop
+    (container
+      nop
+      (container
+        (i32.mul
+          (container
+            (i32.add
+              (container
+                (drop i32.rand)
+                (i32.mul (i32.xor local.get.1 i32.const.0) i32.const.1))
+              i32.const.0)
+            (drop i32.rand))
+          i32.const.1)
+        (drop i32.rand))))
+  (i32.add
+    (container
+      (i32.xor local.get.1 i32.const.0)
+      (drop i32.rand))
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[V128, F64, F32, F32, V128, I32, F32, V128, V128, V128, F32, I64, F32, I64, I64, V128, F64, F64] results: [ExternRef, FuncRef, I32, I64, V128, F64, FuncRef, ExternRef, F32, I64, FuncRef, I64, ExternRef, I64, F32, F64]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 10/34
+Mutating opcode 0/3
+Original expression i32.const.0
+New expression (i32.add
+  (container
+    (drop i64.rand)
+    (container
+      (drop i32.rand)
+      (container
+        (i32.and
+          (container
+            (drop i32.rand)
+            (i32.mul
+              (i32.shl
+                (i32.or
+                  (i32.and i32.const.0 i32.const.0)
+                  (container i32.const.0 (drop i64.rand)))
+                (i32.mul
+                  (container i32.const.0 (drop i64.rand))
+                  i32.const.1))
+              i32.const.1))
+          (i32.shl
+            (i32.mul i32.const.0 i32.const.1)
+            (i32.xor
+              (i32.or
+                (container nop i32.const.0)
+                (container
+                  (i32.shr_s i32.const.0 i32.const.0)
+                  (drop i64.rand)))
+              (i32.xor
+                (container (i32.use_of_global i32.const.0) (drop i64.rand))
+                (i32.shl
+                  (container (drop i64.rand) i32.const.0)
+                  (i32.add i32.const.0 i32.const.0))))))
+        (drop i32.rand))))
+  (container
+    nop
+    (i32.shr_s
+      (i32.shl
+        (container
+          (container
+            nop
+            (i32.shr_u
+              (i32.shl
+                i32.const.0
+                (i32.use_of_global (container (drop i64.rand) i32.const.0)))
+              (container
+                (container
+                  (drop i32.rand)
+                  (container i32.const.0 (drop i64.rand)))
+                nop)))
+          nop)
+        (i32.and
+          (i32.xor
+            (i32.xor
+              (i32.shr_u
+                (i32.add
+                  (i32.and i32.const.0 i32.const.0)
+                  (i32.or i32.const.0 i32.const.0))
+                (i32.or
+                  (i32.shr_s i32.const.0 i32.const.0)
+                  (container i32.const.0 (drop i64.rand))))
+              (container
+                (drop i32.rand)
+                (container
+                  (drop i64.rand)
+                  (i32.shl i32.const.0 i32.const.0))))
+            (i32.add
+              (i32.shr_u
+                (i32.shr_u
+                  (container (drop i64.rand) i32.const.0)
+                  (i32.or i32.const.0 i32.const.0))
+                (container
+                  (drop i32.rand)
+                  (i32.mul i32.const.0 i32.const.1)))
+              (i32.shr_s
+                (container (i32.or i32.const.0 i32.const.0) (drop i32.rand))
+                (i32.use_of_global (container i32.const.0 (drop i64.rand))))))
+          i32.const.0))
+      (container
+        nop
+        (container
+          nop
+          (i32.add
+            i32.const.0
+            (i32.or
+              (i32.and
+                (i32.mul
+                  (container (drop i32.rand) i32.const.0)
+                  i32.const.1)
+                (container
+                  (container (drop i64.rand) i32.const.0)
+                  (drop i64.rand)))
+              (container
+                (container
+                  (drop i32.rand)
+                  (i32.sub i32.const.0 i32.const.0))
+                (drop i32.rand)))))))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 11/34
+Mutating opcode 203/627
+Original expression local.get.2
+New expression (container
+  (container
+    (drop i64.rand)
+    (i32.xor
+      (container
+        nop
+        (container
+          (drop i64.rand)
+          (container
+            (drop i32.rand)
+            (i32.use_of_global
+              (container
+                nop
+                (container nop (i32.shr_s local.get.2 i32.const.0)))))))
+      i32.const.0))
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 31/34
+Mutating opcode 56/102
+Original expression (i32.shl i32.const.0 i32.const.0)
+New expression i32.const.0
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 17/34
+Mutating opcode 201/1676
+Original expression local.get.4
+New expression (i32.use_of_global
+  (i32.or
+    (i32.shr_s
+      (i32.use_of_global
+        (i32.shl
+          (i32.or
+            (i32.shl
+              (i32.shr_u
+                (i32.shr_u
+                  (container local.get.4 (drop i64.rand))
+                  i32.const.0)
+                i32.const.0)
+              i32.const.0)
+            (i32.sub
+              (i32.xor
+                (container nop (i32.sub local.get.4 i32.const.0))
+                i32.const.0)
+              i32.const.0))
+          i32.const.0))
+      i32.const.0)
+    (i32.mul
+      (i32.and
+        (i32.add
+          (i32.or
+            (i32.and
+              local.get.4
+              (container
+                (i32.shl (container nop local.get.4) i32.const.0)
+                (drop i32.rand)))
+            (i32.sub
+              (i32.xor
+                (i32.shr_u (i32.use_of_global local.get.4) i32.const.0)
+                i32.const.0)
+              i32.const.0))
+          i32.const.0)
+        (container
+          nop
+          (i32.and
+            (i32.shl
+              (i32.and
+                (container (drop i32.rand) (container nop local.get.4))
+                (i32.shr_u
+                  (container (drop i32.rand) local.get.4)
+                  i32.const.0))
+              i32.const.0)
+            (container
+              (container
+                (i32.mul (i32.shr_s local.get.4 i32.const.0) i32.const.1)
+                (drop i32.rand))
+              nop))))
+      i32.const.1)))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000083_s7570080342396087173_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000084_s2953306303196262487_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000085_s9312064055063809095_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000086_s4614688618213103528_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000087_s18098997071978552554_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000088_s4500394050808145274_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000089_s13645292009825675626_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000090_s16004254310980406560_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000091_s14185715188759675641_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000092_s6825905291612084656_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/34
+Mutating opcode 799/811
+Original expression local.get.2
+New expression (i32.use_of_global
+  (i32.use_of_global
+    (i32.shl
+      (i32.or
+        (container
+          (i32.add
+            (container
+              (drop i64.rand)
+              (container
+                (i32.shl (i32.shl local.get.2 i32.const.0) i32.const.0)
+                nop))
+            i32.const.0)
+          nop)
+        (i32.mul
+          (i32.use_of_global
+            (i32.or
+              (i32.add
+                (i32.sub
+                  (container (drop i32.rand) local.get.2)
+                  i32.const.0)
+                i32.const.0)
+              (i32.shr_u
+                (i32.use_of_global (i32.shr_u local.get.2 i32.const.0))
+                i32.const.0)))
+          i32.const.1))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 1/34
+Mutating opcode 2005/2146
+Original expression (i32.shl (i32.or local.get.17 i32.const.1) i32.const.2)
+New expression (container
+  (i32.add
+    (container
+      (i32.mul
+        (i32.shr_s
+          (container
+            (drop i32.rand)
+            (i32.mul
+              (i32.shr_u
+                (i32.shr_u
+                  (i32.use_of_global (i32.or local.get.17 i32.const.1))
+                  i32.const.0)
+                i32.const.0)
+              i32.const.4))
+          i32.const.0)
+        (container
+          (i32.shl
+            (i32.or
+              (i32.use_of_global
+                (i32.use_of_global (i32.and i32.const.1 i32.const.1)))
+              (i32.sub (i32.shr_s i32.const.1 i32.const.0) i32.const.0))
+            i32.const.0)
+          nop))
+      nop)
+    i32.const.0)
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 33/34
+Mutating opcode 0/5
+Original expression ref.null.func
+New expression (container
+  (container
+    (drop i32.rand)
+    (container (container nop ref.null.func) (drop i32.rand)))
+  nop)
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[V128, V128, V128, I64, I32, ExternRef, I64, F64, ExternRef, FuncRef] results: [ExternRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 3/34
+Mutating opcode 320/964
+Original expression (i32.store.0.2.0
+  local.get.2
+  (i32.and local.get.3 i32.const.-2))
+New expression (container
+  nop
+  (container
+    (container
+      (drop i64.rand)
+      (container
+        (container
+          (container
+            (container
+              nop
+              (container
+                (container
+                  nop
+                  (container
+                    (i32.store.0.2.0
+                      local.get.2
+                      (i32.and local.get.3 i32.const.-2))
+                    nop))
+                (drop i32.rand)))
+            (drop i64.rand))
+          (drop i64.rand))
+        (drop i64.rand)))
+    (drop i64.rand)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 33/34
+Mutating opcode 8/11
+Original expression f64.const.0
+New expression (container
+  nop
+  (container
+    (container
+      (container
+        (f64.use_of_global
+          (container
+            (container
+              (drop i64.rand)
+              (f64.add
+                (container (container f64.const.0 nop) nop)
+                (f64.mul (container f64.const.0 nop) f64.const.1)))
+            (drop i32.rand)))
+        (drop i64.rand))
+      (drop i32.rand))
+    (drop i64.rand)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/34
+Mutating opcode 625/847
+Original expression local.get.16
+New expression (i32.and
+  (i32.and
+    (i32.shl
+      (i32.add
+        (i32.use_of_global
+          (container
+            (i32.shr_u
+              (i32.shr_s
+                (i32.mul (i32.add local.get.16 i32.const.0) i32.const.1)
+                i32.const.0)
+              i32.const.0)
+            (drop i32.rand)))
+        i32.const.0)
+      i32.const.0)
+    (i32.sub
+      (i32.shr_s
+        (i32.and
+          (i32.xor
+            (i32.and
+              (container
+                (i32.shr_u (i32.add local.get.16 i32.const.0) i32.const.0)
+                nop)
+              (i32.use_of_global
+                (container
+                  (drop i32.rand)
+                  (i32.sub local.get.16 i32.const.0))))
+            i32.const.0)
+          (i32.shl
+            (container
+              (drop i64.rand)
+              (i32.add
+                (container nop (container local.get.16 (drop i32.rand)))
+                i32.const.0))
+            i32.const.0))
+        i32.const.0)
+      i32.const.0))
+  (container
+    nop
+    (i32.xor
+      (container
+        (drop i32.rand)
+        (i32.mul (i32.shl local.get.16 i32.const.0) i32.const.1))
+      i32.const.0)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 10/34
+Mutating opcode 28/146
+Original expression (i32.shr_s i32.const.0 i32.const.0)
+New expression (container
+  (i32.shr_s
+    (i32.shr_s
+      (container
+        (i32.shr_u
+          (container
+            (drop i64.rand)
+            (i32.mul
+              (i32.mul
+                (i32.and
+                  (i32.and i32.const.0 i32.const.0)
+                  (i32.xor i32.const.0 i32.const.0))
+                i32.const.1)
+              i32.const.1))
+          (container
+            (i32.shl
+              (container (drop i32.rand) i32.const.0)
+              (i32.shr_u
+                (i32.shl
+                  (i32.shl i32.const.0 i32.const.0)
+                  (container nop i32.const.0))
+                (i32.sub
+                  (i32.xor i32.const.0 i32.const.0)
+                  (i32.or i32.const.0 i32.const.0))))
+            (drop i64.rand)))
+        (drop i32.rand))
+      (container
+        (i32.use_of_global
+          (container
+            (drop i32.rand)
+            (i32.shl
+              (container
+                (drop i32.rand)
+                (i32.xor
+                  (i32.xor i32.const.0 i32.const.0)
+                  (container i32.const.0 nop)))
+              (container
+                (container (i32.shr_u i32.const.0 i32.const.0) nop)
+                (drop i32.rand)))))
+        nop))
+    (i32.sub
+      (container
+        (i32.and
+          (i32.shr_u
+            (container
+              (i32.or
+                (container (i32.sub i32.const.0 i32.const.0) nop)
+                (container
+                  (drop i64.rand)
+                  (i32.shl i32.const.0 i32.const.0)))
+              nop)
+            (container
+              nop
+              (i32.shl
+                i32.const.0
+                (container (drop i32.rand) (container nop i32.const.0)))))
+          (container
+            (container
+              (drop i64.rand)
+              (i32.shl
+                (i32.and
+                  (i32.mul i32.const.0 i32.const.1)
+                  (container (drop i32.rand) i32.const.0))
+                (i32.xor
+                  (i32.shl i32.const.0 i32.const.0)
+                  (container i32.const.0 (drop i32.rand)))))
+            (drop i32.rand)))
+        nop)
+      (container
+        (drop i64.rand)
+        (container
+          (i32.mul
+            (i32.or
+              (container
+                nop
+                (i32.shl
+                  (container i32.const.0 nop)
+                  (i32.mul i32.const.0 i32.const.1)))
+              (container
+                (i32.or
+                  (container nop i32.const.0)
+                  (i32.or i32.const.0 i32.const.0))
+                nop))
+            i32.const.1)
+          (drop i64.rand)))))
+  nop)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 19/34
+Mutating opcode 134/218
+Original expression (call.12 local.get.2)
+New expression (container
+  (container
+    (container
+      (container
+        (container
+          (container
+            nop
+            (call.12
+              (container
+                (drop i32.rand)
+                (i32.shr_u (container nop local.get.2) i32.const.0))))
+          (drop i32.rand))
+        (drop i64.rand))
+      (drop i64.rand))
+    (drop i32.rand))
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/34
+Mutating opcode 287/322
+Original expression (i32.lt_s local.get.0 local.get.3)
+New expression (container
+  (drop i64.rand)
+  (i32.lt_s
+    (i32.shr_s
+      (container
+        nop
+        (i32.sub
+          (container
+            (i32.shr_s
+              (container local.get.0 (drop i32.rand))
+              i32.const.0)
+            (drop i64.rand))
+          i32.const.0))
+      i32.const.0)
+    (i32.and
+      (i32.or
+        (i32.and
+          (container
+            (container
+              (drop i32.rand)
+              (container
+                nop
+                (i32.or
+                  (i32.add local.get.3 i32.const.0)
+                  (container nop local.get.3))))
+            nop)
+          (i32.use_of_global local.get.3))
+        (i32.sub
+          (i32.shr_u
+            (i32.and
+              (container
+                (container (i32.or local.get.3 local.get.3) (drop i32.rand))
+                nop)
+              (container
+                nop
+                (i32.shr_u (container nop local.get.3) i32.const.0)))
+            i32.const.0)
+          i32.const.0))
+      (i32.xor
+        (container
+          (drop i32.rand)
+          (i32.xor
+            (container local.get.3 (drop i32.rand))
+            i32.const.0))
+        i32.const.0))))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000096_s15219492613010904236_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000097_s6483547317975876078_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000098_s12503612057015710357_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000099_s14493142288697906912_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000100_s12736400445024077755_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000101_s13445072673917706579_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000102_s7104781497269576049_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000103_s11054330869434817456_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000104_s1727082202206694628_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000105_s8417643087578420711_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/34
+Mutating opcode 530/906
+Original expression local.get.35
+New expression (container
+  (i32.add
+    (i32.or
+      local.get.35
+      (container
+        (i32.add
+          (i32.use_of_global
+            (container
+              (i32.shr_s
+                (i32.and
+                  (container (drop i64.rand) local.get.35)
+                  (container nop local.get.35))
+                i32.const.0)
+              (drop i64.rand)))
+          i32.const.0)
+        (drop i64.rand)))
+    i32.const.0)
+  nop)
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 30/35
+Mutating opcode 23/49
+Original expression (drop i32.const.-1819571524)
+New expression (container
+  (container
+    (container
+      (drop i64.rand)
+      (container
+        (container
+          (container
+            (drop i64.rand)
+            (container (drop i64.rand) (drop i32.rand)))
+          nop)
+        (drop i64.rand)))
+    (container nop (drop i32.rand)))
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 7/35
+Mutating opcode 2734/3506
+Original expression i32.const.8
+New expression (container
+  (i32.shl
+    (container
+      nop
+      (i32.or
+        i32.const.8
+        (container
+          (drop i64.rand)
+          (container
+            (container
+              (container
+                nop
+                (container (drop i64.rand) (i32.or i32.const.8 i32.const.8)))
+              (drop i32.rand))
+            nop))))
+    i32.const.0)
+  nop)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 29/35
+Mutating opcode 0/4
+Original expression i32.const.0
+New expression (container i32.const.0 (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 9/35
+Mutating opcode 22/221
+Original expression (local.tee.6 (i32.load.0.2.0 local.get.0))
+New expression (container
+  (i32.add
+    (i32.shr_s
+      (i32.and
+        (container
+          (i32.mul
+            (container
+              (drop i64.rand)
+              (i32.shr_s
+                (container
+                  (local.tee.6 (i32.load.0.2.0 local.get.0))
+                  (drop i64.rand))
+                i32.const.0))
+            i32.const.1)
+          (drop i32.rand))
+        (i32.add
+          (container
+            (i32.shr_u
+              (container
+                (i32.xor
+                  (i32.shr_s
+                    (local.tee.6 (i32.load.0.2.0 local.get.0))
+                    i32.const.0)
+                  i32.const.0)
+                (drop i32.rand))
+              i32.const.0)
+            nop)
+          i32.const.0))
+      i32.const.0)
+    i32.const.0)
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 18/35
+Mutating opcode 347/1402
+Original expression (i32.or
+  (i32.or
+    (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+    (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))
+  (i32.shl (i32.load8_u.58.0.0 local.get.1) i32.const.8))
+New expression (i32.shl
+  (i32.and
+    (i32.or
+      (container
+        (i32.or
+          (container
+            (i32.shr_u
+              (i32.xor
+                (i32.use_of_global
+                  (container
+                    (drop i64.rand)
+                    (i32.shl (i32.load8_u.58.0.0 local.get.1) i32.const.8)))
+                i32.const.0)
+              i32.const.0)
+            (drop i32.rand))
+          (i32.or
+            (i32.xor
+              (container
+                (i32.add
+                  (container
+                    (drop i64.rand)
+                    (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16))
+                  i32.const.0)
+                (drop i64.rand))
+              i32.const.0)
+            (container
+              (drop i64.rand)
+              (container
+                (drop i32.rand)
+                (i32.sub
+                  (i32.shr_s
+                    (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24)
+                    i32.const.0)
+                  i32.const.0)))))
+        (drop i32.rand))
+      (i32.shr_s
+        (i32.shr_u
+          (i32.mul
+            (i32.mul
+              (i32.shr_u
+                (container
+                  (drop i64.rand)
+                  (i32.or
+                    (i32.shl (i32.load8_u.58.0.0 local.get.1) i32.const.8)
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))))
+                i32.const.0)
+              i32.const.1)
+            i32.const.1)
+          i32.const.0)
+        i32.const.0))
+    (i32.or
+      (container
+        (drop i32.rand)
+        (i32.add
+          (container
+            (drop i32.rand)
+            (i32.shl
+              (i32.use_of_global
+                (container
+                  (container
+                    (i32.shl (i32.load8_u.58.0.0 local.get.1) i32.const.8)
+                    (drop i32.rand))
+                  (drop i32.rand)))
+              i32.const.0))
+          i32.const.0))
+      (i32.sub
+        (container
+          (drop i64.rand)
+          (i32.xor
+            (i32.and
+              (i32.and
+                (i32.or
+                  (i32.and
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24)))
+                  (container
+                    nop
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))))
+                (i32.or
+                  (i32.add
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))
+                    i32.const.0)
+                  (i32.or
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24)))))
+              (container
+                (container
+                  (i32.shl
+                    (i32.or
+                      (i32.shl (i32.load8_u.57.0.0 local.get.1) i32.const.16)
+                      (i32.shl (i32.load8_u.56.0.0 local.get.1) i32.const.24))
+                    i32.const.0)
+                  (drop i64.rand))
+                (drop i64.rand)))
+            i32.const.0))
+        i32.const.0)))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 15/35
+Mutating opcode 895/926
+Original expression (i32.add (i32.sub local.get.2 i32.const.0) i32.const.0)
+New expression (i32.shr_u
+  (container
+    (drop i64.rand)
+    (i32.add
+      (container
+        (drop i64.rand)
+        (i32.shr_u
+          (i32.add
+            (i32.xor
+              (container
+                (drop i32.rand)
+                (i32.shl
+                  local.get.2
+                  (container i32.const.0 (drop i32.rand))))
+              (container nop i32.const.0))
+            (i32.mul
+              (container
+                (i32.xor
+                  (i32.or i32.const.0 i32.const.0)
+                  (i32.xor i32.const.0 i32.const.0))
+                nop)
+              i32.const.1))
+          (i32.mul
+            (i32.shr_u
+              (i32.or
+                (i32.xor
+                  (i32.add i32.const.0 i32.const.0)
+                  (i32.use_of_global i32.const.0))
+                (i32.and
+                  (i32.shr_s i32.const.0 i32.const.0)
+                  (i32.xor i32.const.0 i32.const.0)))
+              (i32.xor
+                (i32.or
+                  (container i32.const.0 (drop i64.rand))
+                  (i32.shr_u i32.const.0 i32.const.0))
+                (container
+                  (drop i64.rand)
+                  (container i32.const.0 (drop i64.rand)))))
+            i32.const.1)))
+      (i32.use_of_global
+        (i32.sub
+          i32.const.0
+          (container
+            (container
+              (drop i32.rand)
+              (i32.add
+                (i32.shr_u
+                  (i32.shl i32.const.0 i32.const.0)
+                  (i32.shr_u i32.const.0 i32.const.0))
+                (container nop (i32.or i32.const.0 i32.const.0))))
+            (drop i32.rand))))))
+  (container
+    (drop i64.rand)
+    (i32.use_of_global
+      (container
+        (container
+          (i32.or
+            (i32.or
+              (container
+                (i32.shr_u
+                  (container i32.const.0 (drop i32.rand))
+                  (container nop i32.const.0))
+                (drop i32.rand))
+              (container
+                (i32.mul
+                  (container i32.const.0 (drop i32.rand))
+                  i32.const.1)
+                (drop i32.rand)))
+            (container
+              nop
+              (container
+                (drop i32.rand)
+                (i32.shr_s
+                  (i32.shr_u i32.const.0 i32.const.0)
+                  (i32.mul i32.const.0 i32.const.1)))))
+          (drop i64.rand))
+        (drop i64.rand)))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 9/35
+Mutating opcode 171/252
+Original expression local.get.6
+New expression (i32.use_of_global
+  (i32.xor
+    (i32.shr_s
+      (i32.mul
+        (container
+          (drop i32.rand)
+          (i32.sub local.get.6 i32.const.0))
+        i32.const.1)
+      i32.const.0)
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 30/35
+Mutating opcode 18/63
+Original expression nop
+New expression (container (drop i32.rand) nop)
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000108_s4066287812047488188_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000109_s10068415900683868881_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000110_s5672058304529163148_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000111_s2444528184452969934_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000112_s18169343204546174271_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000113_s14398471963089907479_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000114_s9568577013800780565_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000115_s2882000617607460090_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000116_s3942329505614473641_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000117_s11597662998289476143_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/35
+Mutating opcode 222/375
+Original expression (local.set.1 (i32.add local.get.1 i32.const.64))
+New expression (local.set.1
+  (i32.sub
+    (container
+      (drop i32.rand)
+      (i32.sub
+        (i32.sub
+          (container
+            nop
+            (i32.shr_u
+              (container
+                (i32.add
+                  (i32.xor local.get.1 i32.const.0)
+                  (i32.or i32.const.64 i32.const.64))
+                (drop i64.rand))
+              i32.const.0))
+          i32.const.0)
+        i32.const.0))
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 3/35
+Mutating opcode 926/980
+Original expression local.get.0
+New expression (i32.xor
+  (i32.or
+    (container
+      (container
+        (drop i32.rand)
+        (i32.add local.get.0 i32.const.0))
+      nop)
+    (container
+      nop
+      (container
+        (container
+          nop
+          (i32.add (i32.use_of_global local.get.0) i32.const.0))
+        (drop i32.rand))))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 22/35
+Mutating opcode 68/70
+Original expression local.get.0
+New expression (i32.shl
+  (i32.sub
+    (i32.and
+      (i32.sub
+        (container
+          (drop i32.rand)
+          (i32.sub local.get.0 i32.const.0))
+        i32.const.0)
+      (i32.add
+        (i32.sub
+          (i32.shr_u
+            (i32.shl
+              (container
+                (drop i64.rand)
+                (i32.xor (i32.and local.get.0 local.get.0) i32.const.0))
+              i32.const.0)
+            i32.const.0)
+          i32.const.0)
+        i32.const.0))
+    i32.const.0)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 14/35
+Mutating opcode 3338/8517
+Original expression (i64.shl local.get.15 i64.const.39)
+New expression (i64.use_of_global
+  (i64.or
+    (container
+      (i64.or
+        (container
+          (i64.shr_u
+            (container
+              (i64.use_of_global
+                (i64.add
+                  (container
+                    (drop i32.rand)
+                    (i64.shl local.get.15 i64.const.39))
+                  i64.const.0))
+              (drop i64.rand))
+            i64.const.0)
+          (drop i64.rand))
+        (container
+          nop
+          (i64.shl
+            (i64.add
+              (container
+                (container
+                  (container nop (i64.shl local.get.15 i64.const.39))
+                  nop)
+                nop)
+              i64.const.0)
+            i64.const.0)))
+      nop)
+    (i64.shr_s
+      (i64.shr_u
+        (i64.use_of_global
+          (container
+            nop
+            (container
+              (drop i32.rand)
+              (i64.or
+                (i64.shr_u
+                  (i64.use_of_global (i64.shl local.get.15 i64.const.39))
+                  i64.const.0)
+                (container
+                  (container nop (i64.shl local.get.15 i64.const.39))
+                  (drop i64.rand))))))
+        i64.const.0)
+      i64.const.0)))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/35
+Mutating opcode 74/392
+Original expression local.get.0
+New expression (i32.shr_s
+  (i32.use_of_global
+    (container
+      (i32.shr_u
+        (i32.sub
+          (container
+            (i32.or
+              (container
+                (drop i32.rand)
+                (i32.mul (i32.xor local.get.0 i32.const.0) i32.const.1))
+              (i32.or
+                (i32.use_of_global (i32.use_of_global local.get.0))
+                (i32.or
+                  (container local.get.0 (drop i32.rand))
+                  (i32.shl local.get.0 i32.const.0))))
+            (drop i64.rand))
+          i32.const.0)
+        i32.const.0)
+      (drop i64.rand)))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::codemotion::CodemotionMutator`
+Write if complement 14/21
+mutator `wasm_mutate::mutators::codemotion::CodemotionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[ExternRef, ExternRef, FuncRef, F32, FuncRef, FuncRef] results: [FuncRef, ExternRef, V128, I32, I64, F64, V128, ExternRef, V128, I64, ExternRef, F64, F64, V128, ExternRef, FuncRef, F64, F64, ExternRef]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::add_function::AddFunctionMutator`
+mutator `wasm_mutate::mutators::add_function::AddFunctionMutator` succeeded
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::add_type::AddTypeMutator`
+Added type params:[F32, ExternRef, V128, ExternRef, ExternRef, I32, V128, F32, I32] results: [F32, F32, V128, F64, I64, V128, I32, F32, FuncRef, I32]
+mutator `wasm_mutate::mutators::add_type::AddTypeMutator` succeeded
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000120_s9114180079976595104_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000121_s17462598390021781096_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000122_s9385235379952254503_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000123_s1626045636604793708_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000124_s12063182977408770871_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000125_s7370070026690249444_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000126_s13286988220085084370_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000127_s16918120018232891234_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000128_s17047060088915302913_i0/probes.logs.txt
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/non_interesting/e0000000129_s663826330788779101_i0/probes.logs.txt
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 26/37
+Mutating opcode 287/1123
+Original expression (i32.load.0.2.0 local.get.9)
+New expression (container
+  (i32.add
+    (i32.add
+      (i32.shl
+        (i32.shr_s
+          (i32.shl
+            (i32.use_of_global
+              (i32.xor
+                (container
+                  (i32.shl (i32.load.0.2.0 local.get.9) i32.const.0)
+                  (drop i64.rand))
+                i32.const.0))
+            i32.const.0)
+          i32.const.0)
+        i32.const.0)
+      i32.const.0)
+    i32.const.0)
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 24/37
+Mutating opcode 41/689
+Original expression (i64.store.40.0.0
+  local.get.4
+  (i64.load.0.0.0 i32.const.8024))
+New expression (container
+  (drop i64.rand)
+  (container
+    nop
+    (container
+      (container
+        (i64.store.40.0.0
+          (i32.use_of_global local.get.4)
+          (i64.shr_s
+            (container
+              nop
+              (i64.load.0.0.0
+                (i32.and
+                  (container i32.const.8024 (drop i64.rand))
+                  (i32.sub i32.const.8024 i32.const.0))))
+            i64.const.0))
+        (drop i64.rand))
+      (drop i64.rand))))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 29/37
+Mutating opcode 3/6
+Original expression i32.const.-228131365
+New expression (i32.shr_s
+  (container
+    (i32.xor
+      (container
+        (container
+          (drop i64.rand)
+          (container
+            (i32.or
+              (i32.sub
+                (i32.mul
+                  (container i32.const.-228131365 (drop i32.rand))
+                  i32.const.1)
+                i32.const.0)
+              i32.const.-228131365)
+            (drop i32.rand)))
+        (drop i32.rand))
+      i32.const.0)
+    nop)
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 3/37
+Mutating opcode 415/997
+Original expression i32.const.0
+New expression (container
+  (i32.use_of_global
+    (container
+      (container
+        nop
+        (container
+          (i32.use_of_global
+            (i32.and
+              i32.const.0
+              (i32.mul
+                (i32.use_of_global (container i32.const.0 (drop i64.rand)))
+                i32.const.1)))
+          (drop i64.rand)))
+      (drop i64.rand)))
+  (drop i32.rand))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 11/37
+Mutating opcode 607/644
+Original expression (i32.or local.get.10 i32.const.3)
+New expression (container
+  (container
+    (container
+      (i32.or
+        (i32.xor
+          (i32.mul
+            (i32.use_of_global
+              (i32.use_of_global
+                (i32.shr_s (container local.get.10 nop) i32.const.0)))
+            i32.const.1)
+          i32.const.0)
+        (i32.sub
+          (i32.sub
+            (i32.shl
+              (i32.add
+                (i32.shr_u (i32.shl i32.const.3 i32.const.0) i32.const.0)
+                i32.const.0)
+              i32.const.0)
+            i32.const.0)
+          i32.const.0))
+      (drop i64.rand))
+    nop)
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::remove_item::RemoveItemMutator`
+No mutation
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 0/37
+Mutating opcode 1036/1872
+Original expression i32.const.2
+New expression (i32.add
+  (container
+    (container
+      (drop i64.rand)
+      (i32.use_of_global
+        (i32.use_of_global
+          (container
+            (container
+              (drop i32.rand)
+              (container
+                (container
+                  (container (drop i64.rand) i32.const.2)
+                  (drop i64.rand))
+                (drop i32.rand)))
+            nop))))
+    (drop i64.rand))
+  i32.const.0)
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 12/37
+Mutating opcode 578/959
+Original expression i64.const.-6811201294749393380
+New expression (container
+  (drop i32.rand)
+  (i64.and
+    (i64.xor
+      (container
+        (i64.or
+          (i64.shl
+            (i64.xor
+              (i64.use_of_global
+                (i64.sub
+                  (container nop i64.const.-6811201294749393380)
+                  i64.const.0))
+              i64.const.0)
+            i64.const.0)
+          (container (drop i32.rand) i64.const.-6811201294749393380))
+        (drop i64.rand))
+      i64.const.0)
+    (container
+      (container
+        (drop i64.rand)
+        (i64.xor
+          (i64.shr_u
+            (container
+              (i64.add
+                (container
+                  (i64.shl i64.const.-6811201294749393380 i64.const.0)
+                  (drop i32.rand))
+                i64.const.0)
+              (drop i64.rand))
+            i64.const.0)
+          i64.const.0))
+      (drop i32.rand))))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 2/37
+Mutating opcode 115/424
+Original expression local.get.0
+New expression (container
+  nop
+  (i32.sub
+    (i32.use_of_global
+      (i32.and
+        (container
+          (drop i32.rand)
+          (i32.or
+            (i32.shr_u
+              (i32.and
+                local.get.0
+                (container
+                  (i32.add local.get.0 i32.const.0)
+                  (drop i64.rand)))
+              i32.const.0)
+            (i32.shr_s
+              (i32.sub
+                (container nop (container local.get.0 nop))
+                i32.const.0)
+              i32.const.0)))
+        (i32.mul
+          (i32.mul
+            (container
+              (drop i32.rand)
+              (container
+                (i32.xor
+                  (container (drop i64.rand) local.get.0)
+                  i32.const.0)
+                nop))
+            i32.const.1)
+          i32.const.1)))
+    i32.const.0))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 16/37
+Mutating opcode 1254/2161
+Original expression i64.const.50
+New expression (container
+  (i64.shr_u
+    (i64.xor
+      (i64.use_of_global
+        (i64.and
+          i64.const.50
+          (container
+            (container
+              (i64.and
+                (i64.shl (i64.shr_u i64.const.50 i64.const.0) i64.const.0)
+                (container
+                  (drop i32.rand)
+                  (i64.shr_u i64.const.50 i64.const.0)))
+              (drop i64.rand))
+            nop)))
+      i64.const.0)
+    i64.const.0)
+  (drop i64.rand))
+attempting to mutate with `wasm_mutate::mutators::peephole::PeepholeMutator`
+mutator `wasm_mutate::mutators::peephole::PeepholeMutator` succeeded
+Mutating function 25/37
+Mutating opcode 228/503
+Original expression (i64.extend_i32_s (i32.sub i32.const.440 local.get.6))
+New expression (container
+  (drop i32.rand)
+  (i64.or
+    (i64.use_of_global
+      (i64.shr_u
+        (container
+          (drop i64.rand)
+          (i64.mul
+            (container
+              (drop i64.rand)
+              (i64.mul
+                (container
+                  (i64.shr_s
+                    (i64.extend_i32_s (i32.sub i32.const.440 local.get.6))
+                    i64.const.0)
+                  (drop i64.rand))
+                i64.const.1))
+            i64.const.1))
+        i64.const.0))
+    (container
+      (i64.xor
+        (i64.shr_s
+          (i64.or
+            (container
+              (i64.and
+                (container
+                  nop
+                  (i64.shr_s
+                    (i64.extend_i32_s (i32.sub i32.const.440 local.get.6))
+                    i64.const.0))
+                (container
+                  (drop i32.rand)
+                  (container
+                    (drop i64.rand)
+                    (i64.extend_i32_s (i32.sub i32.const.440 local.get.6)))))
+              nop)
+            (i64.shr_s
+              (i64.extend_i32_s
+                (container
+                  (drop i32.rand)
+                  (i32.and
+                    (i32.sub i32.const.440 local.get.6)
+                    (i32.sub i32.const.440 local.get.6))))
+              i64.const.0))
+          i64.const.0)
+        i64.const.0)
+      (drop i32.rand))))
+New variant
+datas/all/python3_.._oracles_vt_custom_chrome_vt_oracle.py_http:__vt-service.vt:4000_Google_vt_vt123_Google_a1000_p1_ts10/interesting/e0000000134_s3293461802535469848_i0/probes.logs.txt

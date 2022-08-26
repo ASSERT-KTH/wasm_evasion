@@ -39,7 +39,7 @@ spec:
           bucket: my-bucket
           endpoint: minio-service.minio:3434
           insecure: true
-          key: "my-artifacts/filtered"
+          key: "filtered"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
