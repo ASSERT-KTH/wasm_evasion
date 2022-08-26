@@ -1,48 +1,56 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: obfuscator-bisect-
+  generateName: obfuscator-mutate-
 spec:
-  entrypoint: obfuscator-bisect
-  parallelism: 20
+  entrypoint: obfuscator-mutate
+  parallelism: 10
   arguments:
     parameters:
+    - name: attempts
+    - name: treesize
+    - name: peek
     - name: file
-    - name: oracle
   templates:
-  - name: obfuscator-bisect
+  - name: obfuscator-mutate
+    steps:
+    - - name: select-oracle
+        template: select-oracle-template
+        arguments:
+          parameters:
+          - name: oracle
+            value: "{{ item.oracle }}"
+        withItems:
+          - { oracle: 'all' }
+          # Add the others here
+
+  - name: select-oracle-template
+    inputs:
+      parameters:
+      - name: oracle
     steps:
     - - name: execute-analyzer
         template: analyzer-template
         arguments:
           parameters:
+          - name: oracle
+            value: "{{ inputs.parameters.oracle }}"
           - name: features
             value: "{{item.features}}"
           - name: dbconn
             value: "{{item.dbconn}}"
-          - name: peek
-            value: "{{item.peek}}"
-          - name: treesize
-            value: "{{item.treesize}}"
-          - name: attempts
-            value: "{{item.attempts}}"
         withItems:
-          - { features: "wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole", dbconn: "c14", peek: "1", treesize: "100", attempts: "1000" }
-          - { features: "wasm-mutate/all", dbconn: "all", peek: "1", treesize: "100", attempts: "1000" }
-
-          
+          - { dbconn: "all", features: "wasm-mutate/all" }
         continueOn:
           failed: true
-   
   - name: analyzer-template
-
+    retryStrategy:
+      limit: 3
     inputs:
       parameters:
+      - name: oracle
       - name: dbconn
       - name: features
-      - name: peek
-      - name: attempts
-      - name: treesize
       artifacts:
       - name: data
         path: /input.wasm
@@ -53,7 +61,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "wasms/{{workflow.parameters.file}}"
+          key: "filtered/{{workflow.parameters.file}}"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -64,6 +72,7 @@ spec:
       artifacts:
       - name: data
         path: /{{inputs.parameters.dbconn}}.zip
+        optional: true
         archive:
           none: {}
         s3:
@@ -71,7 +80,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/datas/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.zip"
+          key: "data/vt/{{inputs.parameters.oracle}}/mutate_datas/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.zip"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -80,6 +89,7 @@ spec:
             key: secretkey
       - name: logs
         path: /{{inputs.parameters.dbconn}}.logs.txt
+        optional: true
         archive:
           none: {}
         s3:
@@ -87,7 +97,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.logs.txt"
+          key: "data/vt/{{inputs.parameters.oracle}}/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.logs.txt"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -96,6 +106,7 @@ spec:
             key: secretkey
       - name: stats
         path: /{{inputs.parameters.dbconn}}.stats.txt
+        optional: true
         archive:
           none: {}
         s3:
@@ -103,7 +114,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.stats.txt"
+          key: "data/vt/{{inputs.parameters.oracle}}/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.stats.txt"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -117,7 +128,7 @@ spec:
       resources:
         requests:
           memory: "0"
-          cpu: 1
+          cpu: 2
       source: |
          # Install mc client to save snapshot
           mkdir -p $HOME/minio-binaries
@@ -128,6 +139,14 @@ spec:
           export PATH=$PATH:$HOME/minio-binaries/
          
           mc config host add exp http://minio-service.minio:3434 minio minio123
+
+          
+          if [[  $(mc ls exp/my-bucket/data/vt/{{ inputs.parameters.oracle }}/mutate_datas/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.zip | wc -l) -gt 0 ]]
+          then
+            echo "Already exist. Skip"
+            exit 0
+          fi
+
           # Now copy this into /wasms
 
          # Update with latest version
@@ -142,22 +161,24 @@ spec:
 
           # launch watchdog
           touch "{{inputs.parameters.dbconn}}.stats.txt"
-          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 bisect/{{workflow.parameters.file}} &
-          watchID=$!
+          #bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 {{workflow.parameters.file}} &
+          #watchID=$!
 
           touch "{{inputs.parameters.dbconn}}.logs.txt"
-          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 bisect/{{workflow.parameters.file}} &
-          watchID2=$!
+          #bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 {{workflow.parameters.file}} &
+          #watchID2=$!
 
-
-         echo "Oracle {{workflow.parameters.oracle}}"
-         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate -p {{inputs.parameters.peek}} -e --attempts {{inputs.parameters.attempts}} -s {{inputs.parameters.treesize}} -b --input /input.wasm --oracle {{workflow.parameters.oracle}} 1> {{inputs.parameters.dbconn}}.stats.txt 2> {{inputs.parameters.dbconn}}.logs.txt 
+         echo "Oracle {{inputs.parameters.oracle}}"
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --bulk-size 10 -s {{workflow.parameters.treesize}} -e --attempts {{workflow.parameters.attempts}} -p {{workflow.parameters.peek}}  --input /input.wasm --oracle python3 ../oracles/vt_custom_chrome/vt_oracle_count.py http://vt-service.vt:4000 {{ inputs.parameters.oracle }} vt vt123 {{ inputs.parameters.oracle }} 1> {{inputs.parameters.dbconn}}.stats.txt
          
-         kill -9 $watchID
-         kill -9 $watchID2
+         #kill -9 $watchID
+         #kill -9 $watchID2
 
-         cp {{inputs.parameters.dbconn}}.logs.txt  /{{inputs.parameters.dbconn}}.logs.txt 
+         ls .
+         #touch /{{inputs.parameters.dbconn}}.logs.txt 
+         cp probes.logs.txt /{{inputs.parameters.dbconn}}.logs.txt 
          cp {{inputs.parameters.dbconn}}.stats.txt  /{{inputs.parameters.dbconn}}.stats.txt 
-         c
+         cp probes.logs.txt datas/{{inputs.parameters.dbconn}}
+         cat /{{inputs.parameters.dbconn}}.stats.txt 
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"

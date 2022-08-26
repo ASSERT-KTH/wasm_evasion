@@ -1,0 +1,1 @@
+Call `python3 minip.py <input.wasm>`. The exit code is the number of "BENIGN" samples. 

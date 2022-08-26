@@ -180,7 +180,7 @@ subcommands:
 
 
           - bulk_size:
-              short: b
+              short: u
               required: false
               default_value: "1"
               long: bulk-size

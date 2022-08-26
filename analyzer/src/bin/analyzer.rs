@@ -45,7 +45,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
     let matches = App::from_yaml(yaml).get_matches();
     let dbconn = arg_or_error!(matches, "dbconn");
     let cachesize = value_t!(matches.value_of("cachesize"), u64).expect("Invalid cache size conversion");
-    let dbclient = DB::new(string_to_static_str(dbconn.clone()), cachesize)?;
+    let mut dbclient = DB::new(string_to_static_str(dbconn.clone()), cachesize)?;
     let mut state = State {
         dbclient: Some(dbclient.clone()),
         process: AtomicU32::new(0),
@@ -65,6 +65,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
 
     match matches.subcommand() {
         ("mutate", Some(args)) => {
+            dbclient.create()?;
             let mut seed = 0;
             let mut attemps = 0;
             let mut peek_count = 0;
@@ -108,6 +109,7 @@ pub fn main() -> Result<(), analyzer::errors::CliError> {
                     exit_on_found, peek_count, seed, tree_size, mode, bulk_size)?;
         }
         ("extract", Some(args)) => {
+            dbclient.open();
             let reset = args.is_present("reset");
             if reset {
                 log::debug!("Reseting ");

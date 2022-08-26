@@ -20,10 +20,11 @@ spec:
           - name: features
             value: "{{item.features}}"
         withItems:
-
+          - {   dbconn: "i32.mul-by-8", features: "wasm-mutate/peep_hole,wasm-mutate/i32.mul-by-8"  }
+          - {   dbconn: "i32.add-x-x", features: "wasm-mutate/peep_hole,wasm-mutate/i32.add-x-x"  }
           # - {   dbconn: "container-x-nop", features: "wasm-mutate/peep_hole,wasm-mutate/container-x-nop"  }
-          - {   dbconn: "container-drop-i32.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i32.rand-x"  }
-          - {   dbconn: "container-drop-i64.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i64.rand-x"  }
+          # - {   dbconn: "container-drop-i32.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i32.rand-x"  }
+          # - {   dbconn: "container-drop-i64.rand-x", features: "wasm-mutate/peep_hole,wasm-mutate/container-drop-i64.rand-x"  }
           # - {   dbconn: "container-x-drop-i32.rand", features: "wasm-mutate/peep_hole,wasm-mutate/container-x-drop-i32.rand"  }
           # - {   dbconn: "container-x-drop-i64.rand", features: "wasm-mutate/peep_hole,wasm-mutate/container-x-drop-i64.rand"  }
           # - {   dbconn: "i32.use_of_global", features: "wasm-mutate/peep_hole,wasm-mutate/i32.use_of_global"  }
@@ -148,8 +149,8 @@ spec:
           # - {   dbconn: "function_body_unreachable", features: "wasm-mutate/function_body_unreachable"  }
 
 
-          # - {   dbconn: "code_motion_loops", features: "wasm-mutate/code_motion,wasm-mutate/code_motion_loops"  }
-          # - {   dbconn: "code_motion_ifs", features: "wasm-mutate/code_motion,wasm-mutate/code_motion_ifs"  }
+          #- {   dbconn: "code_motion_loops", features: "wasm-mutate/code_motion,wasm-mutate/code_motion_loops"  }
+          - {   dbconn: "code_motion_ifs", features: "wasm-mutate/code_motion,wasm-mutate/code_motion_ifs"  }
 
 
           # - {   dbconn: "modify_custom_section_name", features: "wasm-mutate/modify_custom_section,wasm-mutate/modify_custom_section_name"  }
@@ -166,21 +167,6 @@ spec:
       parameters:
       - name: dbconn
       - name: features
-    
-      #artifacts:
-      #- name: wasms
-      #  path: /wasms
-      #  s3:
-      #    bucket: my-bucket
-      #    endpoint: minio-service.minio:3434
-      #    insecure: true
-      #    key: "my-artifacts/filtered"
-      #    accessKeySecret:
-      #      name: argo-artifacts
-      #      key: accesskey
-      #    secretKeySecret:
-      #      name: argo-artifacts
-      #      key: secretkey
     outputs:
       artifacts:
       - name: data
@@ -263,7 +249,28 @@ spec:
 
          # Now run the analysis 
          # Watch that the process is not going over 8Gb of rss
-         RUST_LOG=analyzer=debug ./target/release/analyzer -c 2147483648 --dbconn "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" extract --snapshot "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" --snapshot-time 300 -t 2 -s 1 -d 2 --input "/wasms" 2>"{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt" 
+
+         RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" extract --snapshot "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" --snapshot-time 300 -t {{workflow.parameters.time}} -s 1 -d 2 --input "/wasms" 2>"{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt" &
+         extractid=$!
+         while true
+         do
+            sleep 10
+            if ps -p $extractid > /dev/null
+            then
+              echo $extractid
+              free -m
+              ps -o pid,user,%mem,command ax
+              m=$(free -m | head -n 2 | tail -n 1 | tr -s " " | cut -d " " -f 3)
+              if [ $m -ge 8000 ]; then
+                kill -9 $extractid
+                sleep 120 # Wait for a minute before starting again
+                RUST_LOG=analyzer=debug ./target/release/analyzer -c 1048576 --dbconn "datas/{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}" extract --snapshot "{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.snapshot.csv" --snapshot-time 300 -t {{workflow.parameters.time}} -s 1 -d 2 --input "/wasms" 2>"{{inputs.parameters.dbconn}}_t{{workflow.parameters.time}}.logs.txt" &
+                extractid=$!
+              fi
+            else
+              break
+            fi
+         done
         
          kill -9 $watchID
          kill -9 $watchID2
