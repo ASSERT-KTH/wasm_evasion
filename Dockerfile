@@ -12,5 +12,5 @@ RUN $HOME/.cargo/bin/rustup default nightly
 RUN git clone --recursive https://github.com/Jacarte/obfuscation_wasm.git
 
 RUN pip3 install -r /obfuscation_wasm/oracles/requirements.txt
-WORKDIR /obfuscation_wasm/analyzer
+WORKDIR /obfuscation_wasm/crates/analyzer
 RUN $HOME/.cargo/bin/cargo build --release
