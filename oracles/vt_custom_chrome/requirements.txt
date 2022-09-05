@@ -5,3 +5,5 @@ flask
 flask_httpauth
 requests
 filelock
+pytesseract
+opencv-python

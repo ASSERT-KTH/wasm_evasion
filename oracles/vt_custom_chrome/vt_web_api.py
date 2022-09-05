@@ -4,20 +4,32 @@ import vt_web_gui
 from flask_httpauth import HTTPBasicAuth
 import parse_result
 import os
-import queue
 import threading
 import hashlib
 import time
-from io import StringIO
 import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
+import vt_mc
+import threading
+import importlib
+import subprocess
+
+COUNT = 0
+DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
 def server():
+    global COUNT
     app = Flask(__name__)
 
-    worklist = queue.Queue()
+    worklist = []
+    lock = threading.Lock()
 
     auth = HTTPBasicAuth()
+    mcwrapper = vt_mc.MCWrapper(
+        os.environ.get("MC_ENDPOINT", "exp"),
+        os.environ.get("MC_BUCKET", "my-bucket"),
+        "vt_api_files"
+    )
 
     users = {
         os.environ.get("WEB_USER", "admin"): generate_password_hash(os.environ.get("WEB_PASS", "admin"))
@@ -32,17 +44,15 @@ def server():
     @app.route('/')
     @auth.login_required    
     def index():
-        return f'Workcount {worklist.qsize()}'
+        return f'Workcount {len(worklist)}'
 
     @app.route('/upload_file/<outfolder>', methods=['GET', 'POST'])
     @auth.login_required
     def upload_file(outfolder):
+        global COUNT
         if request.method == 'POST':
-            if not os.path.exists(f"data/{outfolder}"):
-                os.makedirs(f"data/{outfolder}")
-
-            if not os.path.exists(f"data/upload/{outfolder}"):
-                os.makedirs(f"data/upload/{outfolder}")
+            COUNT += 1
+            print("Received count", COUNT)
             # check if the post request has the file part
             print(request)
             if 'file' not in request.files:
@@ -58,17 +68,21 @@ def server():
 
                 newname = f"{hash}.wasm"
 
-                file = open(os.path.join(f"data/upload/{outfolder}", newname), 'wb')
-                file.write(content)
-                file.close()
+                mcwrapper.saveb(f"data/upload/{outfolder}/{newname}", content)
                 print(hash)
                 # Adding to queue
                 try:
-                    if os.path.exists(f"data/upload/{outfolder}/{hash}.wasm.logs.txt"):
+                    if mcwrapper.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
                         print("Not queued")
                     else:
                         print("Adding to queue")
-                        worklist.put([os.path.join(f"data/upload/{outfolder}", newname), f"data/{outfolder}" ])
+                        # Make a tmp copy and send also to mcwrapper
+                        tmpfile = f"/tmp/{hash}.wasm"
+                        f = open(tmpfile, 'wb')
+                        f.write(content)
+                        f.close()
+                        with lock:
+                            worklist.append([f"/tmp/{hash}.wasm", f"{outfolder}" ])
                 except Exception as e:
                     print(e)
                 return hash 
@@ -78,19 +92,25 @@ def server():
     @auth.login_required
     def get_analysis_result(out, hash):
 
-        if not os.path.exists(out):
-            os.makedirs(out)
 
-        if os.path.exists(f"data/{out}/{hash}.wasm.logs.txt"):
+        if mcwrapper.exists(f"data/{out}/{hash}.wasm.logs.txt"):
             print("Loading result")
-            f, _ = parse_result.parse_result(f"data/{out}/{hash}.wasm.logs.txt")
+            # load first
+            content, hsh = mcwrapper.load(f"data/{out}/{hash}.wasm.logs.txt")
+            tmp = open(f"/tmp/{hsh}", 'wb')
+            tmp.write(content)
+            tmp.close()
 
-            if not os.path.exists(f"data/upload/{out}/"):
-                os.makedirs(f"data/upload/{out}/")
-                
-            f.to_csv(f"data/upload/{out}/{hash}.csv")
+            f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-            output = make_response(open(f"data/upload/{out}/{hash}.csv", "r").read())
+
+            tmpcsv = f"/tmp/{hsh}.csv"
+            f.to_csv(tmpcsv)
+
+            output = make_response(open(tmpcsv, "r").read())
+            # Save to mc
+            mcwrapper.saveb(f"data/upload/{out}/{hash}.csv", open(tmpcsv, "rb").read())
+
             output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/{hash}.csv"
             output.headers["Content-type"] = "text/csv"
             return output
@@ -102,50 +122,66 @@ def server():
     @auth.login_required
     def get_all_results(out):
 
-        if not os.path.exists(f"data/upload/{out}"):
-            os.makedirs(f"data/upload/{out}")
-
         print("Loading result")
-        f = parse_result.parse_all_results_in_folder(out)
-        f.to_csv(f"data/upload/{out}/all.csv")
+        # Copy all folder to tmp
+        try:
+            mcwrapper.loadfolder(f"/tmp/{out}", f"data/{out}")
+            f = parse_result.parse_all_results_in_folder(f"/tmp/{out}")
+            f.to_csv(f"/tmp/{out}/all.csv")
 
-        output = make_response(open(f"data/upload/{out}/all.csv", "r").read())
-        output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/all.csv"
-        output.headers["Content-type"] = "text/csv"
-        return output
+            output = make_response(open(f"/tmp/{out}/all.csv", "r").read())
+            mcwrapper.save(f"data/upload/{out}/all.csv", open(f"/tmp/{out}/all.csv", "r").read())
+            
+            output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/all.csv"
+            output.headers["Content-type"] = "text/csv"
+            return output
+        except Exception as e:
+            # Empty response
+            output = make_response(f"No folder found {e}")            
+            output.headers["Content-Disposition"] = f"attachment; filename=data/upload/none.txt"
+            output.headers["Content-type"] = "text/csv"
+            return output
 
+        
     def check_files():
 
-        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "2"))
+        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "8"))
 
         prev = {}
 
         def process():
+            # This should be a call to ray :)
 
             while True:
-                s = worklist.qsize()
+                s = len(worklist)
+
                 if s == 0:
-                    print("Worklist empty, returning. Sleeping for a while")
+                    print("Worklist empty. Sleeping for a while")
                     #worklist.task_done()
                     time.sleep(5)
                     continue
 
-                filename, outfolder = worklist.get()
+                with lock:
+                    filename, outfolder = worklist.pop()
+
                 content = open(filename, "rb").read()
                 hash = hashlib.sha256(content).hexdigest()
-                if os.path.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
+                if mcwrapper.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
                     print(f"File {filename} already checked")
                     continue 
 
-                worklist.task_done()
                 print("Work count", s)
                 times = 0        
                 driver = vt_web_gui.setUp()
 
                 done = False
-                while times < 3:
+                while times < 5:
                     try:
-                        vt_web_gui.check_file(driver, filename, prev = prev, out=outfolder)        
+                        # reload module every time, this will help in Argo workflows
+                        print("Reloading module")
+                        subprocess.check_output(["/bin/bash", f"{DIRNAME}/download_module.sh"])
+                        mod:vt_web_gui = importlib.reload(vt_web_gui)
+                        mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper)        
                         done = True
                         break
                     except Exception as e:
@@ -161,7 +197,8 @@ def server():
                         time.sleep(4*times)
                 if not done:
                     # requeue the page
-                    worklist.put(filename)
+                    with lock:
+                        worklist.append((filename, outfolder))
 
         workers = []
         for _ in range(WORKERS_NUMBER):

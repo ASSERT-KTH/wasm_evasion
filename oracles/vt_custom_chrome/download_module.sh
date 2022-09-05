@@ -1,0 +1,1 @@
+wget -O vt_web_gui.py https://raw.githubusercontent.com/Jacarte/obfuscation_wasm/main/oracles/vt_custom_chrome/vt_web_gui.py
