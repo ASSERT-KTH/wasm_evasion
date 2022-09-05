@@ -375,7 +375,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
         time.sleep(0.6)   
         times += 1
-        if times >= 600: #360s
+        if times >= 60: #360s
             raise Exception("Wait too much") 
     
     #time.sleep(2)
