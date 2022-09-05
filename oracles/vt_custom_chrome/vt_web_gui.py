@@ -303,7 +303,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                 break
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
-                print("Doing image based detection", name)
+                #print("Doing image based detection", name)
                 buttonpos, size = (1023, 1005),(39.0*2, 172.5*2) #get_confirm_btn_position(driver, name, wrapper)
                 print("Position", buttonpos, name)
                 if buttonpos:
@@ -327,7 +327,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     #wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
 
                     marker = driver.find_element(By.ID, "marker")
-                    print(marker, name)
+                    # print(marker, name)
                     actions.move_to_element_with_offset(marker, x, y).click().perform()
 
                     # Remove the element
