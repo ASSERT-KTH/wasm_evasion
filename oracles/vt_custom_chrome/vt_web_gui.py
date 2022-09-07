@@ -369,9 +369,9 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
         break_if_captcha(driver, name)
         print(driver.current_url, times)
         # Take an screenshot and save it 
-        #if wrapper:
-        #    fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
-        #    wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
+        if wrapper:
+            fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
+            wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
 
         time.sleep(0.6)   
         times += 1
