@@ -323,8 +323,10 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     #actions.move_by_offset(x, y).click().perform()
                     # create a marker in the page to show where the mouse is
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
-                    #fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
-                    #wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 50}px'; dot.style.left = '{x - 30}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+
+                    fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
+                    wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
 
                     marker = driver.find_element(By.ID, "marker")
                     # print(marker, name)
