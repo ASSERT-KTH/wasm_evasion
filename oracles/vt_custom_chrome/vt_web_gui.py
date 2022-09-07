@@ -174,7 +174,10 @@ def expand_shadow_element(driver, element):
 def break_if_captcha(driver, name):
     #image = fullpage_screenshot(driver, name, f"snapshots/{name}.analysis.png")
 
-    if "captcha" in driver.current_url:
+    content = driver.find_element(By.TAG_NAME, 'body')
+    content_text = expand_element(driver, content, {})
+        
+    if "captcha" in driver.current_url or "RayID" in content_text:
 
         print("Trying to access file")
         with filelock.FileLock("name.socket.lock"):
