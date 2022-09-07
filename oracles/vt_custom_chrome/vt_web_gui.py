@@ -308,8 +308,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                 print("Position", buttonpos, name)
                 if buttonpos:
                     x, y = buttonpos
-                    x = x/2 + 5
-                    y = y/2 + 5
+                    x = x/2 + 15
+                    y = y/2 + 50
 
                     h, w = size
 
