@@ -331,6 +331,11 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
                     fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
                     wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
+                    f = open(f"/tmp/url{name}",  "w")
+                    f.write(f"{driver.current_url}")
+                    f.close()
+                    wrapper.savefile(f"screenshots/{name}.url.txt", f"{driver.current_url}")
+                
 
                     marker = driver.find_element(By.ID, "marker")
                     # print(marker, name)
