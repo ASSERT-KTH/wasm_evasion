@@ -337,6 +337,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     #break
             times += 1
             if times > 500:
+                print("Button not clicked ?")        
+                raise Exception("Too many times")
                 break
         except Exception as e:
             print(e) 
