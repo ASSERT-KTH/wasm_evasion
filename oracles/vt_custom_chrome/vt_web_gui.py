@@ -400,7 +400,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                 all = matches[0][1]
                 all = int(all)
 
-                if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
+                if (all >= 59 or "Security Vendors' Analysis" in content_text): # and "Analysing (" not in content_text:
                     print("Returning")
                     time.sleep(2)
                 else:
