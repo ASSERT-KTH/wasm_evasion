@@ -337,7 +337,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     f = open(f"/tmp/url{name}",  "w")
                     f.write(f"{driver.current_url}")
                     f.close()
-                    wrapper.savefile(f"screenshots/{name}.url.txt", f"{driver.current_url}")
+                    wrapper.savefile(f"screenshots/{name}.url.txt", f"/tmp/url{name}")
                 
 
                     marker = driver.find_element(By.ID, "marker")
