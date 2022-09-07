@@ -296,7 +296,11 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
         break_if_captcha(driver, name)
 
         try:
-            btn = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#confirmUpload')")
+            try:
+                btn = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#confirmUpload')")
+            except Exception as e:
+                print(e)
+                btn = None
             if btn:
                 print("Confirming upload")
                 driver.execute_script("arguments[0].click();", btn)
