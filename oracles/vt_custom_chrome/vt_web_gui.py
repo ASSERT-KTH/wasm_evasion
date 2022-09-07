@@ -311,7 +311,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
-                buttonpos, size = (1023, 1005),(39.0*2, 172.5*2) #get_confirm_btn_position(driver, name, wrapper)
+                buttonpos, size = get_confirm_btn_position(driver, name, wrapper)
                 print("Position", buttonpos, name)
                 if buttonpos:
                     x, y = buttonpos
