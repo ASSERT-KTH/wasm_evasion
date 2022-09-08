@@ -311,12 +311,12 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
-                buttonpos, size = get_confirm_btn_position(driver, name, wrapper)
+                buttonpos, size = (1123, 1055),(39.0*2, 172.5*2) # get_confirm_btn_position(driver, name, wrapper)
                 print("Position", buttonpos, name)
                 if buttonpos:
                     x, y = buttonpos
-                    x = x/2 + 15
-                    y = y/2 + 50
+                    x = x/2
+                    y = y/2
 
                     h, w = size
 
@@ -330,7 +330,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     #actions.move_by_offset(x, y).click().perform()
                     # create a marker in the page to show where the mouse is
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
-                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 10}px'; dot.style.left = '{x - 10}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 1}px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
 
                     fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
                     wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
