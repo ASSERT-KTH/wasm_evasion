@@ -65,6 +65,7 @@ enum MiddleNode {
 fn parses_operands(tokens: Vec<Tokens>, head: usize) -> anyhow::Result<(Vec<MiddleNode>, usize)> {
     
     let mut current = &tokens[head];
+    //println!("Current operand tk {:?}", current);
     let mut result: Vec<MiddleNode> = vec![];
     let mut position = head;
     match current {
@@ -78,6 +79,9 @@ fn parses_operands(tokens: Vec<Tokens>, head: usize) -> anyhow::Result<(Vec<Midd
                         }
                         32 => {
                             MiddleNode::LangToken(Lang::I32(*val))
+                        }
+                        64 => {
+                            MiddleNode::LangToken(Lang::I64(*val as i64))
                         }
                         _ => {
                             anyhow::bail!("Invalid size {}", w)
@@ -113,12 +117,25 @@ fn parses_operands(tokens: Vec<Tokens>, head: usize) -> anyhow::Result<(Vec<Midd
 fn parses_operation(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap<String, String>) -> anyhow::Result<(Option<(String, Vec<MiddleNode>)> /* If it is a variable definition then, there is no point in returning the node, register in the global map instead */, usize)> {
     let current = &tokens[head];
 
+    //println!("CUrrent {:?}", current);
     match current {
         Tokens::Operator(id) => {
             match id.as_str() {
                 "var" => {
                     // It is a variable declaration, add it to the global map
                     // and return if the next is EOL
+
+
+                    // Check first in local
+                    /*//println!("{:?}", localmaps);
+                    if localmaps.contains_key(&varidx) {
+                        return Ok((Some(format!("local.get.{}", localmaps.get(&varidx).unwrap())), head + 3));
+                    }
+                    if globalmaps.contains_key(&varidx) {
+                        return Ok((Some(format!("global.get.{}", globalmaps.get(&varidx).unwrap())), head + 3));
+                    } */      
+
+
                     if let Tokens::EOL = tokens[head + 1] {
                         return Ok((None, head + 2))
                     }
@@ -127,6 +144,7 @@ fn parses_operation(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap<Strin
                 _ => {
                     // The remaining ones are probably operand having type
                     let (operands, pos) = parses_operands(tokens.clone(), head + 1)?;
+                    //println!("operands {:?}", operands);
                     if let Tokens::EOL = tokens[pos] {
                         return Ok((Some((
                             id.clone(),
@@ -138,14 +156,14 @@ fn parses_operation(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap<Strin
             }
         },
         _ => {
-
+            eprintln!("Invalid token {:?}", current);
         }
     };
 
-    anyhow::bail!("Invalid parsing");
+    anyhow::bail!("Invalid parsing of operation");
 }
 
-fn parses_variable_assign(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap<String, String>, ) -> anyhow::Result<(Option<String>, usize)> {
+fn parses_variable_assign(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap<String, String>, localmaps: HashMap<String, u32>, globalmaps: HashMap<String, u32>) -> anyhow::Result<(Option<String>, usize)> {
     let current = &tokens[head];
     match current {
         Tokens::Var(id) => {
@@ -179,8 +197,38 @@ fn parses_variable_assign(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap
                                         ("slt", 1) => {
                                             "i32.slt"
                                         }
+                                        ("add", 32) => {
+                                            "i32.add"
+                                        }
+                                        ("mul", 32) => {
+                                            "i32.mul"
+                                        }
+                                        ("sub", 32) => {
+                                            "i32.sub"
+                                        }
+                                        ("xor", 32) => {
+                                            "i32.xor"
+                                        }
+                                        ("shl", 32) => {
+                                            "i32.shl"
+                                        }
+                                        ("lshl", 32) => {
+                                            "i32.shl"
+                                        }
+                                        ("ashr", 32) => {
+                                            "i32.shr_u"
+                                        }
+                                        ("lshr", 32) => {
+                                            "i32.shr_u"
+                                        }
+                                        ("and", 32) => {
+                                            "i32.or"
+                                        }
+                                        ("or", 32) => {
+                                            "i32.or"
+                                        }
                                         _ => {
-                                            anyhow::bail!("Invalid conversion for {}:{}", tpe, size)
+                                            anyhow::bail!("Invalid token translation from SouperIR {}:{}", tpe, size)
                                         }
                                     };
                                     subtree.push_str(eterm);
@@ -237,7 +285,7 @@ fn parses_variable_assign(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap
                                         anyhow::bail!("Invalid width {}", w)
                                     }
                                 };
-                                println!("Returning a constant {}", i);
+                                //println!("Returning a constant {}", i);
                                 let varidx = format!("{}", i.to_string());
                                 return Ok((Some(varidx), head + 4 /* includes the last eol token */))
                             }
@@ -257,27 +305,27 @@ fn parses_variable_assign(tokens: Vec<Tokens>, head: usize, buffer: &mut HashMap
         }
     }
 
-    anyhow::bail!("Invalid parsing")
+    anyhow::bail!("Invalid parsing of variable assign")
 }
 
-fn parses(tokens: Vec<Tokens>, head: usize) -> anyhow::Result<String> {
+fn parses(tokens: Vec<Tokens>, head: usize, localmaps: HashMap<String, u32>, globalmaps: HashMap<String, u32>) -> anyhow::Result<String> {
     
     let mut position = head;
     let mut expressions = HashMap::new();
 
     while position < tokens.len() {
-        match parses_variable_assign(tokens.clone(), position, &mut expressions) {
+        match parses_variable_assign(tokens.clone(), position, &mut expressions, localmaps.clone(), globalmaps.clone()) {
 
             Ok((id, h)) => {
                 
                 if let Some(expr) = id {
                     return Ok(expr.clone())
                 }
-                println!("pos {}, len {}", h, tokens.len());
+                //println!("pos {}, len {}", h, tokens.len());
                 position = h
             },
             Err(e) => {
-                println!("Error {:?}", e);
+                //println!("Error {:?}", e);
                 anyhow::bail!(e)
             }
         }
@@ -287,8 +335,8 @@ fn parses(tokens: Vec<Tokens>, head: usize) -> anyhow::Result<String> {
 }
 
 
-pub fn souper2Lang(rhs: &str) -> anyhow::Result<RecExpr<Lang>> {
-    println!("rhs {}", rhs);
+pub fn souper2Lang(rhs: &str, localmaps: HashMap<String, u32>, globalmaps: HashMap<String, u32>) -> anyhow::Result<RecExpr<Lang>> {
+    //println!("rhs {}", rhs);
 
 
     #[derive(Debug)]
@@ -303,11 +351,20 @@ pub fn souper2Lang(rhs: &str) -> anyhow::Result<RecExpr<Lang>> {
     let mut stage = LexContext::Start;
     let operators = vec![
         // Add here the operators from Souper
+        "sub",
+        "shl",
         "add",
+        "xor",
         "var",
         "slt",
         "eq",
-        "result"
+        "mul",
+        "ashr",
+        "lshl",
+        "lshr",
+        "and",
+        "or",
+        "result",
     ];
 
     // TODO, move this to some lexer class
@@ -354,6 +411,7 @@ pub fn souper2Lang(rhs: &str) -> anyhow::Result<RecExpr<Lang>> {
                         // so, get the subtree directly and add it as a
                         // reference
                         tokens.push(Tokens::Var(number));
+                        stage = LexContext::Start;
                     },
                     LexContext::Assign => {
                         // It is an operator
@@ -389,18 +447,22 @@ pub fn souper2Lang(rhs: &str) -> anyhow::Result<RecExpr<Lang>> {
             }
             _ => {
                 // Check if from this character some literal token can be
-                // formed, if so, advance the head to it                   
+                // formed, if so, advance the head to it                
                 let mut mtch = false;
                 for operator in operators.clone() {
-                    let mut tmpeek = operator.chars().peekable();
+                    let mut tmpeek = operator.chars().peekable().clone();   
+                    ////println!("{} {:?} {:?}", operator, tmpeek, peekable);
+                    let currpos = peekable.clone();
                     if get_fixed_token(&mut peekable,&mut tmpeek) {
                         tokens.push(Tokens::Operator(format!("{}", operator)));
                         mtch = true;
                         break;
                     }
+                    // Else reset the peekable
+                    peekable = currpos;
                 }
                 if ! mtch {                    
-                    anyhow::bail!("Invalid character");
+                    anyhow::bail!("Invalid character {}", c);
                 }
             }
         }
@@ -408,7 +470,7 @@ pub fn souper2Lang(rhs: &str) -> anyhow::Result<RecExpr<Lang>> {
 
     }
 
-    let holes = parses(tokens, 0)?;
+    let holes = parses(tokens, 0, localmaps, globalmaps)?;
 
     // TODO, check for holes (locals, globals, mem values)
     // Read from the previous translation lang to souper to get %id -> global |
