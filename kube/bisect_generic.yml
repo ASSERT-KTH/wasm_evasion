@@ -27,7 +27,9 @@ spec:
           - name: attempts
             value: "{{item.attempts}}"
         withItems:
+          - { features: "wasm-mutate/i64.operator_and_commutative,wasm-mutate/peep_hole", dbconn: "c14", peek: "1", treesize: "100", attempts: "1000" }
           - { features: "wasm-mutate/all", dbconn: "all", peek: "1", treesize: "100", attempts: "1000" }
+
           
         continueOn:
           failed: true
@@ -69,7 +71,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/datas/{{inputs.parameters.dbconn}}.zip"
+          key: "bisect_datas/datas/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.zip"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -85,7 +87,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/logs_mutate/{{inputs.parameters.dbconn}}.logs.txt"
+          key: "bisect_datas/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.logs.txt"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -101,7 +103,7 @@ spec:
           endpoint: minio-service.minio:3434
           insecure: true
           # Avoid to mount the full metas_filtered folder in the container
-          key: "bisect_datas/logs_mutate/{{inputs.parameters.dbconn}}.stats.txt"
+          key: "bisect_datas/logs_mutate/{{workflow.parameters.file}}/{{inputs.parameters.dbconn}}.stats.txt"
           accessKeySecret:
             name: argo-artifacts
             key: accesskey
@@ -140,12 +142,13 @@ spec:
 
           # launch watchdog
           touch "{{inputs.parameters.dbconn}}.stats.txt"
-          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 &
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 bisect/{{workflow.parameters.file}} &
           watchID=$!
 
           touch "{{inputs.parameters.dbconn}}.logs.txt"
-          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 &
+          bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 bisect/{{workflow.parameters.file}} &
           watchID2=$!
+
 
          echo "Oracle {{workflow.parameters.oracle}}"
          RUST_LOG=analyzer=debug ./target/release/analyzer --dbconn "datas/{{inputs.parameters.dbconn}}" mutate -p {{inputs.parameters.peek}} -e --attempts {{inputs.parameters.attempts}} -s {{inputs.parameters.treesize}} -b --input /input.wasm --oracle {{workflow.parameters.oracle}} 1> {{inputs.parameters.dbconn}}.stats.txt 2> {{inputs.parameters.dbconn}}.logs.txt 
@@ -155,6 +158,6 @@ spec:
 
          cp {{inputs.parameters.dbconn}}.logs.txt  /{{inputs.parameters.dbconn}}.logs.txt 
          cp {{inputs.parameters.dbconn}}.stats.txt  /{{inputs.parameters.dbconn}}.stats.txt 
-
+         c
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"

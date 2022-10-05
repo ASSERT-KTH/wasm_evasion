@@ -1,0 +1,102 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel any in-flight jobs for the same PR/branch so there's only one active
+# at a time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, beta, nightly, macos, windows]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+          - build: beta
+            os: ubuntu-latest
+            rust: beta
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+          - build: macos
+            os: macos-latest
+            rust: stable
+          - build: windows
+            os: windows-latest
+            rust: stable
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Install Rust (rustup)
+      run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+      shell: bash
+    - run: cargo test --all
+    - run: cargo test --manifest-path crates/wasmparser/Cargo.toml --features deterministic
+    - run: cargo build --manifest-path crates/wast/Cargo.toml --no-default-features
+    - run: cargo build --manifest-path crates/wast/Cargo.toml --no-default-features --features wasm-module
+    - run: cmake -S ${{github.workspace}}/examples -B ${{github.workspace}}/examples/build -DCMAKE_BUILD_TYPE=Release
+    - run: cmake --build ${{github.workspace}}/examples/build --config Release
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Rust
+      run: rustup update stable && rustup default stable && rustup component add rustfmt
+    - run: cargo fmt -- --check
+
+  compare-with-main:
+    name: wasmparser bench
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - run: git fetch --recurse-submodules=no origin main && git branch main origin/main
+      if: github.ref != 'refs/heads/main'
+    - run: (cd crates/wasmparser && ./compare-with-main.sh)
+
+  fuzz:
+    name: Fuzz
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Install Rust
+      run: rustup update nightly && rustup default nightly
+    - run: cargo install cargo-fuzz
+    - run: cargo fuzz build
+
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo check --benches -p wasm-smith
+      - run: cargo check --no-default-features
+      - run: cargo check --no-default-features --features print
+      - run: cargo check --no-default-features --features parse
+      - run: cargo check --no-default-features --features validate
+      - run: cargo check --no-default-features --features smith
+      - run: cargo check --no-default-features --features shrink
+      - run: cargo check --no-default-features --features mutate
+      - run: cargo check --no-default-features --features dump
+      - run: cargo check --no-default-features --features objdump
+
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo doc --all
