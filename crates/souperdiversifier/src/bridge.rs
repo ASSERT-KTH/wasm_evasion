@@ -6,7 +6,7 @@ use wasm_encoder::{Function, ValType, CodeSection, GlobalSection, Instruction};
 use wasm_mutate::{info::ModuleInfo, module::{PrimitiveTypeInfo, TypeInfo, map_type}, mutators::peephole::{eggsy::{analysis::PeepholeMutationAnalysis, lang::Lang, encoder::{Encoder, expr2wasm::ResourceRequest}}, dfg::DFGBuilder}, WasmMutate};
 use wasmparser::{LocalsReader, CodeSectionReader, FunctionBody, GlobalSectionReader};
 use wasmtime::Module;
-
+use std::ffi::CString;
 use std::collections::HashMap;
 
 use crate::{parser::souper2Lang, OperatorAndByteOffset};
@@ -17,11 +17,38 @@ lazy_static! {
         let mut m = Mutex::new(HashMap::new());
         m
     };
+
+    static ref VAR_MAP: Mutex<HashMap<u32, String>> = {
+        let mut m = Mutex::new(HashMap::new());
+        m
+    };
+
+    static ref REVERSE_LOCAL_MAP: Mutex<HashMap<String, u32>> = {
+        let mut m = Mutex::new(HashMap::new());
+        m
+    };
+
+    static ref GLOBAL_MAP: Mutex<HashMap<u32, String>> = {
+        let mut m = Mutex::new(HashMap::new());
+        m
+    };
+
+    static ref REVERSE_GLOBAL_MAP: Mutex<HashMap<String, u32>> = {
+        let mut m = Mutex::new(HashMap::new());
+        m
+    };
+
 }
 
-pub struct Superdiversifier;
+pub struct Superdiversifier {
+}
 
 impl Superdiversifier {
+
+    pub fn new() -> Self {
+        Superdiversifier {
+        }
+    }
 
     // Collect and unfold params and locals, [x, ty, y, ty2] -> [ty....ty, ty2...ty2]
     fn get_func_locals(
@@ -63,20 +90,39 @@ impl Superdiversifier {
             (root, Event::Exit),
             (root, Event::Enter)
             ];
-        let mut varidx = 1;
+        let mut varidx = 0;
         let mut stack = vec![];
+        
         while let Some((current, event)) = worklist.pop() {
             let l = &egraph[current].nodes[0];
 
             match event {
                 Event::Enter => {
-                    for ch in l.children() {
-                        worklist.push((*ch, Event::Exit));
-                        worklist.push((*ch, Event::Enter));
-                    } 
+                    // Patch, in the case of the select...reverse
+                    
+                    match l {
+                        Lang::Select([then, alternative, cond]) => {
+                            // Force the first operand as a fixed size
+
+                            worklist.push((*cond, Event::Exit));
+                            worklist.push((*cond, Event::Enter));
+                            worklist.push((*then, Event::Exit));
+                            worklist.push((*then, Event::Enter));
+                            worklist.push((*alternative, Event::Exit));
+                            worklist.push((*alternative, Event::Enter));
+                        }
+                        _ => {
+
+
+                            for ch in l.children() {
+                                worklist.push((*ch, Event::Exit));
+                                worklist.push((*ch, Event::Enter));
+                            } 
+                        }
+                    }
                 },
                 Event::Exit => {
-                    println!(";%{}", l);
+                    //println!(";%{}", l);
                     let rpte = egraph.analysis.get_returning_tpe(l, &egraph);
                     let souper_width = match rpte {
                         Ok(tpe) => {
@@ -106,16 +152,23 @@ impl Superdiversifier {
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
                         },
-                        Lang::LocalGet(_) => {
+                        Lang::LocalGet(idx) => {
+                            if VAR_MAP.lock().unwrap().contains_key(idx) {
+                                //println!("Getting name from context {}", idx);
+                                stack.push(format!("{}", VAR_MAP.lock().unwrap().get(idx).unwrap()));
+                            } else {
+                                result.push_str(&format!("%{}:{} = var; local", varidx, souper_width));
+                                stack.push(format!("%{}", varidx));
+                                VAR_MAP.lock().unwrap().insert(*idx, format!("%{}", varidx));
+                                REVERSE_LOCAL_MAP.lock().unwrap().insert(format!("%{}", varidx), *idx);
+                                varidx += 1;
+                            }
                             // Swap operands
-                            result.push_str(&format!("%{}:{} = var", varidx, souper_width));
-                            stack.push(format!("%{}", varidx));
-                            varidx += 1;
+                            // check if the variant exist, if so, get the tmp var name
                         },
-                        
                         Lang::GlobalGet(_) => {
                             // Swap operands
-                            result.push_str(&format!("%{} = var", varidx));
+                            result.push_str(&format!("%{} = var; global", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
                         },
@@ -228,8 +281,20 @@ impl Superdiversifier {
                             varidx += 1;
                         }
                         Lang::Select(_) => {
+                            // truncate the condition
+                            let o2 = operators.pop().unwrap();
+                            let o = operators.pop().unwrap();
+                            let c = operators.pop().unwrap();
+                            result.push_str(&format!("%{}:i1 = trunc {}\n", varidx, c));
+                            operators.push(format!("%{}", varidx));
+                            operators.push(o2);
+                            operators.push(o);
+                            varidx += 1;
+                            
                             result.push_str(&format!("%{} = select ", varidx));
                             stack.push(format!("%{}", varidx));
+
+                            // Get the first operator 
                             varidx += 1;
                         }
                         Lang::I32Eq(_) | Lang::I64Eq(_) => {
@@ -266,6 +331,9 @@ impl Superdiversifier {
                 },
             }
         }
+        if varidx == 0 {
+            anyhow::bail!("Invalid expression {}", root)
+        }
         // set to infer last operation
         result.push_str(&format!("infer %{}", varidx - 1 ));
         // Return the result and the number of operands
@@ -278,16 +346,30 @@ impl Superdiversifier {
         let lang = unsafe { CStr::from_ptr(lhs_ptr) };
         println!("LHS {:?}", lang);
 
-        let lang = souper2Lang(rhs.to_str().unwrap()).unwrap(); // Save this into a global State ?
-        let lhs = unsafe { CStr::from_ptr(lhs_ptr) };
-        let lhs = lhs.to_str().unwrap().to_string();
+        let lang = souper2Lang(rhs.to_str().unwrap(), 
+            REVERSE_LOCAL_MAP.lock().unwrap().clone(), 
+            REVERSE_GLOBAL_MAP.lock().unwrap().clone()); // Save this into a global State ?
 
-        if !REPLACEMENT_MAP.lock().unwrap().contains_key(&lhs){
-            REPLACEMENT_MAP.lock().unwrap().insert(lhs.clone(), vec![]);
+        match lang {
+            Ok(lang) => {
+
+                let lhs = unsafe { CStr::from_ptr(lhs_ptr) };
+                let lhs = lhs.to_str().unwrap().to_string();
+                println!("REP {}", lang.to_string());
+        
+                if !REPLACEMENT_MAP.lock().unwrap().contains_key(&lhs){
+                    REPLACEMENT_MAP.lock().unwrap().insert(lhs.clone(), vec![]);
+                }
+        
+                REPLACEMENT_MAP.lock().unwrap().get_mut(&lhs).unwrap().push((lang.to_string(), cost));
+                0
+            },
+            Err(r) => {
+                println!("{}", r);
+                // Printing for now, but ideally, it should be complete, and all operations should have a 1-1 translation
+                return 0
+            }
         }
-
-        REPLACEMENT_MAP.lock().unwrap().get_mut(&lhs).unwrap().push((lang.to_string(), cost));
-        0
     }
 
  
@@ -709,17 +791,17 @@ impl Superdiversifier {
                         log::debug!("E-expre {}", &start);
                         match self.generate_souper_query(root, egraph) {
                             Ok((souperIR, numoperands)) => {
-                                println!("Souper IR '{}'", souperIR);
-                                println!("LANG IR '{}'", start);
-                                if numoperands > 1 {
-                                    let startptr = format!("{}\x00", start.to_string()).as_ptr();
+                                let souperIRC = CString::new(souperIR).unwrap();
 
-                                    println!("{}",souperIR);                                
-                                    // Call Souper here
+                                if numoperands > 1 {
+                                    let startptr = CString::new(format!("({}", start.to_string())).unwrap();
+                                    // Call Souper
                                     unsafe {
-                                        superoptimize( souperIR.as_ptr() as *const i8, startptr as *const i8 ,Superdiversifier::callback);
+                                        superoptimize( souperIRC.as_ptr(), startptr.as_ptr() ,Superdiversifier::callback);
                                     }
                                 }
+                                // Free resource
+                                std::mem::forget(souperIRC);
                             }
                             Err(e) => {
                                 println!("{}", e);

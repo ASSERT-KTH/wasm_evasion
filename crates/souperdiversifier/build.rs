@@ -8,5 +8,5 @@ fn main() {
     println!("cargo:rustc-link-lib=dylib=bridge");   
     
     // TODO add , z3, alive, hiredis libs
-    println!("cargo:rustc-link-search=native=/Users/javierca/Documents/Develop/slumps/souper/build");
+    println!("cargo:rustc-link-search=native=libs/souper");
 }

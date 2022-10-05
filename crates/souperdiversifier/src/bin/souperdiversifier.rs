@@ -51,7 +51,7 @@ fn main() -> anyhow::Result<()> {
 
     // Iterate through the functions and each DFG
     // TODO, returns the new module here
-    let sdiversifier = Superdiversifier;
+    let sdiversifier = Superdiversifier::new();
     sdiversifier.souperdiversify_peepholes(info)?;
     // TODO, validate module
 
@@ -73,7 +73,7 @@ mod tests {
     use souperdiversifier::{bridge::{Superdiversifier, superoptimize}, parser::souper2Lang};
     use wasm_mutate::{info::ModuleInfo, WasmMutate};
     use wasmparser::validate;
-
+    use std::ffi::CString;
 
     #[test]
     fn test_to_superoptimize() {
@@ -95,7 +95,7 @@ mod tests {
         )
         "#;
 
-        let sdiversifier = Superdiversifier;
+        let sdiversifier = Superdiversifier::new();
         let expected = &wat::parse_str(wat).unwrap();
 
         
@@ -132,12 +132,14 @@ mod tests {
                 i32.const 42
                 i32.const 42
                 i32.const 1
-                i32.select
+                i32.const 0
+                i32.add
+                select
             )
         )
         "#;
 
-        let sdiversifier = Superdiversifier;
+        let sdiversifier = Superdiversifier::new();
         let expected = &wat::parse_str(wat).unwrap();
 
         
@@ -161,6 +163,128 @@ mod tests {
 
 
         println!("{}", text);
+        //println!("{:?}", replacements)
+    }
+
+
+
+    #[test]
+    fn test_to_superoptimize3() {
+        let wat =  r#"
+        (module
+            (func (export "exported_func") (param i32 i32 i32) (result i32)
+                local.get 0
+                local.get 0
+                local.get 0
+                i32.add
+                i32.add
+                local.get 0
+                local.get 2
+                select
+            )
+        )
+        "#;
+
+        let sdiversifier = Superdiversifier::new();
+        let expected = &wat::parse_str(wat).unwrap();
+
+        
+        // Get the wasm-mutate AST
+        //let info = ModuleInfo::new(&expected).unwrap();
+        let mut config = WasmMutate::default();
+        config.setup(&expected).unwrap();
+        println!("Correct parsing of Wasm binary. ");
+
+        // Iterate through the functions and each DFG
+        // TODO, returns the new module here
+        let info = config.info();
+        let replacements = sdiversifier.souperdiversify_peepholes(info.clone()).unwrap();
+        let module = sdiversifier.superoptimize(&mut config, replacements.clone()).unwrap();
+
+
+        println!("Module ");
+        let mutated_bytes = &module.finish();
+        let text = wasmprinter::print_bytes(mutated_bytes).unwrap();
+        validate( mutated_bytes).unwrap();
+
+
+        println!("{}", text);
+        //println!("{:?}", replacements)
+    }
+
+
+    #[test]
+    fn test_to_superoptimize4() {
+        let wat =  r#"
+        (module
+            (func (export "exported_func") (param i32 i32 i32) (result i32)
+                local.get 0
+                local.get 0
+                local.get 0
+                local.get 0
+                i32.add
+                i32.add
+                i32.add
+            )
+        )
+        "#;
+
+        let sdiversifier = Superdiversifier::new();
+        let expected = &wat::parse_str(wat).unwrap();
+
+        
+        // Get the wasm-mutate AST
+        //let info = ModuleInfo::new(&expected).unwrap();
+        let mut config = WasmMutate::default();
+        config.setup(&expected).unwrap();
+        println!("Correct parsing of Wasm binary. ");
+
+        // Iterate through the functions and each DFG
+        // TODO, returns the new module here
+        let info = config.info();
+        let replacements = sdiversifier.souperdiversify_peepholes(info.clone()).unwrap();
+        let module = sdiversifier.superoptimize(&mut config, replacements.clone()).unwrap();
+
+
+        println!("Module ");
+        let mutated_bytes = &module.finish();
+        let text = wasmprinter::print_bytes(mutated_bytes).unwrap();
+        validate( mutated_bytes).unwrap();
+
+
+        println!("{}", text);
+        //println!("{:?}", replacements)
+    }
+
+
+
+    extern "C" fn callback(lhs_ptr: *const i8 /* Original Query */, rhs_ptr: *const i8, cost: i32) -> i32 {
+        let rhs = unsafe { CStr::from_ptr(rhs_ptr) };
+        println!("RHS {:?}\n Cost: {}", rhs, cost);
+        let lang = unsafe { CStr::from_ptr(lhs_ptr) };
+        println!("LHS {:?}", lang);
+
+        0
+    }
+
+
+    #[test]
+    fn test_to_superoptimize_direct_string() {
+        let souperIR = CString::new("
+        %0:i32 = var; local
+        %1:i32 = add %0,%0
+        %2:i32 = add %0,%1
+        %3:i32 = add %0,%2
+        infer %3").unwrap();
+
+        let startptr = CString::new("(i32.add local.get.0 (i32.add local.get.0 (i32.add local.get.0 local.get.0)))").unwrap();
+
+        unsafe {
+            superoptimize( souperIR.as_ptr(), startptr.as_ptr(), callback);
+        }
+        std::mem::forget(souperIR);
+        std::mem::forget(startptr);
+        // FIXME, release the memory
         //println!("{:?}", replacements)
     }
 }
