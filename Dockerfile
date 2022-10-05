@@ -13,4 +13,4 @@ RUN git clone --recursive https://github.com/Jacarte/wasm_evasion.git
 
 RUN pip3 install -r /wasm_evasion/oracles/requirements.txt
 WORKDIR /wasm_evasion/crates/evasor
-RUN $HOME/.cargo/bin/cargo build --features=wasm_mutate/all --release
+RUN $HOME/.cargo/bin/cargo build --features=wasm-mutate/all --release
