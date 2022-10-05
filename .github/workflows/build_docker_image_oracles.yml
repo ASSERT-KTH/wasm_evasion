@@ -1,0 +1,44 @@
+name: Build docker
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - analyzer/**
+      - wasm-tools
+      - .github/**
+      - Dockerfile
+      - oracles/**
+
+jobs:
+  build:
+    name: Build docker
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      
+
+      - name: Build docker image
+        run: |
+          cd oracles
+          cd vt_custom_chrome
+          docker build --no-cache -t jacarte/vt_selenium:bulk18 -f Dockerfile .
+
+      
+      - name: Build docker image ref
+        run: |
+          git_hash=$(git rev-parse --short HEAD)
+          docker build -t jacarte/vt_selenium:$git_hash -f Dockerfile .
+
+      - name: Push images
+        run: |
+          git_hash=$(git rev-parse --short HEAD)
+          docker login -u="$user" -p="$pass" && docker push jacarte/vt_selenium:bulk18 && docker push jacarte/vt_selenium:$git_hash
+        env:
+          user: ${{secrets.DOCKER_USER}}
+          pass: ${{secrets.DOCKER_PASS}}
+          

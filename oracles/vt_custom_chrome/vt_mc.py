@@ -2,7 +2,69 @@ import subprocess
 import uuid
 import hashlib
 
-class MCWrapper(object):
+import os
+
+class Storage(object):
+    
+    def __init__(self, endpoint, bucket, subfolder = "") -> None:
+        raise NotImplementedError("Not implemented yet")
+
+
+    def exists(self, key):
+        raise NotImplementedError("Not implemented yet")
+
+    def save(self, key, content):
+        raise NotImplementedError("Not implemented yet")
+
+
+    def savefile(self, key, file):
+        raise NotImplementedError("Not implemented yet")
+
+    def saveb(self, key, content):
+        raise NotImplementedError("Not implemented yet")
+
+    def load(self, key):
+        raise NotImplementedError("Not implemented yet")
+    
+
+    def loadfolder(self, localname,  key):
+        raise NotImplementedError("Not implemented yet")
+
+
+class LocalWrapper(Storage):
+    def __init__(self, endpoint) -> None:
+        self.endpoint = endpoint
+
+    def exists(self, key):
+        return os.path.exists(f"{self.endpoint}/{key}")
+
+    def save(self, key, content):
+        os.makedirs(os.path.dirname(f"{self.endpoint}/{key}"), exist_ok=True)
+        f = open(f"{self.endpoint}/{key}", "w")
+        f.write(content)
+        f.close()
+
+    def savefile(self, key, file):
+        os.makedirs(os.path.dirname(f"{self.endpoint}/{key}"), exist_ok=True)
+        f = open(f"{self.endpoint}/{key}", "w")
+        f.write(file)
+        f.close()
+
+    def saveb(self, key, content):
+        os.makedirs(os.path.dirname(f"{self.endpoint}/{key}"), exist_ok=True)
+        f = open(f"{self.endpoint}/{key}", "wb")
+        f.write(content)
+        f.close()
+
+    def load(self, key):
+        f = open(f"{self.endpoint}/{key}", "r")
+        content = f.read()
+        f.close()
+        return content, key
+
+
+
+class MCWrapper(Storage):
 
     def __init__(self, endpoint, bucket, subfolder = "") -> None:
         self.bucket = bucket

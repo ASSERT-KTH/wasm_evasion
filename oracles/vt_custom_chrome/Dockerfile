@@ -22,12 +22,14 @@ COPY vt_web_gui.py .
 COPY vt_mc.py .
 COPY vt_web_api.py .
 COPY parse_result.py .
+COPY vt_oracle_count_reward.py .
 COPY tor.sh .
 COPY requirements.txt .
 COPY test.wasm /data/test.wasm
 COPY entrypoint.sh .
 COPY test.py .
 COPY test.wasm test.wasm
+COPY download_module.sh .
 
 RUN mkdir out
 RUN mkdir upload

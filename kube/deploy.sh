@@ -1,7 +1,9 @@
 kubectl delete cm workflow-controller-configmap -n argo
 kubectl create ns argo
 kubectl apply -n argo -f https://github.com/argoproj/argo-workflows/releases/download/v3.3.8/install.yaml
+kubectl apply -f roles.yml 
 kubectl create rolebinding default-admin --clusterrole=admin --serviceaccount=default:default
+kubectl create rolebinding arg-dev-binding --clusterrole=argo-dev --serviceaccount=argo:argo -n argo
 
 # kubectl patch configmap workflow-controller-configmap --patch '{"data":{"containerRuntimeExecutor":"pns"}}'
 

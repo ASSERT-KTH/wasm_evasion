@@ -25,13 +25,43 @@ from selenium.webdriver.common.action_chains import ActionChains
 #/ 60
 engines_re = r"(\d+)\n/ (\d+)"
 
+def expand_element(driver, element, visited):
+    subelements  = element.find_elements(By.XPATH, "./*")
+    tag = element.get_attribute('tagName')    
+    class_ = element.get_attribute('class')
+
+    text = element.text
+    tags_to_skip= ["TEMPLATE" , "svg" , "g" ,"path" , "STYLE" , "img" , "video"  ]
+    S =""
+    
+    if tag in tags_to_skip:
+        return S
+    S += f"tag: {tag}\n"
+    S += f"class: {class_}\n"
+    S += f"{text}\n"
+    
+    return S
+    #shadowroot = expand_shadow_element(element)
+    #if shadowroot:
+     #   subelements  = shadowroot.find_elements(By.XPATH, "./*")
+
+    #for obj in subelements:
+    #    expand_element(obj, fd, visited)    
+
 def fullpage_screenshot(driver, name, file, from_=""):
 
-        driver.get_screenshot_as_file(file)
-        screenshot = Image.open(file)
-        screenshot.save(file, optimize=True, quality=100)
+        try:
+            driver.get_screenshot_as_file(file)
+            screenshot = Image.open(file)
+            screenshot.save(file, optimize=True, quality=100)
 
-        return screenshot
+            return screenshot
+        except Exception as e:
+            print(e)
+            content = driver.find_element(By.TAG_NAME, 'body')
+
+            print(expand_element(driver, content, {}))
+            return None
 
 def setUp():
     os.putenv('PREDEF_FILE', os.path.abspath("name.socket"))
@@ -140,28 +170,6 @@ def check_files(files):
     #    j.result()
         
 
-def expand_element(driver, element, visited):
-    subelements  = element.find_elements(By.XPATH, "./*")
-    tag = element.get_attribute('tagName')    
-    class_ = element.get_attribute('class')
-
-    text = element.text
-    tags_to_skip= ["TEMPLATE" , "svg" , "g" ,"path" , "STYLE" , "img" , "video"  ]
-    S =""
-    
-    if tag in tags_to_skip:
-        return S
-    S += f"tag: {tag}\n"
-    S += f"class: {class_}\n"
-    S += f"{text}\n"
-    
-    return S
-    #shadowroot = expand_shadow_element(element)
-    #if shadowroot:
-     #   subelements  = shadowroot.find_elements(By.XPATH, "./*")
-
-    #for obj in subelements:
-    #    expand_element(obj, fd, visited)    
 
 def expand_shadow_element(driver, element):
     try:
@@ -197,7 +205,7 @@ def get_confirm_btn_position(driver, name, wrapper):
     # Detect where the button is
     image = cv2.imread(f"{name}.png")
 
-    wrapper.savefile(f"screenshots/{name}.upload.png", f"{name}.png")
+    # wrapper.savefile(f"screenshots/{name}.upload.png", f"{name}.png")
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Performing OTSU threshold
     ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
@@ -233,7 +241,7 @@ def get_confirm_btn_position(driver, name, wrapper):
         if text.strip() in ["Confirm upload", "Confirm", "Confir", "Confi", "Conf"]:
             print(text)
             cv2.imwrite(f"{name}.rect.png", im2)
-            wrapper.savefile(f"screenshots/{name}.rect.png", f"{name}.rect.png")
+            # wrapper.savefile(f"screenshots/{name}.rect.png", f"{name}.rect.png")
 
 
             return (x, y), (h, w)
@@ -260,9 +268,9 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
     
     # To avoid bot
     # . time.sleep(random.randint(1,3))
+    print("Waiting for upload btn")
     break_if_captcha(driver, name)
     times = 0
-    print("Waiting for upload btn")
     while True:
         time.sleep(0.34)
         times += 1
@@ -333,7 +341,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 1}px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
 
                     fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
-                    wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
+                    #wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
                     f = open(f"/tmp/url{name}",  "w")
                     f.write(f"{driver.current_url}")
                     f.close()
@@ -385,9 +393,9 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
         break_if_captcha(driver, name)
         print(driver.current_url, times)
         # Take an screenshot and save it 
-        if wrapper:
-            fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
-            wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
+        #if wrapper:
+        #    fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
+        #    wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
 
         time.sleep(0.6)   
         times += 1
@@ -431,8 +439,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
                 image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash")
 
-                if wrapper:
-                    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
+                #if wrapper:
+                #    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
 
                 print(f"Done {name}")
                 return
