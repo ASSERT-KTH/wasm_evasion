@@ -1,4 +1,4 @@
-name: Build docker
+name: Build docker oracle
 # This workflow is triggered on pushes to the repository.
 on:
   push:
