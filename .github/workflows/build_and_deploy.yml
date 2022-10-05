@@ -1,12 +1,15 @@
-name: Build and deploy
+name: Build and deploy release
 # This workflow is triggered on pushes to the repository.
 on:
+  pull_request:
+    branches:
+      - main 
   push:
     branches:
       - main
     paths:
-      - analyzer/**
-      - wasm-tools
+      - crates/**
+      - oracles/**
       - .github/**
 
 jobs:
@@ -29,7 +32,7 @@ jobs:
 
       - name: Build binaries
         run: |
-          cd analyzer
+          cd crates/evasor
           cargo build --release
 
       
@@ -37,9 +40,9 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: analyzer/target/release/analyzer
-          asset_name: analyzer
+          file: analyzer/target/release/evasor
+          asset_name: evasor_linux_amd64
           tag: 0.1.0
           overwrite: true
-          body: "Analyzer binary for linux"
+          body: "Evasor binary for linux"
 
