@@ -38,7 +38,7 @@ RUN mkdir snapshots
 
 
 RUN pip3 install -r requirements.txt
-RUN wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/104.0.5112.79/chromedriver_linux64.zip
+RUN wget -O chromedriver.zip https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
 RUN unzip chromedriver.zip
 RUN rm chromedriver.zip
 RUN ln chromedriver /bin/chromedriver
