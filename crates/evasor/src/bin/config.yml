@@ -172,10 +172,10 @@ subcommands:
               help: "(Experimental) Only uses the peep_hole feature to bisect which tree size is the miinimum needed to break the oracle."
 
           - reward:
-            short: r
-            required: false
-            long: use-reward
-            help: "Uses the stderr of the oracle as the reward. Ensure your oracle writes an integer to the stderr to be correctly parsed by the tool."
+              short: r
+              required: false
+              long: use-reward
+              help: "Uses the stderr of the oracle as the reward. Ensure your oracle writes an integer to the stderr to be correctly parsed by the tool."
 
           - peek_count:
               short: p
