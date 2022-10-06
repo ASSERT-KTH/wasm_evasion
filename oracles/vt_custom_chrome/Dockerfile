@@ -21,6 +21,8 @@ WORKDIR /vt_oracle
 COPY vt_web_gui.py .
 COPY vt_mc.py .
 COPY vt_web_api.py .
+COPY vt_check_hash.py .
+COPY setup.py .
 COPY parse_result.py .
 COPY vt_oracle_count_reward.py .
 COPY tor.sh .
