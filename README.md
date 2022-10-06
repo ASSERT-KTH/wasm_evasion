@@ -10,47 +10,12 @@ This repo contains the tooling and the reproduction of our experiments on Wasm o
     - Set nightly as the version `rustup default nightly`
     - Compile the analyzer tool `cd analyzer && cargo build`
 
-- As an alternative, you can download the [ubuntu release binary](https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/analyzer) `wget -O analyzer https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/analyzer`
-- Run the analysis on a binary or a folder of Wasm binaries `RUST_LOG=analyzer,wasm-mutate=debug ./target/debug/analyzer --dbconn "datas/database" extract -d 4 --input "binary.wasm"  `
+- As an alternative, you can download the [ubuntu release binary](https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/analyzer) `wget -O analyzer https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/evasor_linux_64amd`
+- Run the analysis on a binary or a folder of Wasm binaries `RUST_LOG=evasor,wasm-mutate=debug ./target/debug/evasor --dbconn "datas/database" extract -d 4 --input "binary.wasm"  `
 
-### Analyzer CLI
+### Evasor CLI
 
-The tool provides a cli to perform mutation analysis on binaries. To access the help lines of the tool, run `./analyzer --help`. 
-
-### Notebooks and experiments
-
-We continuously update our experiments insights using the notebooks [here](./notebooks). Our experiments are based on the [wasmbench](todo) dataset. In the following figure we plot a sample of the wasmbench dataset mutability. The x axis ticks represent different mutators, the bar height represent how man binaries are subceptible (can be mutated by the x mutator).
-
-![mutable](notebooks/mutable.png)
-
-#### The [notebooks](notebooks)
-
-The notebooks folder contains the information needed to reproduce our experiments
-
-- **[RQ1.ipynb](notebooks/RQ1.ipynb)** Here we evaluate the muatbility of the filtered dataset of wasmbench
-- **[MINOS.ipynb](notebooks/MINOS.ipynb)** Here we reproduce the experiments of MINOS. MINOS uses a neural network to detect malwares. It transforms binaries into images and those images are the information passed to the neural network to detect classifiers.
-- **[Features.ipynb](notebooks/Features%20selection.ipynb)** This notebook contains our process to generate the configs for a `swarm testing` process. The swarm testing process allows us to determine which features are better to get interesting mutated binaries regarding an Oracle.
-
-
-### Featurized wasm-mutate
-
-TODO
-
-### Simple KV database to restore the experiment's data
-
-TODO
+The tool provides a cli to perform mutation analysis on binaries. To access the help lines of the tool, run `./evasor --help`. 
 
 ### Tests
 - Run `cargo test --features <wasm-mutate features>`
-
-### Flamegraph
-- Run `rm -rf test_db && RUST_LOG=debug cargo flamegraph --features wasm-mutate/peep_hole,"<features> --unit-test -- tests::test_extract`
-- See it in `flamegraph.svg`
-
-### Benches
-- Run `cargo bench --features <wasm-mutate features>`
-- Some preliminary results with `cargo bench wasm-mutate/peep_hole,wasm-mutate/i64.mul-by-8`:
-```
-
-
-```
