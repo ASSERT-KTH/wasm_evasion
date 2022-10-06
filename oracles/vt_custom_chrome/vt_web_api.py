@@ -120,7 +120,7 @@ def server():
             # load first
             content, hsh = mcwrapper.load(f"data/{out}/{hash}.wasm.logs.txt")
             tmp = open(f"/tmp/{hsh}", 'wb')
-            tmp.write(content.encode())
+            tmp.write(content)
             tmp.close()
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
