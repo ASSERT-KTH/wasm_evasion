@@ -37,7 +37,7 @@ jobs:
       - name: Push images
         run: |
           git_hash=$(git rev-parse --short HEAD)
-          docker login -u="$user" -p="$pass" && docker push jacarte/vt_selenium:bulk18 && docker push jacarte/vt_selenium:$git_hash
+          docker login -u="$user" -p="$pass" && docker push jacarte/vt_selenium:bulk19 && docker push jacarte/vt_selenium:$git_hash
         env:
           user: ${{secrets.DOCKER_USER}}
           pass: ${{secrets.DOCKER_PASS}}
