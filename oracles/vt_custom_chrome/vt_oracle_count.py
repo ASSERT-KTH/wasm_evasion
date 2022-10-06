@@ -112,16 +112,21 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
             DATA = StringIO(r.text)
             print(hsh)
             df = pd.read_csv(DATA)
-            print(df)
-            print("Non detected", df['non_benign'].values)
 
-            val = df['non_benign'].values[0]
+            try:
+                print(df)
+                print("Non detected", df['non_benign'].values)
 
-            if val == 0:
-                print("Not detected as mal")
-                exit(1)
-            # Remove hsh from hashes
-            meta['checked'] = True
+                val = df['non_benign'].values[0]
+
+                if val == 0:
+                    print("Not detected as mal")
+                    exit(1)
+                # Remove hsh from hashes
+                meta['checked'] = True
+            except Exception as e:
+                print(e)
+                pass
         
         if complete:
             break

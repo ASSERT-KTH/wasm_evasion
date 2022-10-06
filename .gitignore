@@ -45,6 +45,9 @@ cargo.logs.txt
 logs.txt
 probes.logs.txt
 test.zip
+tmp_bck
+tmp_bck2tools
+crawl_data*
+data
+job*
 *.png
-job_*.yml
-selenium_scripts
