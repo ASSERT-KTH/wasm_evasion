@@ -106,25 +106,25 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
     while True:
         complete = False
         for meta in hashes:
-            if all(x['checked'] for x in hashes):
-                complete = True
-                break
-            if meta['checked']:
-                continue
-
-            hsh = meta['hsh']
-            r = requests.get(
-                f"{oracleurl}/get_result/{session}/{hsh}",
-                auth = HTTPBasicAuth(user, pass_)
-            )
-            if r.text == "INVALID":
-                continue
-
-            DATA = StringIO(r.text)
-            print(hsh)
-            df = pd.read_csv(DATA)
-
             try:
+                if all(x['checked'] for x in hashes):
+                    complete = True
+                    break
+                if meta['checked']:
+                    continue
+
+                hsh = meta['hsh']
+                r = requests.get(
+                    f"{oracleurl}/get_result/{session}/{hsh}",
+                    auth = HTTPBasicAuth(user, pass_)
+                )
+                if r.text == "INVALID":
+                    continue
+
+                DATA = StringIO(r.text)
+                print(hsh)
+                df = pd.read_csv(DATA)
+
                 print(df)
                 print("Non detected", df['non_benign'].values)
 
