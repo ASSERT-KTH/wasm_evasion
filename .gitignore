@@ -45,3 +45,6 @@ cargo.logs.txt
 logs.txt
 probes.logs.txt
 test.zip
+*.png
+job_*.yml
+selenium_scripts
