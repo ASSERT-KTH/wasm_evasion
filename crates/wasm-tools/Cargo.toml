@@ -1,0 +1,83 @@
+[package]
+name = "wasm-tools"
+version = "1.0.8"
+authors = ["The Wasmtime Project Developers"]
+edition = "2021"
+description = "CLI tools for interoperating with WebAssembly files"
+license = "Apache-2.0 WITH LLVM-exception"
+documentation = "https://github.com/bytecodealliance/wasm-tools"
+categories = ["wasm"]
+keywords = ["webassembly", "wasm"]
+repository = "https://github.com/bytecodealliance/wasm-tools"
+readme = "README.md"
+exclude = ['tests/wabt', 'tests/testsuite', 'publish.rs']
+
+[workspace]
+members = ['crates/c-api', 'fuzz', 'crates/wasm-encoder', 'crates/fuzz-stats', 'crates/wasm-mutate-stats']
+
+[dependencies]
+anyhow = "1.0"
+atty = "0.2"
+env_logger = "0.9"
+log = "0.4"
+clap = { version = "3.1.8", features = ['derive'] }
+tempfile = "3.2.0"
+wat = { path = "crates/wat", version = '1.0.46' }
+
+# Dependencies of `validate`
+wasmparser = { path = "crates/wasmparser", optional = true, version = '0.87.0' }
+rayon = { version = "1.0", optional = true }
+
+# Dependencies of `print`
+wasmprinter = { path = "crates/wasmprinter", version = '0.2.37' }
+
+# Dependencies of `smith`
+arbitrary = { version = "1.0.0", optional = true }
+serde = { version = "1", features = ['derive'], optional = true }
+serde_json = { version = "1", optional = true }
+wasm-smith = { path = "crates/wasm-smith", features = ["_internal_cli"], optional = true, version = '0.11.2' }
+
+# Dependencies of `shrink`
+wasm-shrink = { path = "crates/wasm-shrink", features = ["clap"], optional = true, version = '0.1.7' }
+is_executable = { version = "1.0.1", optional = true }
+
+# Dependencies of `mutate`
+wasm-mutate = { path = "crates/wasm-mutate", features = ["clap"], optional = true, version = '0.2.5' }
+
+# Dependencies of `dump`
+wasmparser-dump = { path = "crates/dump", optional = true, version = '0.1.5' }
+
+# Dependencies of `strip`
+wasm-encoder = { path = "crates/wasm-encoder", optional = true, version = '0.14.0' }
+
+[dev-dependencies]
+anyhow = "1.0"
+getopts = "0.2"
+serde_json = "1.0"
+tempfile = "3.1"
+diff = "0.1"
+wasmparser-dump = { path = 'crates/dump' }
+wast = { path = 'crates/wast' }
+
+[[test]]
+name = "dump"
+harness = false
+
+[[test]]
+name = "roundtrip"
+harness = false
+
+[features]
+# By default, all subcommands are built
+default = ['shrink', 'smith', 'mutate', 'validate', 'print', 'parse', 'dump', 'objdump', 'strip']
+
+# Each subcommand is gated behind a feature and lists the dependencies it needs
+validate = ['wasmparser', 'rayon']
+print = []
+parse = []
+smith = ['wasm-smith', 'arbitrary', 'serde', 'serde_json']
+shrink = ['wasm-shrink', 'is_executable']
+mutate = ['wasm-mutate']
+dump = ['wasmparser-dump']
+objdump = ['wasmparser']
+strip = ['wasm-encoder']

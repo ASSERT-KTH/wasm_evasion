@@ -1,0 +1,4 @@
+;;; TOOL: wat2wasm
+;;; ARGS: --enable-exceptions
+(module
+  (import "foo" "1" (tag (param f64 f32))))

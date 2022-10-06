@@ -9,8 +9,8 @@ RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 RUN export PATH="$PATH:$HOME/.cargo/bin"
 RUN $HOME/.cargo/bin/rustup default nightly
 # Copy the source code
-RUN git clone --recursive https://github.com/Jacarte/obfuscation_wasm.git
+RUN git clone --recursive https://github.com/Jacarte/wasm_evasion.git
 
-RUN pip3 install -r /obfuscation_wasm/oracles/requirements.txt
-WORKDIR /obfuscation_wasm/analyzer
-RUN $HOME/.cargo/bin/cargo build --release
+RUN pip3 install -r /wasm_evasion/oracles/requirements.txt
+WORKDIR /wasm_evasion/crates/evasor
+RUN $HOME/.cargo/bin/cargo build --features=wasm-mutate/all --release

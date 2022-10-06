@@ -1,0 +1,114 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-details-1-
+spec:
+  entrypoint: per-file
+  parallelism: 1
+  templates:
+  - name: per-file
+    steps:
+    - - name: select-file
+        template: obfuscator-details
+        arguments:
+          parameters:
+            - name: hsh
+              value: "{{ item.hash }}"
+        withItems: 
+%% HASHES
+
+        continueOn:
+          failed: true
+
+  
+  - name: obfuscator-details
+    inputs:
+      parameters:
+      - name: hsh
+    sidecars:
+    - name: vt-oracle
+      image: jacarte/vt_selenium:bulk17
+      args:
+      - web
+      env:
+      - name: WEB_USER
+        value: "vt"
+      - name: WEB_PASS
+        value: "vt123"
+      - name: NO_WORKERS
+        value: "1"
+      - name: MC_ENDPOINT
+        value: "exp"
+      - name: MC_BUCKET
+        value: "my-bucket"
+      - name: MINIO_HOST
+        value: "http://minio-service.minio:3434"
+      - name: MINIO_PASS
+        value: "minio123"
+      - name: MINIO_USER
+        value: "minio"
+      command: ["/bin/bash", "/vt_oracle/entrypoint.sh", "web"]
+    outputs:
+      artifacts:
+      - name: details
+        path: /{{inputs.parameters.hsh}}.details.png
+        optional: true
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "details/vt/{{inputs.parameters.hsh}}.details.png"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    
+    retryStrategy:
+      limit: 8
+    script:
+      image: jacarte/vt_selenium:bulk17
+      command: [bash]
+      source: |
+        
+        apt-get install -y curl wget
+         echo "{{inputs.parameters.hsh}}"
+         # Check if the details file exist
+         sleep 5
+         until `curl -G --socks5 127.0.0.1:9050 google.com >& /tmp/out`; do echo sleep && sleep 1; done
+         echo "Server working"
+
+          mkdir -p $HOME/minio-binaries
+          wget -O $HOME/minio-binaries/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          ls
+          echo "======"
+          chmod +x $HOME/minio-binaries/mc
+          export PATH=$PATH:$HOME/minio-binaries/
+          
+          mc config host add exp http://minio-service.minio:3434 minio minio123
+
+          if [[  $(mc ls exp/my-bucket/details/vt/{{inputs.parameters.hsh}}.details.png | wc -l) -gt 0 ]]
+          then
+              echo "Already exist. Skip"
+              exit 0
+          fi
+
+          google-chrome --no-sandbox --enable-automation --disable-dev-shm-usag --headless --disable-gpu --proxy-server="socks5://127.0.0.1:9050" --screenshot "https://www.virustotal.com/gui/file/{{inputs.parameters.hsh}}/details" 2>&1 > logs.txt
+          
+          ls .
+          sleep 2
+          
+          if grep -q "Written to file" logs.txt 
+          then
+            echo "Correct screenshot"
+
+            ls -lah .
+            cp screenshot.png /{{inputs.parameters.hsh}}.details.png
+          else
+            cat logs.txt
+            exit 1
+          fi
