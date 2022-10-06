@@ -47,6 +47,8 @@ jobs:
       
       - name: Build docker image ref
         run: |
+          cd oracles
+          cd vt_custom_chrome
           git_hash=$(git rev-parse --short HEAD)
           docker build -t jacarte/vt_selenium:$git_hash -f Dockerfile .
 
