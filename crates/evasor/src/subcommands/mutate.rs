@@ -693,6 +693,7 @@ pub fn mutate_with_reward(
                         *original_peep.lock().unwrap() = "".into();
                         *replacement_peep.lock().unwrap() = "".into();
 
+                        println!("stderr {:?}", stderr);
                         println!("BINGO!");
                         break 'attempts;
                     } else {
