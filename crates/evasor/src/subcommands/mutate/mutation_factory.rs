@@ -177,6 +177,17 @@ create_all_with_weight!("Uniform" =>
         PeepholeMutator::new(2)
         // TODO Set the rules here
     )
+
+    "peephole", "med", "5", 0.1 (
+        PeepholeMutator::new(10)
+        // TODO Set the rules here
+    )
+
+
+    "peephole", "large", "15", 0.1 (
+        PeepholeMutator::new(10)
+        // TODO Set the rules here
+    )
     /*"peephole", "medium", "10", 0.1 (
         PeepholeMutator::new(10)
         // TODO Set the rules here

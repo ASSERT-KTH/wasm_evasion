@@ -81,6 +81,6 @@ pub fn get_acceptance_symmetric_prob(
     let cost1 = cost_func(original.clone(), curr.clone());
     let cost2 = cost_func(original, prev.clone());
 
-    let beta = 0.8;
+    let beta = 0.44;
     return (cost1, cost2, beta);
 }
