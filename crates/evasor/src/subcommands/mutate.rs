@@ -758,8 +758,8 @@ pub fn mutate_with_reward(
                         };
 
                         //println!("Hash {}", hash);
-                        if cost2 < cost1 - lg {
-                            println!("Accepting with {} < {} - ({}) ", cost2, cost1, lg);
+                        if cost2 < cost1 + lg {
+                            println!("Accepting with {} < {} + ({}) ", cost2, cost1, lg);
 
                             println!(
                                 "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
@@ -804,7 +804,7 @@ pub fn mutate_with_reward(
                             // TODO update reward
                             // Add the mutation to the current list
                         } else {
-                            println!("Rejecting with {} < {} - ({}) ", cost2, cost1, lg);
+                            println!("Rejecting with {} < {} + ({}) ", cost2, cost1, lg);
 
                             println!(
                                 "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}| but not moved\n",
