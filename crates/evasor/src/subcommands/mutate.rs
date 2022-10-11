@@ -762,7 +762,7 @@ pub fn mutate_with_reward(
                             println!("Accepting with {} < {} + ({}) ", cost2, cost1, lg);
 
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -778,7 +778,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
+                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
@@ -807,7 +807,7 @@ pub fn mutate_with_reward(
                             println!("Rejecting with {} < {} + ({}) ", cost2, cost1, lg);
 
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}| but not moved\n",
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}| but not moved\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -823,7 +823,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}| but not moved\n",
+                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}| but not moved\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
