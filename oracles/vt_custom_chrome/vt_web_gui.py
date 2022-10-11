@@ -20,6 +20,7 @@ import filelock
 import cv2
 import pytesseract
 from selenium.webdriver.common.action_chains import ActionChains
+from datetime import datetime
 
 #31
 #/ 60
@@ -435,6 +436,9 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
                     fd.write(content_text)
                     fd.close()
                 else:
+                    # set the date as the first line
+                    now = datetime.now()
+                    content_text = f"DATE: {now}\n{content_text}"
                     wrapper.save(f"{out}/{name}.logs.txt", content_text)
 
                 image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash")
