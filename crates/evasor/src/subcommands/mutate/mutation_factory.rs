@@ -153,12 +153,12 @@ create_all_with_weight!("Uniform" =>
     )
 
     // small, medium and large for the same mutator
-    "add", "type", "2020", 0.1 (
-        AddTypeMutator {
-            max_params: 20,
-            max_results: 20
-        }
-    )
+    //"add", "type", "2020", 0.1 (
+    //    AddTypeMutator {
+    //        max_params: 20,
+    //        max_results: 20
+    //    }
+    //)
 
     "add", "type", "1010", 0.1 (
         AddTypeMutator {
