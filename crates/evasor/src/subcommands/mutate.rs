@@ -747,7 +747,7 @@ pub fn mutate_with_reward(
                                 newr,
                             ),
                             probs1clone,
-                            Box::new(get_distance_reward)
+                            Box::new(get_distance_reward_penalize_iteration)
                         );
 
                         let lg = rn.log(2.7) / beta;
