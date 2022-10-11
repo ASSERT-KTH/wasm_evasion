@@ -109,7 +109,7 @@ pub fn main() -> Result<(), evasor::errors::CliError> {
             let command = oracle[0];
             let input = args.value_of("input").unwrap();
             let args = &oracle[1..];
-
+            
             mutate(
                 Arc::new(state),
                 input.into(),
