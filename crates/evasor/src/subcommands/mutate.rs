@@ -760,6 +760,22 @@ pub fn mutate_with_reward(
                         //println!("Hash {}", hash);
                         if cost2 < cost1 - lg {
                             println!("Accepting with {} < {} - {} ", cost2, cost1, lg);
+
+                            println!(
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
+                                all,
+                                number_of_oracle_calls,
+                                newr,
+                                lg,
+                                mutator_tpe,
+                                mutator_name,
+                                mutator_param,
+                                reduction,
+                                hash,
+                                mutated_bin.len(),
+                                original_peep.lock().unwrap(),
+                                replacement_peep.lock().unwrap()
+                            );
                             mutationlogfile.write(
                                 format!(
                                     "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
@@ -788,6 +804,21 @@ pub fn mutate_with_reward(
                             // TODO update reward
                             // Add the mutation to the current list
                         } else {
+                            println!(
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}| but not moved\n",
+                                all,
+                                number_of_oracle_calls,
+                                newr,
+                                lg,
+                                mutator_tpe,
+                                mutator_name,
+                                mutator_param,
+                                reduction,
+                                hash,
+                                mutated_bin.len(),
+                                original_peep.lock().unwrap(),
+                                replacement_peep.lock().unwrap()
+                            );
                             mutationlogfile.write(
                                 format!(
                                     "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}| but not moved\n",
