@@ -758,8 +758,8 @@ pub fn mutate_with_reward(
                         };
 
                         //println!("Hash {}", hash);
-                        if cost2 < cost1 - lg {
-                            println!("Accepting with {} < {} - {} ", cost2, cost1, lg);
+                        if cost1 < cost2 - lg {
+                            println!("Accepting with {} < {} - {} ", cost1, cost2, lg);
 
                             println!(
                                 "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
