@@ -21,7 +21,7 @@ use wasm_mutate::{
 use crate::{
     errors::{AResult, CliError},
     send_signal_to_probes_socket,
-    subcommands::mutate::{mutation_factory::get_by_name, hasting::{get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size}},
+    subcommands::mutate::{mutation_factory::get_by_name, hasting::{get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size, get_distance_reward_penalize_iteration}},
     State, SOCKET_PATH,
 };
 use std::thread;
@@ -747,7 +747,7 @@ pub fn mutate_with_reward(
                                 newr,
                             ),
                             probs1clone,
-                            Box::new(get_distance_reward)
+                            Box::new(get_distance_reward_penalize_iteration)
                         );
 
                         let lg = rn.log(2.7) / beta;
