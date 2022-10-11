@@ -52,7 +52,7 @@ pub fn get_distance_reward_and_size(seed: AcceptanceTuple, wasm: AcceptanceTuple
 /// The formula is "1 + 10.0*delta(reward)". It penalizes the increase in the size of the new binary
 pub fn get_distance_reward(seed: AcceptanceTuple, wasm: AcceptanceTuple) -> f32 {
     let scale = 10.0;
-    return (1.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32) as f32 // only reward
+    return (0.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32) as f32 // only reward
 }
 
 /// Assumes that the probs of getting one mutator is always the same including its reverse
