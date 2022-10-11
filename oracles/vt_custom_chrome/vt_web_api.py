@@ -33,7 +33,7 @@ def server():
         mcwrapper = vt_mc.MCWrapper(
             os.environ.get("MC_ENDPOINT", "exp"),
             os.environ.get("MC_BUCKET", "my-bucket"),
-            "vt_api_files"
+            os.environ.get("MC_FILES", "vt_api_files"),
         )
     else:
         mcwrapper = vt_mc.LocalWrapper("out")

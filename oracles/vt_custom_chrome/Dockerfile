@@ -68,7 +68,7 @@ ENV MC_BUCKET "my-bucket"
 ENV MINIO_HOST "http://minio-service.minio:3434"
 ENV MINIO_PASS "minio123"
 ENV MINIO_USER = "minio"
-
+ENV MC_FILES = "vt-api-files"
 # RUN test
 RUN python3 test.py
 
