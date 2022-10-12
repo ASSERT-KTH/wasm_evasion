@@ -21,7 +21,7 @@ use wasm_mutate::{
 use crate::{
     errors::{AResult, CliError},
     send_signal_to_probes_socket,
-    subcommands::mutate::{mutation_factory::get_by_name, hasting::{get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size, get_distance_reward_penalize_iteration}},
+    subcommands::mutate::{mutation_factory::get_by_name, hasting::{get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size, get_distance_reward_penalize_iteration, get_distance_reward_penalize_attempt}},
     State, SOCKET_PATH,
 };
 use std::thread;
@@ -43,6 +43,7 @@ pub enum MODE {
     REWARD {
         mutators_weights_name: &'static str,
         use_reward: bool,
+        beta: f32
     },
 }
 
@@ -503,6 +504,7 @@ pub fn mutate_with_reward(
     tree_size: u32,
     prob_weights_name: &'static str,
     use_reward: bool,
+    beta: f32
 ) -> AResult<(u32, u32)> {
     log::debug!("Mutating binary {}", path);
     let prob_weights = get_by_name(prob_weights_name);
@@ -558,6 +560,7 @@ pub fn mutate_with_reward(
     let mut reward = 0;
     let mut original_reward = 0;
     let mut number_of_oracle_calls = 0;
+    let mut last_accepted = 0;
 
     if use_reward {
         // get the original reward by calling the oracle
@@ -737,14 +740,14 @@ pub fn mutate_with_reward(
                         let binclone = bin.clone();
                         let probs1clone = prob_weights.clone();
 
-                        let (cost1, cost2, beta) = get_acceptance_symmetric_prob(
-                            (origclone, vec![], original_reward),
-                            (binclone, opsclone.clone(), reward),
+                        let (cost1, cost2) = get_acceptance_symmetric_prob(
+                            (origclone, vec![], original_reward, 0),
+                            (binclone, opsclone.clone(), reward, last_accepted),
                             (
                                 mutatedcp,
                                 vec![opsclone, vec![(mutator_tpe, mutator_name, mutator_param)]]
                                     .concat(),
-                                newr,
+                                newr, all
                             ),
                             probs1clone,
                             Box::new(get_distance_reward_penalize_iteration)
@@ -760,7 +763,7 @@ pub fn mutate_with_reward(
                         //println!("Hash {}", hash);
                         if cost2 < cost1 - lg {
                             println!("Accepting with {} < {} - ({}) ", cost2, cost1, lg);
-
+                            last_accepted = all;
                             println!(
                                 "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
                                 all,
@@ -986,6 +989,7 @@ pub fn mutate(
         MODE::REWARD {
             mutators_weights_name,
             use_reward,
+            beta
         } => {
             mutate_with_reward(
                 state,
@@ -999,6 +1003,7 @@ pub fn mutate(
                 tree_size,
                 mutators_weights_name,
                 use_reward,
+                beta
             )?;
         }
     };
@@ -1235,6 +1240,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
+                beta: 0.1
             },
             1,
         )
@@ -1283,6 +1289,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
+                beta: 0.1
             },
             1,
         )
@@ -1324,6 +1331,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
+                beta: 0.1
             },
             1,
         )
@@ -1365,6 +1373,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
+                beta: 0.1
             },
             1,
         )
@@ -1406,6 +1415,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
+                beta: 0.1
             },
             1,
         )
