@@ -106,8 +106,8 @@ pub fn main() -> Result<(), evasor::errors::CliError> {
                 } else {
                     0.1
                 };
-                
-                MODE::REWARD { mutators_weights_name: "Uniform", use_reward: true, beta }
+
+                MODE::REWARD { mutators_weights_name: "Uniform", use_reward: true, beta, max_mutations: peek_count as u32 }
             } else {
                 mode
             };

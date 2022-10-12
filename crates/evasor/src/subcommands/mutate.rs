@@ -43,7 +43,8 @@ pub enum MODE {
     REWARD {
         mutators_weights_name: &'static str,
         use_reward: bool,
-        beta: f32
+        beta: f32,
+        max_mutations: u32
     },
 }
 
@@ -504,7 +505,8 @@ pub fn mutate_with_reward(
     tree_size: u32,
     prob_weights_name: &'static str,
     use_reward: bool,
-    beta: f32
+    beta: f32,
+    max_mutations: u32
 ) -> AResult<(u32, u32)> {
     log::debug!("Mutating binary {}", path);
     let prob_weights = get_by_name(prob_weights_name);
@@ -598,11 +600,32 @@ pub fn mutate_with_reward(
         config.peephole_size(tree_size);
         config.seed(s);
 
-        let cp = bin.clone();
-        config.setup(&cp).unwrap();
         // Get random mutators here
-        let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
+        // Mutate several times, no more than 10 times
+        let mut times = gn.gen_range(1..=max_mutations);
+        let mut real_times = 0;
+        let mut times_iterator = 0;
+        let mut cp = bin.clone();
+        let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) = loop {
+            swap(&mut cp.clone(), bin.clone());
+            let s2 = gn.gen();
+            config.seed(s2);
+            config.setup(&cp).unwrap();
+
+            let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
             get_random_mutators(&mut config, &mut gn2, prob_weights.clone(), use_reward)?;
+            times_iterator += 1;
+            let hash = blake3::hash(&mutated_bin.clone());
+            swap(&mut bin, mutated_bin.clone());
+            if mutated {
+                println!("Mutation {times_iterator} {s2} {mutator_name}|{mutator_param} {hash}");
+                real_times += 1;
+            }
+
+            if times_iterator >= times {
+                break (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin);
+            }
+        };
         all += 1;
 
         if mutated {
@@ -676,7 +699,7 @@ pub fn mutate_with_reward(
 
                         mutationlogfile.write(
                             format!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{:?}|{:?}\n",
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{real_times}|{:?}|{:?}\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -718,7 +741,7 @@ pub fn mutate_with_reward(
                         f.write_all(format!("parent: {}\n", parent).as_bytes())?;
                         f.write_all(
                             format!(
-                                "mutation: {}|{}|{}\n",
+                                "mutation: {}|{}|{}|{real_times}\n",
                                 mutator_tpe, mutator_name, mutator_param
                             )
                             .as_bytes(),
@@ -765,7 +788,7 @@ pub fn mutate_with_reward(
                             println!("Accepting with {} < {} - ({}) ", cost2, cost1, lg);
                             last_accepted = all;
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -781,7 +804,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
+                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
@@ -810,7 +833,7 @@ pub fn mutate_with_reward(
                             println!("Rejecting with {} < {} - ({}) ", cost2, cost1, lg);
 
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}| but not moved\n",
+                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -826,7 +849,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}| but not moved\n",
+                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
@@ -989,7 +1012,8 @@ pub fn mutate(
         MODE::REWARD {
             mutators_weights_name,
             use_reward,
-            beta
+            beta,
+            max_mutations
         } => {
             mutate_with_reward(
                 state,
@@ -1003,7 +1027,8 @@ pub fn mutate(
                 tree_size,
                 mutators_weights_name,
                 use_reward,
-                beta
+                beta,
+                max_mutations
             )?;
         }
     };
@@ -1240,7 +1265,8 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
-                beta: 0.1
+                beta: 0.1,
+                max_mutations: 1
             },
             1,
         )
@@ -1289,7 +1315,8 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
-                beta: 0.1
+                beta: 0.1,
+                max_mutations: 1
             },
             1,
         )
@@ -1331,7 +1358,8 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
-                beta: 0.1
+                beta: 0.1,
+                max_mutations: 1
             },
             1,
         )
@@ -1373,7 +1401,8 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
-                beta: 0.1
+                beta: 0.1,
+                max_mutations: 1
             },
             1,
         )
@@ -1415,7 +1444,8 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
-                beta: 0.1
+                beta: 0.1,
+                max_mutations: 1
             },
             1,
         )
