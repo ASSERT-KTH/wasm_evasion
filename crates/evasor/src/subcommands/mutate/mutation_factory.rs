@@ -188,6 +188,10 @@ create_all_with_weight!("Uniform" =>
         PeepholeMutator::new(10)
         // TODO Set the rules here
     )
+
+    "codemotion", "", "", 0.1 (
+        CodemotionMutator
+    )
     /*"peephole", "medium", "10", 0.1 (
         PeepholeMutator::new(10)
         // TODO Set the rules here
@@ -198,9 +202,6 @@ create_all_with_weight!("Uniform" =>
         // TODO Set the rules here
     )
 
-    "codemotion", "", "", 0.1 (
-        CodemotionMutator
-    )
 
     "remove_export", "", "", 0.1 (
         RemoveExportMutator
