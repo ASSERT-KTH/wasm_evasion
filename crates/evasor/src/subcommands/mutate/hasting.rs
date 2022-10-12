@@ -5,7 +5,7 @@ type AcceptanceWasm = Vec<u8>;
 // Wasm, operations to reach the Wasm, reward
 type AcceptanceTuple = (
     AcceptanceWasm,
-    Vec<(&'static str, &'static str, &'static str)>,
+    Vec<(Vec<&'static str>, Vec<&'static str>, Vec<&'static str>)>,
     i32,
     u32 // attempt
 );
