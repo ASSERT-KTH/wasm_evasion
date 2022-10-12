@@ -181,7 +181,7 @@ subcommands:
               long: beta
               required: false
               help: "Beta parameter for acceptance in the metropolis hasting algorithm. This should balance exploration and exploitation during MCMC."
-              default: "0.1"
+              default_value: "0.1"
               
           - peek_count:
               short: p
