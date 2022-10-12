@@ -747,10 +747,10 @@ pub fn mutate_with_reward(
                                 mutatedcp,
                                 vec![opsclone, vec![(mutator_tpe, mutator_name, mutator_param)]]
                                     .concat(),
-                                newr, all
+                                newr, number_of_oracle_calls
                             ),
                             probs1clone,
-                            Box::new(get_distance_reward_penalize_attempt)
+                            Box::new(get_distance_reward_penalize_iteration)
                         );
 
                         let lg = rn.log(2.7) / beta;
@@ -763,7 +763,7 @@ pub fn mutate_with_reward(
                         //println!("Hash {}", hash);
                         if cost2 < cost1 - lg {
                             println!("Accepting with {} < {} - ({}) ", cost2, cost1, lg);
-                            last_accepted = all;
+                            last_accepted = number_of_oracle_calls;
                             println!(
                                 "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{:?}|{:?}\n",
                                 all,
