@@ -17,7 +17,7 @@ use std::{
 use wasm_mutate::{
     WasmMutate,
 };
-
+use core::borrow::Borrow;
 use crate::{
     errors::{AResult, CliError},
     send_signal_to_probes_socket,
@@ -480,13 +480,13 @@ pub fn get_random_mutators(
     let mutations = prob_weights.get_available_mutations();
     if uniform {
         let name = &mutations[rng.gen_range(0..mutations.len())];
-        println!("{:?}", name);
+        //println!("{:?}", name);
         let mt = cn.get_mutators_by_feature(config, name, 1)?;
         return Ok(mt);
     } else {
         let dist2 = WeightedIndex::new(mutations.iter().map(|item| item.3)).unwrap();
         let name = &mutations[dist2.sample(rng)];
-        println!("{:?}", name);
+        //println!("{:?}", name);
         let mt = cn.get_mutators_by_feature(config, name, 1)?;
 
         return Ok(mt);
@@ -558,7 +558,7 @@ pub fn mutate_with_reward(
     let mut missed: u32 = 0;
     let mut all: u32 = 0;
     let mut bin = original.clone();
-    let mut operations: Vec<(&str, &str, &str)> = vec![];
+    let mut operations: Vec<(Vec<&str>, Vec<&str>, Vec<&str>)> = vec![];
     let mut reward = 0;
     let mut original_reward = 0;
     let mut number_of_oracle_calls = 0;
@@ -588,13 +588,23 @@ pub fn mutate_with_reward(
 
     let mut mutationlogfile = fs::File::create(format!("{session_folder}/mutation_log.txt"))?;
 
+    let mut times = gn.gen_range(2..=max_mutations);
+    let mut times_iterator = 0;
+    let mut mutated = false;
+    let mut mutator_tpe = &mut vec![];
+    let mut mutator_name = &mut vec![];
+    let mut mutator_param = &mut vec![];
+    let mut seeds = &mut vec![];
+
+    let mut real_times = 0;
+    let mut times_iterator = 0;
     'attempts: loop {
         if elapsed >= attemps {
             println!("Elapsed {}", elapsed);
             break;
         }
-        // mutated = m
-        let s = gn.gen();
+        // mutated = mx
+        let mut s = gn.gen();
         let mut config = WasmMutate::default();
         config.preserve_semantics(true);
         config.peephole_size(tree_size);
@@ -602,35 +612,46 @@ pub fn mutate_with_reward(
 
         // Get random mutators here
         // Mutate several times, no more than 10 times
-        let mut times = gn.gen_range(1..=max_mutations);
-        let mut real_times = 0;
-        let mut times_iterator = 0;
         let mut cp = bin.clone();
-        let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) = loop {
-            swap(&mut cp.clone(), bin.clone());
-            let s2 = gn.gen();
-            config.seed(s2);
-            config.setup(&cp).unwrap();
+        let mut old_mutated = false;
 
-            let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
-            get_random_mutators(&mut config, &mut gn2, prob_weights.clone(), use_reward)?;
-            times_iterator += 1;
-            let hash = blake3::hash(&mutated_bin.clone());
-            swap(&mut bin, mutated_bin.clone());
-            if mutated {
-                println!("Mutation {times_iterator} {s2} {mutator_name}|{mutator_param} {hash}");
-                real_times += 1;
+        config.setup(&cp).unwrap();
+
+        let mutated_bin = if times_iterator <= times {  
+            let (mutatedn, mutator_tpen, mutator_namen, mutator_paramn, mutated_bin) =
+                get_random_mutators(&mut config, &mut gn2, prob_weights.clone(), use_reward)?;
+
+            if mutatedn {
+                times_iterator += 1;
+                swap(&mut bin, mutated_bin.clone());
+                //let t1=format!("{:?},", &mutator_tpen).as_str();
+                mutator_tpe.push(mutator_tpen.clone());
+                mutator_name.push(mutator_namen.clone());
+                mutator_param.push(mutator_paramn.clone());
+                seeds.push(s);
+                //mutator_name = format!("{mutator_name}, {mutator_namen}").as_str();
+                //mutator_param = format!("{mutator_param}, {mutator_paramn}").as_str();
+                //seeds = format!("{seeds}, {s}").as_str();
+                let hash = blake3::hash(&mutated_bin.clone());
+                println!("mutated {times_iterator} times {hash}");
             }
 
-            if times_iterator >= times {
-                break (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin);
-            }
+            mutated = mutatedn || mutated;          
+            continue;
+        } else {
+            bin.clone()
         };
+
+        times_iterator = 0;
+        times = gn.gen_range(1..=max_mutations);
+
         all += 1;
 
         if mutated {
+            
+            
             println!(
-                "{} Mutated with {}:{}:{}",
+                "{} Mutated with {:?}:{:?}:{:?}",
                 number_of_oracle_calls, mutator_tpe, mutator_name, mutator_param
             );
 
@@ -638,7 +659,7 @@ pub fn mutate_with_reward(
             // Check if this is by reward, otherwise just, random mutate based on a weight map
             if use_reward {
                 number_of_oracle_calls += 1;
-                println!("Calling oracle");
+                println!("Calling oracle {hash}");
                 let results = check_binary(
                     vec![(mutated_bin.clone(), 0, s)],
                     command.clone(),
@@ -686,8 +707,8 @@ pub fn mutate_with_reward(
                         f.write_all(format!("parent: {}\n", parent).as_bytes())?;
                         f.write_all(
                             format!(
-                                "mutation: {}|{}|{}\n",
-                                mutator_tpe, mutator_name, mutator_param
+                                "mutation: {:?}|{:?}|{:?}:{:?}\n",
+                                mutator_tpe.clone(), mutator_name, mutator_param, seeds
                             )
                             .as_bytes(),
                         )?;
@@ -699,7 +720,7 @@ pub fn mutate_with_reward(
 
                         mutationlogfile.write(
                             format!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{}|{real_times}|{:?}|{:?}\n",
+                                "{}|{}|{}|{}| {:?}:{:?}:{:?}:{:?} {}|{}|{}|{:?}|{:?}\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -707,6 +728,7 @@ pub fn mutate_with_reward(
                                 mutator_tpe,
                                 mutator_name,
                                 mutator_param,
+                                seeds,
                                 "",
                                 hash,
                                 mutated_bin.len(),
@@ -741,7 +763,7 @@ pub fn mutate_with_reward(
                         f.write_all(format!("parent: {}\n", parent).as_bytes())?;
                         f.write_all(
                             format!(
-                                "mutation: {}|{}|{}|{real_times}\n",
+                                "mutation: {:?}|{:?}|{:?}|{real_times}\n",
                                 mutator_tpe, mutator_name, mutator_param
                             )
                             .as_bytes(),
@@ -768,7 +790,7 @@ pub fn mutate_with_reward(
                             (binclone, opsclone.clone(), reward, last_accepted),
                             (
                                 mutatedcp,
-                                vec![opsclone, vec![(mutator_tpe, mutator_name, mutator_param)]]
+                                vec![opsclone, vec![(mutator_tpe.clone(), mutator_name.clone(), mutator_param.clone())]]
                                     .concat(),
                                 newr, all
                             ),
@@ -788,7 +810,7 @@ pub fn mutate_with_reward(
                             println!("Accepting with {} < {} - ({}) ", cost2, cost1, lg);
                             last_accepted = all;
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
+                                "{}|{}|{}|{}| {:?}:{:?}:{:?}:{:?} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -796,6 +818,7 @@ pub fn mutate_with_reward(
                                 mutator_tpe,
                                 mutator_name,
                                 mutator_param,
+                                seeds,
                                 reduction,
                                 hash,
                                 mutated_bin.len(),
@@ -804,7 +827,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
+                                    "{}|{}|{}|{}| {:?}:{:?}:{:?}:{:?} {}|{}|{s}|{}|{real_times}|{:?}|{:?}\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
@@ -812,6 +835,7 @@ pub fn mutate_with_reward(
                                     mutator_tpe,
                                     mutator_name,
                                     mutator_param,
+                                    seeds,
                                     reduction,
                                     hash,
                                     mutated_bin.len(),
@@ -825,7 +849,7 @@ pub fn mutate_with_reward(
                             *replacement_peep.lock().unwrap() = "".into();
 
                             swap(&mut bin, mutated_bin.clone());
-                            operations.push((mutator_tpe, mutator_name, mutator_param));
+                            operations.push((vec![], vec![], vec![]));
                             reward = newr;
                             // TODO update reward
                             // Add the mutation to the current list
@@ -833,7 +857,7 @@ pub fn mutate_with_reward(
                             println!("Rejecting with {} < {} - ({}) ", cost2, cost1, lg);
 
                             println!(
-                                "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
+                                "{}|{}|{}|{}| {:?}:{:?}:{:?} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
                                 all,
                                 number_of_oracle_calls,
                                 newr,
@@ -849,7 +873,7 @@ pub fn mutate_with_reward(
                             );
                             mutationlogfile.write(
                                 format!(
-                                    "{}|{}|{}|{}| {}:{}:{} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
+                                    "{}|{}|{}|{}| {:?}:{:?}:{:?}:{:?} {}|{}|{s}|{}|{real_times}|{:?}|{:?}| but not moved\n",
                                     all,
                                     number_of_oracle_calls,
                                     newr,
@@ -857,6 +881,7 @@ pub fn mutate_with_reward(
                                     mutator_tpe,
                                     mutator_name,
                                     mutator_param,
+                                    seeds,
                                     reduction,
                                     hash,
                                     mutated_bin.len(),
@@ -875,7 +900,7 @@ pub fn mutate_with_reward(
             } else {
                 mutationlogfile.write(
                     format!(
-                        "{}|{}| {}:{}:{}\n",
+                        "{}|{}| {:?}:{:?}:{:?}\n",
                         all, number_of_oracle_calls, mutator_tpe, mutator_name, mutator_param
                     )
                     .as_bytes(),
@@ -920,7 +945,7 @@ pub fn mutate_with_reward(
                     f.write_all(format!("parent: {}\n", parent).as_bytes())?;
                     f.write_all(
                         format!(
-                            "mutation: {}|{}|{}\n",
+                            "mutation: {:?}|{:?}|{:?}\n",
                             mutator_tpe, mutator_name, mutator_param
                         )
                         .as_bytes(),
@@ -950,6 +975,14 @@ pub fn mutate_with_reward(
 
                 buffer.clear();
             }
+
+            mutated = false;
+            mutator_tpe.clear();
+            mutator_name.clear();
+            mutator_param.clear();
+            //mutator_name = String::new();
+            //mutator_param = String::new();
+            seeds.clear();
         } else {
             missed += 1;
             if missed % 100 == 99 {
@@ -1107,6 +1140,10 @@ fn check_binary(
 }
 
 fn swap(a: &mut Vec<u8>, b: Vec<u8>) {
+    *a = b;
+}
+
+fn swapconfig<'a>(a: & mut WasmMutate<'a>, b: WasmMutate<'a>) {
     *a = b;
 }
 
@@ -1443,9 +1480,9 @@ pub mod tests {
             100,
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
-                use_reward: false,
+                use_reward: true,
                 beta: 0.1,
-                max_mutations: 1
+                max_mutations: 5
             },
             1,
         )
