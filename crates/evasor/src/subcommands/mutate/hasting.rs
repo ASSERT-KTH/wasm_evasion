@@ -7,6 +7,7 @@ type AcceptanceTuple = (
     AcceptanceWasm,
     Vec<(&'static str, &'static str, &'static str)>,
     i32,
+    u32 // attempt
 );
 
 pub enum MutatorAppliance {
@@ -62,6 +63,13 @@ pub fn get_distance_reward_penalize_iteration(seed: AcceptanceTuple, wasm: Accep
     return (0.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32)/(0.8*wasm.1.len()  as f32 + 1.0) as f32 // only reward
 }
 
+/// Returns the cost of the binary by taking into account only the reward
+/// The formula is "1 + 10.0*delta(reward)". It penalizes the increase in the size of the new binary
+pub fn get_distance_reward_penalize_attempt(seed: AcceptanceTuple, wasm: AcceptanceTuple) -> f32 {
+    let scale = 5.0;
+    return (0.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32)/(0.8*wasm.3  as f32 + 1.0) as f32 // only reward
+}
+
 /// Assumes that the probs of getting one mutator is always the same including its reverse
 pub fn get_acceptance_symmetric_prob(
     original: AcceptanceTuple,
@@ -69,17 +77,16 @@ pub fn get_acceptance_symmetric_prob(
     curr: AcceptanceTuple,
     _prob_weights: impl MutationFactory,
     mut cost_func: Box<dyn FnMut(AcceptanceTuple, AcceptanceTuple) -> f32>
-) -> (f32, f32, f32) {
+) -> (f32, f32) {
     // get last operation of curr
-    let (_, operations, _) = curr.clone();
-    let (_, _, _) = prev.clone();
-    let (_, _, _) = original;
+    let (_, operations, _, _) = curr.clone();
+    let (_, _, _, _) = prev.clone();
+    let (_, _, _, _) = original;
     // Last operation
     let _ = operations.last().unwrap();
 
     let cost1 = cost_func(original.clone(), curr.clone());
     let cost2 = cost_func(original, prev.clone());
 
-    let beta = 0.7;
-    return (cost1, cost2, beta);
+    return (cost1, cost2);
 }

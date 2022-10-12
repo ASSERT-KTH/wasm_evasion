@@ -100,11 +100,19 @@ pub fn main() -> Result<(), evasor::errors::CliError> {
                 MODE::SEQUENTIAL
             };
 
-            let mode = if args.is_present("reward") {
-                MODE::REWARD { mutators_weights_name: "Uniform", use_reward: true }
+            let mut mode = if args.is_present("reward") {
+                let beta  = if args.is_present("beta") {
+                    value_t!(args.value_of("beta"), f32).unwrap()
+                } else {
+                    0.1
+                };
+                
+                MODE::REWARD { mutators_weights_name: "Uniform", use_reward: true, beta }
             } else {
                 mode
             };
+
+            
 
             let command = oracle[0];
             let input = args.value_of("input").unwrap();

@@ -177,6 +177,12 @@ subcommands:
               long: use-reward
               help: "Uses the stderr of the oracle as the reward. Ensure your oracle writes an integer to the stderr to be correctly parsed by the tool."
 
+          - beta:
+              long: beta
+              required: false
+              help: "Beta parameter for acceptance in the metropolis hasting algorithm. This should balance exploration and exploitation during MCMC."
+              default: "0.1"
+              
           - peek_count:
               short: p
               required: false
