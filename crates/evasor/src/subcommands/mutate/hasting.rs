@@ -5,7 +5,7 @@ type AcceptanceWasm = Vec<u8>;
 // Wasm, operations to reach the Wasm, reward
 type AcceptanceTuple = (
     AcceptanceWasm,
-    Vec<(&'static str, &'static str, &'static str)>,
+    Vec<Vec<(&'static str, &'static str, &'static str, u64)>>,
     i32,
     u32 // attempt
 );
@@ -60,7 +60,8 @@ pub fn get_distance_reward(seed: AcceptanceTuple, wasm: AcceptanceTuple) -> f32 
 /// The formula is "1 + 10.0*delta(reward)". It penalizes the increase in the size of the new binary
 pub fn get_distance_reward_penalize_iteration(seed: AcceptanceTuple, wasm: AcceptanceTuple) -> f32 {
     let scale = 5.0;
-    return (0.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32 - 0.2*wasm.3  as f32) as f32 // only reward -  #of oracle calls
+    let sum: usize = wasm.1.iter().map(|l|l.len()).sum();
+    return (0.0 + scale*(wasm.2.overflowing_sub(seed.2)).0 as f32 - 0.2*wasm.3 as f32 - 0.2*sum  as f32) as f32 // only reward -  #of oracle calls
 }
 
 /// Returns the cost of the binary by taking into account only the reward
