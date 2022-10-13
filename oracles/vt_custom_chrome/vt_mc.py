@@ -101,7 +101,7 @@ class MCWrapper(Storage):
         subprocess.check_output(
             [ "mc", "rm", f"{self.endpoint}/{self.bucket}/{key}" ]
         )
-        print("File removed")
+        print(f"File removed", f"{self.endpoint}/{self.bucket}/{key}")
 
 
     def savefile(self, key, file):
