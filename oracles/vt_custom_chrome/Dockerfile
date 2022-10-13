@@ -22,6 +22,7 @@ COPY vt_web_gui.py .
 COPY vt_mc.py .
 COPY vt_web_api.py .
 COPY vt_check_hash.py .
+COPY vt_oracle_count_reward_weighted_oracles.py .
 COPY setup.py .
 COPY parse_result.py .
 COPY vt_oracle_count_reward.py .

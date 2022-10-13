@@ -1294,7 +1294,7 @@ pub mod tests {
             "tests/0d99646229ea6010fa510333161653955eadb11acdb51c6cc886d1108e2fc626.wasm".into(),
             "python3".into(),
             vec![
-                "../../oracles/vt_custom_chrome/vt_oracle_count_reward.py".into(),
+                "../../oracles/vt_custom_chrome/vt_oracle_count_reward_weighted_oracles.py".into(),
                 "http://0.0.0.0:4000/".into(),
                 "test".into(),
                 "admin".into(),
