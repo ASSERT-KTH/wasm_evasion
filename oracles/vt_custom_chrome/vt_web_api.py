@@ -90,7 +90,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh2}")
 
-                    if "Analysing (" not in contentlog and f['engines'].values[0] >= 55:
+                    if b"Analysing (" not in contentlog or f['engines'].values[0] >= 55:
                         print("Not queued")
                     else:
                         print("Adding to queue")
@@ -153,7 +153,7 @@ def server():
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-            if "Analysing (" not in content or f['engines'].values[0] >= 55:
+            if b"Analysing (" not in content or f['engines'].values[0] >= 55:
                 tmpcsv = f"/tmp/{hsh}.csv"
                 f.to_csv(tmpcsv)
 
@@ -235,7 +235,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-                    if "Analysing (" not in content and f['engines'].values[0] >= 55:
+                    if b"Analysing (" not in content or f['engines'].values[0] >= 55:
                         print("Engines", f['engines'].values[0])
                         print(f"File {filename} already checked")
                         continue 
