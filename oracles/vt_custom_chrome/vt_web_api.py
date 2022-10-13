@@ -78,7 +78,30 @@ def server():
             # Adding to queue
             try:
                 if mcwrapper.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
-                    print("Not queued")
+                    contentlog, hsh2 = mcwrapper.load(f"data/{outfolder}/{hash}.wasm.logs.txt")
+                    tmp = open(f"/tmp/{hsh2}", 'wb')
+                    try:
+                        tmp.write(contentlog)
+                    except Exception as e:
+                        print(e)
+                        tmp.write(contentlog.encode())
+
+                    tmp.close()
+
+                    f, _ = parse_result.parse_result(f"/tmp/{hsh2}")
+
+                    if f['engines'].values[0] >= 58:
+                        print("Not queued")
+                    else:
+                        print("Adding to queue")
+                        # Make a tmp copy and send also to mcwrapper
+                        tmpfile = f"/tmp/{hash}.wasm"
+                        f = open(tmpfile, 'wb')
+                        f.write(content)
+                        f.close()
+                        with lock:
+                            worklist.append([f"/tmp/{hash}.wasm", f"{outfolder}", task ])
+
                 else:
                     print("Adding to queue")
                     # Make a tmp copy and send also to mcwrapper
