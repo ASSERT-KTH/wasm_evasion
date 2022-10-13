@@ -90,7 +90,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh2}")
 
-                    if f['engines'].values[0] >= 58:
+                    if "Analysing (" not in contentlog and f['engines'].values[0] >= 55:
                         print("Not queued")
                     else:
                         print("Adding to queue")
@@ -153,7 +153,7 @@ def server():
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-            if f['engines'].values[0] >= 58:
+            if "Analysing (" not in content or f['engines'].values[0] >= 55:
                 tmpcsv = f"/tmp/{hsh}.csv"
                 f.to_csv(tmpcsv)
 
@@ -165,6 +165,7 @@ def server():
                 output.headers["Content-type"] = "text/csv"
                 return output
             else:
+                print(content)
                 print("Removing invalid result, asking to requeue")
                 mcwrapper.remove(f"data/{out}/{hash}.wasm.logs.txt")
                 return 'REQUEUE'
@@ -234,7 +235,8 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-                    if f['engines'].values[0] >= 58:
+                    if "Analysing (" not in content and f['engines'].values[0] >= 55:
+                        print("Engines", f['engines'].values[0])
                         print(f"File {filename} already checked")
                         continue 
                     else: 
