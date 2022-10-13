@@ -165,8 +165,9 @@ def server():
                 output.headers["Content-type"] = "text/csv"
                 return output
             else:
-                print("Removing invalid result")
+                print("Removing invalid result, asking to requeue")
                 mcwrapper.remove(f"data/{out}/{hash}.wasm.logs.txt")
+                return 'REQUEUE'
             
 
         # Return none if the hash was not yet added to the queue

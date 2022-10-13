@@ -41,7 +41,12 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
             f"{oracleurl}/get_result/{session}/{hsh}",
             auth = HTTPBasicAuth(user, pass_)
         )
-        if r.text != "INVALID":
+        if r.text == "REQUEUE":
+            requests.post(f"{oracleurl}/upload_file/{session}",
+                    files = { 'file': open(input, 'rb') },
+                    auth = HTTPBasicAuth(user, pass_)
+            )
+        elif r.text != "INVALID":
             break
 
         lapsed += waitfor
