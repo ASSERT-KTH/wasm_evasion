@@ -14,9 +14,16 @@ WHITELIST = ['undetected', 'timeout', 'unable_to_process_file_type', 'no_respons
 # Get this data from RQ1, what are the most resilient antiviruses ?
 VENDORS_WEIGHT = {'Ad-Aware': 31, 'ALYac': 31, 'Arcabit': 28, 'BitDefender': 31, 'Emsisoft': 32, 'eScan': 31, 'Fortinet': 0, 'Google': 47, 'Ikarus': 60, 'Kaspersky': 133, 'MAX': 31, 'McAfee': 4, 'McAfee-GW-Edition': 4, 'Sangfor Engine Zero': 33, 'Symantec': 0, 'TrendMicro': 4, 'TrendMicro-HouseCall': 4, 'VIPRE': 31, 'Acronis (Static ML)': 0, 'AhnLab-V3': 0, 'Antiy-AVL': 0, 'Avast': 0, 'Avira (no cloud)': 0, 'Baidu': 0, 'BitDefenderTheta': 0, 'Bkav Pro': 0, 'ClamAV': 0, 'Comodo': 0, 'Cynet': 0, 'Cyren': 0, 'DrWeb': 0, 'ESET-NOD32': 0, 'F-Secure': 0, 'Gridinsoft (no cloud)': 0, 'Jiangmin': 2, 'K7AntiVirus': 0, 'K7GW': 0, 'Kingsoft': 0, 'Lionic': 0, 'Malwarebytes': 0, 'MaxSecure': 0, 'Microsoft': 0, 'NANO-Antivirus': 0, 'Panda': 0, 'QuickHeal': 0, 'Rising': 0, 'Sophos': 0, 'SUPERAntiSpyware': 0, 'TACHYON': 0, 'Tencent': 0, 'VBA32': 0, 'VirIT': 0, 'ViRobot': 0, 'Yandex': 0, 'Zillya': 4, 'ZoneAlarm by Check Point': 149, 'Zoner': 1}
 
+MAX = 0
+
+for k in VENDORS_WEIGHT:
+    MAX += VENDORS_WEIGHT[k]
+
+
 def check_simple(oracleurl, checkoracle, user, pass_, session, input):
     global WHITELIST
     global VENDORS_WEIGHT
+    global MAX
     
     # check count
     r = requests.get(
@@ -67,7 +74,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
             if k in df.columns:
                 if df[k].values[0] in WHITELIST:
                     val += VENDORS_WEIGHT[k]
-        if val == 0:
+        if val == MAX:
             sys.stderr.write(f"{val}")
             exit(0)
         else:
