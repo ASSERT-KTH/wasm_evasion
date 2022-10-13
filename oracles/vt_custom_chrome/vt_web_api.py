@@ -17,7 +17,7 @@ import os
 
 COUNT = 0
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
-LOCAL = False
+LOCAL = True
 
 def server():
     global COUNT
@@ -116,26 +116,35 @@ def server():
 
 
         if mcwrapper.exists(f"data/{out}/{hash}.wasm.logs.txt"):
+
             print("Loading result")
             # load first
             content, hsh = mcwrapper.load(f"data/{out}/{hash}.wasm.logs.txt")
             tmp = open(f"/tmp/{hsh}", 'wb')
-            tmp.write(content)
+            try:
+                tmp.write(content)
+            except Exception as e:
+                print(e)
+                tmp.write(content.encode())
             tmp.close()
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
+            if f['engines'].values[0] >= 58:
+                tmpcsv = f"/tmp/{hsh}.csv"
+                f.to_csv(tmpcsv)
 
-            tmpcsv = f"/tmp/{hsh}.csv"
-            f.to_csv(tmpcsv)
+                output = make_response(open(tmpcsv, "r").read())
+                # Save to mc
+                mcwrapper.saveb(f"data/upload/{out}/{hash}.csv", open(tmpcsv, "rb").read())
 
-            output = make_response(open(tmpcsv, "r").read())
-            # Save to mc
-            mcwrapper.saveb(f"data/upload/{out}/{hash}.csv", open(tmpcsv, "rb").read())
-
-            output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/{hash}.csv"
-            output.headers["Content-type"] = "text/csv"
-            return output
+                output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/{hash}.csv"
+                output.headers["Content-type"] = "text/csv"
+                return output
+            else:
+                print("Removing invalid result")
+                mcwrapper.remove(f"data/{out}/{hash}.wasm.logs.txt")
+            
 
         # Return none if the hash was not yet added to the queue
         return 'INVALID'
@@ -189,8 +198,24 @@ def server():
                 content = open(filename, "rb").read()
                 hash = hashlib.sha256(content).hexdigest()
                 if mcwrapper.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
-                    print(f"File {filename} already checked")
-                    continue 
+                    content, hsh = mcwrapper.load(f"data/{outfolder}/{hash}.wasm.logs.txt")
+                    tmp = open(f"/tmp/{hsh}", 'wb')
+                    try:
+                        tmp.write(content)
+                    except Exception as e:
+                        print(e)
+                        tmp.write(content.encode())
+
+                    tmp.close()
+
+                    f, _ = parse_result.parse_result(f"/tmp/{hsh}")
+
+                    if f['engines'].values[0] >= 58:
+                        print(f"File {filename} already checked")
+                        continue 
+                    else: 
+                        print("File existed before but was invalid")
+
                 if mcwrapper.exists(f"data/{outfolder}/{hash}.details.txt"):
                     print(f"File {filename} already checked")
                     continue 

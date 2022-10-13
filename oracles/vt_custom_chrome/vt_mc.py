@@ -30,6 +30,9 @@ class Storage(object):
     def loadfolder(self, localname,  key):
         raise NotImplementedError("Not implemented yet")
 
+    def remove(self,  key):
+        raise NotImplementedError("Not implemented yet")
+
 
 class LocalWrapper(Storage):
     def __init__(self, endpoint) -> None:
@@ -91,6 +94,14 @@ class MCWrapper(Storage):
             [ "mc", "cp", f"/tmp/{tmpname}", f"{self.endpoint}/{self.bucket}/{key}" ]
         )
         print("File saved")
+
+
+    def remove(self, key):
+        
+        subprocess.check_output(
+            [ "mc", "rm", f"{self.endpoint}/{self.bucket}/{key}" ]
+        )
+        print("File removed")
 
 
     def savefile(self, key, file):
