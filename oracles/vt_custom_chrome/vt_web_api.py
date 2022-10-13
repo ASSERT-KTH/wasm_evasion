@@ -17,7 +17,7 @@ import os
 
 COUNT = 0
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
-LOCAL = True
+LOCAL = False
 
 def server():
     global COUNT
