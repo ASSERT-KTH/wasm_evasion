@@ -669,6 +669,7 @@ pub fn mutate_with_reward(
                 // The reward in these cases come from the stderr
 
                 let stderrstr = String::from_utf8(stderr.clone());
+                let stdoutstr = String::from_utf8(stdout.clone());
 
                 let newr = if let Ok(str) = stderrstr {
                     if let Ok(parsed) = str.parse() {
@@ -769,6 +770,8 @@ pub fn mutate_with_reward(
                     let rn: f32 = rng.gen();
 
                     println!("New reward {newr}");
+                    println!("STDOUT:\n");
+                    println!("{}\n", stdoutstr.unwrap());
 
                     let origclone = original.clone();
                     let opsclone = operations.clone();
