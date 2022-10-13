@@ -68,7 +68,7 @@ pub trait MutationFactory: Debug + Clone {
 macro_rules! create_all_with_weight {
     // TODO use paste
     ($funcname: literal => $(
-        $tpe: literal, $name: literal, $param:literal, $weight: literal
+        $tpe: literal, $name: literal, $param:literal, $weight: literal $(,$times: literal)?
         ($instance: expr)
     ) *) => {
 
@@ -112,7 +112,7 @@ macro_rules! create_all_with_weight {
 
 create_all_with_weight!("Uniform" =>
 
-    "modify", "custom_section_data", "", 0.1 (
+    "modify", "custom_section_data", "1", 0.1, 1 (
         CustomSectionMutator
     )
 
