@@ -92,7 +92,7 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
 
         hsh = r.text
         print(hsh)
-        hashes.append(dict(hsh=hsh, checked=False))
+        hashes.append(dict(hsh=hsh, checked=False, f=input))
 
     # Then check hash by hash
     lapsed = 0
@@ -112,7 +112,14 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
                 f"{oracleurl}/get_result/{session}/{hsh}",
                 auth = HTTPBasicAuth(user, pass_)
             )
-            if r.text == "INVALID":
+
+            if r.text == "REQUEUE":
+                input = meta['f']
+                requests.post(f"{oracleurl}/upload_file/{session}",
+                        files = { 'file': open(input, 'rb') },
+                        auth = HTTPBasicAuth(user, pass_)
+                )
+            elif r.text != "INVALID":
                 continue
 
             DATA = StringIO(r.text)
