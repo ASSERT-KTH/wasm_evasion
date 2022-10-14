@@ -388,8 +388,10 @@ pub fn mutate_sequential(
         while let Some((newbin, idx)) = worklist.pop() {
             // TODO Move this to parallel execution
             // TODO move this to bulk execution
+            let hash = blake3::hash(&newbin.clone());
             buffer.push((newbin.clone(), idx, s));
-            log::debug!("Size of bulk {}", buffer.len());
+
+            log::debug!("Size of bulk {}. New hsh: {}", buffer.len(), hash);
             swap(&mut bin, newbin.clone());
             if buffer.len() >= bulk_limit {
                 let results = check_binary(
@@ -1312,7 +1314,7 @@ pub mod tests {
             MODE::REWARD {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
-                beta: 0.1,
+                beta: 0.01,
                 step_size: 1
             },
             1,
