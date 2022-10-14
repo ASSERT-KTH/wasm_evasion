@@ -96,7 +96,7 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
 
     # Then check hash by hash
     lapsed = 0
-    waitfor = 5
+    waitfor = 1
     print("Collecting result")
     while True:
         complete = False
