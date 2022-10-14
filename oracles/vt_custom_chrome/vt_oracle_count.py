@@ -133,7 +133,7 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
                 val = df['non_benign'].values[0]
                 engines = df['engines'].values[0]
 
-                if val == 0 and engines >= 58:
+                if val == 0:
                     print("Not detected as mal")
                     exit(1)
                 # Remove hsh from hashes
