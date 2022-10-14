@@ -366,7 +366,7 @@ pub fn mutate_sequential(
                             let hash = blake3::hash(&b.clone());
 
                             if !seen.contains(&hash) {
-                                println!("New Hsh: {}", hash);
+                                log::debug!("New Hsh: {}", hash);
                                 worklist.push((b.clone(), idx, s));
                                 seen.insert(hash);
                             } else {
