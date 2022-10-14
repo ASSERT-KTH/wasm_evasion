@@ -366,7 +366,8 @@ pub fn mutate_sequential(
                             let hash = blake3::hash(&b.clone());
 
                             if !seen.contains(&hash) {
-                                worklist.push((b.clone(), idx));
+                                println!("New Hsh: {}", hash);
+                                worklist.push((b.clone(), idx, s));
                                 seen.insert(hash);
                             } else {
                                 log::debug!("Binary already seen");
@@ -385,17 +386,17 @@ pub fn mutate_sequential(
             continue;
         }
 
-        while let Some((newbin, idx)) = worklist.pop() {
+        while let Some((newbin, idx, seed)) = worklist.pop() {
             // TODO Move this to parallel execution
             // TODO move this to bulk execution
             let hash = blake3::hash(&newbin.clone());
-            buffer.push((newbin.clone(), idx, s));
+            buffer.push((newbin.clone(), idx, seed));
 
-            log::debug!("Size of bulk {}. New hsh: {}", buffer.len(), hash);
+            log::debug!("Size of bulk {}. New hsh: {}. Seed: {}", buffer.len(), hash, seed);
             swap(&mut bin, newbin.clone());
             if buffer.len() >= bulk_limit {
                 let results = check_binary(
-                    buffer.clone(),
+                    buffer.clone().iter().rev().map(|t|t.clone()).collect::<_>(), // Invert the order to get the first mutation
                     command.clone(),
                     args.clone(),
                     bulk_limit > 1,
