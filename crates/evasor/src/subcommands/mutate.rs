@@ -396,7 +396,7 @@ pub fn mutate_sequential(
             swap(&mut bin, newbin.clone());
             if buffer.len() >= bulk_limit {
                 let results = check_binary(
-                    buffer.clone().iter().rev().map(|t|t.clone()).collect::<_>(), // Invert the order to get the first mutation
+                    buffer.clone(), // Invert the order to get the first mutation
                     command.clone(),
                     args.clone(),
                     bulk_limit > 1,
