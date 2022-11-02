@@ -69,8 +69,8 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
             exit(1)
     except Exception as e:
         # This means an error on this proxy
-        sys.stderr.write(f"{-1}")
-        exit(0)
+        # requeue
+        return check_simple(oracleurl, checkoracle, user, pass_, session, input)
 
 
 def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
