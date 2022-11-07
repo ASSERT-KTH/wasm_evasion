@@ -43,10 +43,8 @@ spec:
       - name: oracle
         # Pulls the default Minio image from Docker Hub
         image: jacarte/vt_selenium:0285101
-        args:
-        - /bin/bash
-        - "/vt_oracle/entrypoint.sh"
-        - web
+        command: ["/bin/bash", "/vt_oracle/entrypoint.sh", "web"]
+
         env:
         # Minio access key and secret key
         - name: MINIO_ROOT_USER
