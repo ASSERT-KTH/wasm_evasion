@@ -122,32 +122,7 @@ spec:
         continueOn:
           failed: true
   - name: analyzer-template
-    sidecars:
-    - name: vt-oracle
-      image: jacarte/vt_selenium:0285101
-      args:
-      - web
-      env:
-      - name: WEB_USER
-        value: "vt"
-      - name: WEB_PASS
-        value: "vt123"
-      - name: NO_WORKERS
-        value: "12"
-      - name: MC_ENDPOINT
-        value: "exp"
-      - name: MC_BUCKET
-        value: "vt-bucket"
-      - name: MINIO_HOST
-        value: "http://minio-service.minio:3434"
-      - name: MINIO_PASS
-        value: "minio123"
-      - name: MINIO_USER
-        value: "minio"
-      - name: MC_FILES
-        value: "vt-weight-reward-files-multiple"
-      command: ["/bin/bash", "/vt_oracle/entrypoint.sh", "web"]
-      mirrorVolumeMounts: true
+    
     volumes:
     - name: data
       emptyDir: {}
@@ -263,7 +238,7 @@ spec:
           cpu: 2
       source: |
          # Install mc client to save snapshot
-          until `curl -G 'http://127.0.0.1:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
+          until `curl -G 'http://oracle-service.oracle:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
           echo "Server working"
 
           mkdir -p $HOME/minio-binaries
@@ -322,7 +297,7 @@ spec:
 
          mkdir -p datas/{{inputs.parameters.dbconn}}
          echo "Oracle {{inputs.parameters.oracle}}"
-         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward_weighted_oracles.py  http://127.0.0.1:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
+         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward_weighted_oracles.py  http://oracle-service.oracle:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
          
          #kill -9 $watchID
          #kill -9 $watchID2
