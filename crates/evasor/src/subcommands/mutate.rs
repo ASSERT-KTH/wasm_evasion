@@ -624,7 +624,7 @@ pub fn mutate_with_reward(
     }
 
     let mut mutationlogfile = fs::File::create(format!("{session_folder}/mutation_log.txt"))?;
-
+    let mut total_times = 0;
     'attempts: loop {
         if elapsed >= attemps {
             println!("Elapsed {}", elapsed);
@@ -667,7 +667,10 @@ pub fn mutate_with_reward(
                 true,
             )?;
 
-            log::debug!("Oracle returns in {:?}", now.elapsed().as_millis());
+            let elapsed = now.elapsed().as_millis();
+            log::debug!("Oracle returns in {:?}ms", elapsed);
+            total_times += elapsed;
+            log::debug!("Avg time per query {}ms", total_times as f64/number_of_oracle_calls as f64);
 
             for result in results {
                 let (r, stdout, stderr) = result;
