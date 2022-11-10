@@ -31,8 +31,20 @@ macro_rules! _mutate {
                         Ok(it) => {
                             // Always take the first
                             // TODO change to return a random one from here
-                            let mut first = it.into_iter().take($take).map(|r| r.map(|m| m.finish()));
-                            return Ok((true, $name, $tpe, $param, first.next().unwrap().unwrap()))
+                            let mut first = it.into_iter().map(|r| r.map(|m| m.finish()));
+                            loop {
+                                let n = first.next();
+
+                                match n {
+                                    Some(t) => {
+                                        return Ok((true, $name, $tpe, $param, t.unwrap()))
+                                    }
+                                    _ => {
+                                        log::error!("Error mutating, no mutation found ");
+                                        return Ok((false, $name, $tpe, $param,  vec![]))
+                                    }
+                                }
+                            }
                         }
                         Err(e) => {
                             log::error!("Error mutating {:?}", e);
@@ -40,7 +52,7 @@ macro_rules! _mutate {
                         }
                     }
                 } else {
-                    //println!("not applicable {}", $name );
+                    println!("not applicable {}", $name );
                     return Ok((false, $name, $tpe, $param, vec![]))
                 }
 

@@ -284,7 +284,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
         time.sleep(waiting_time_for_upload)
         times += 1
 
-        if times >= 500:
+        if times >= 20:
             print("Restarting")
             raise Exception("Too many times")
         # Detect where the button is
@@ -422,7 +422,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
             content = driver.find_element(By.TAG_NAME, 'body')
             content_text = expand_element(driver, content, {})
             times += 1
-            if times >= 2000: # 600s 10mins
+            if times >= 80: # 600s 10mins
                 raise Exception("Waiting too much")
 
             matches = re.findall(engines_re, content_text)
