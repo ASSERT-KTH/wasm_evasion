@@ -252,7 +252,15 @@ def get_submit_btn_position(driver):
     pass
 
 
-def check_file(driver, filename, prev = {}, out="out", wrapper = None):
+def check_file(driver, filename, prev = {}, out="out", wrapper = None,
+    waiting_time_for_upload=0.34,
+    waiting_time_for_analysis=4,
+    waiting_time_for_hash=0.6,
+    waiting_time_to_get_info=0.3,
+    waiting_time_to_check_final=2,
+    watiting_for_button_time=2,
+    button_not_clicked_times=500
+):
     # create a debug monitor to take screenshot
     name = os.path.basename(filename)
    
@@ -273,7 +281,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
     break_if_captcha(driver, name)
     times = 0
     while True:
-        time.sleep(0.34)
+        time.sleep(waiting_time_for_upload)
         times += 1
 
         if times >= 500:
@@ -297,7 +305,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
     #print(inpt)
     inpt.send_keys(os.path.abspath(filename))
 
-    time.sleep(2)
+    time.sleep(watiting_for_button_time)
     # Now confirm the upload if needed
     times = 0
     print("Checking if confirm button")
@@ -359,7 +367,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
                     #break
             times += 1
-            if times > 500:
+            if times > button_not_clicked_times:
                 print("Button not clicked ?")        
                 raise Exception("Too many times")
                 break
@@ -371,7 +379,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
     content_text = ""
 
-    time.sleep(4)
+    time.sleep(waiting_time_for_analysis)
     print("Wait for the analysis", name)
     times = 0
     while "/file-analysis/" in driver.current_url:
@@ -398,7 +406,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
         #    fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
         #    wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
 
-        time.sleep(0.6)   
+        time.sleep(waiting_time_for_hash)   
         times += 1
         if times >= 60: #360s
             raise Exception("Wait too much") 
@@ -408,7 +416,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
     if "file" in driver.current_url:
         times = 0
         while True:
-            time.sleep(0.3)
+            time.sleep(waiting_time_to_get_info)
             break_if_captcha(driver, name)
             # Done
             content = driver.find_element(By.TAG_NAME, 'body')
@@ -427,7 +435,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None):
 
                 if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
                     print("Returning")
-                    time.sleep(2)
+                    time.sleep(waiting_time_to_check_final)
                 else:
                     continue
 

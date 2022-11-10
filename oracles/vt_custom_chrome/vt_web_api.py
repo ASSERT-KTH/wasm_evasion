@@ -207,7 +207,14 @@ def server():
 
         prev = {}
 
-        def process():
+        def process(
+                waiting_time_for_upload=0.34,
+                waiting_time_for_analysis=4,
+                waiting_time_for_hash=0.6,
+                waiting_time_to_get_info=0.3,
+                waiting_time_to_check_final=2,
+                watiting_for_button_time=2,
+                button_not_clicked_times=500):
             # This should be a call to ray :)
 
             while True:
@@ -261,7 +268,15 @@ def server():
 
                         if task == 'SUBMIT':
                             mod:vt_web_gui = importlib.reload(vt_web_gui)
-                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper) 
+                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper, 
+                                    waiting_time_for_upload=waiting_time_for_upload,
+                                    waiting_time_for_analysis=waiting_time_for_analysis,
+                                    waiting_time_for_hash=waiting_time_for_hash,
+                                    waiting_time_to_get_info=waiting_time_to_get_info,
+                                    waiting_time_to_check_final=waiting_time_to_check_final,
+                                    watiting_for_button_time=watiting_for_button_time,
+                                    button_not_clicked_times=button_not_clicked_times
+                                ) 
                         elif task == 'DETAILS':
                             mod:vt_check_hash = importlib.reload(vt_check_hash)
                             mod.check_hash(driver, hash, wrapper=mcwrapper) 
@@ -285,8 +300,46 @@ def server():
                         worklist.append((filename, outfolder, task))
 
         workers = []
-        for _ in range(WORKERS_NUMBER):
-            th = threading.Thread(target=process)
+        # Creating built in workers
+
+        # The faster
+        th = threading.Thread(target=process, kwargs=dict(
+            waiting_time_for_upload=0.1,
+            waiting_time_for_analysis=2,
+            waiting_time_for_hash=0.2,
+            waiting_time_to_get_info=0.1,
+            waiting_time_to_check_final=2,
+            watiting_for_button_time=2,
+            button_not_clicked_times=50
+        ))
+        th.start()
+        workers.append(th)
+
+        # The patientest
+        th = threading.Thread(target=process, kwargs=dict(
+            waiting_time_for_upload=0.5,
+            waiting_time_for_analysis=6,
+            waiting_time_for_hash=0.9,
+            waiting_time_to_get_info=0.2,
+            waiting_time_to_check_final=4,
+            watiting_for_button_time=2,
+            button_not_clicked_times=1000
+        ))
+        workers.append(th)
+        th.start()
+
+        import random
+        for _ in range(WORKERS_NUMBER - 2):
+            th = threading.Thread(target=process, kwargs=dict(
+                    
+                waiting_time_for_upload=random.randint(1, 10)/10.0,
+                waiting_time_for_analysis=random.randint(1, 10),
+                waiting_time_for_hash=random.randint(1, 10)/10.0,
+                waiting_time_to_get_info=random.randint(1, 10)/10.0,
+                waiting_time_to_check_final=random.randint(1, 26),
+                watiting_for_button_time=random.randint(1, 5)/2,
+                button_not_clicked_times=random.randint(1, 1000)
+            ))
             workers.append(th)
             th.start()
         
