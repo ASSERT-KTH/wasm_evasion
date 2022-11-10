@@ -186,7 +186,7 @@ def break_if_captcha(driver, name):
     content = driver.find_element(By.TAG_NAME, 'body')
     content_text = expand_element(driver, content, {})
         
-    if "captcha" in driver.current_url or "RayID" in content_text:
+    if "captcha" in driver.current_url or "RayID" in content_text or "Forbidden" in content_text:
 
         print("Trying to access file")
         with filelock.FileLock("name.socket.lock"):
@@ -281,6 +281,9 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     break_if_captcha(driver, name)
     times = 0
     while True:
+        fullpage_screenshot(driver, name, f"meh.init.png",from_="Waiting from file hash")
+        if "file" in driver.current_url:
+            break
         time.sleep(waiting_time_for_upload)
         times += 1
 
