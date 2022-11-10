@@ -307,13 +307,13 @@ def server():
 
         # The faster
         th = threading.Thread(target=process, kwargs=dict(
-            waiting_time_for_upload=0.1,
-            waiting_time_for_analysis=2,
-            waiting_time_for_hash=0.2,
-            waiting_time_to_get_info=0.1,
-            waiting_time_to_check_final=2,
-            watiting_for_button_time=2,
-            button_not_clicked_times=50
+            waiting_time_for_upload=0.01,
+            waiting_time_for_analysis=0.1,
+            waiting_time_for_hash=0.05,
+            waiting_time_to_get_info=0.05,
+            waiting_time_to_check_final=0.5,
+            watiting_for_button_time=0.2,
+            button_not_clicked_times=30
         ))
         th.start()
         workers.append(th)
