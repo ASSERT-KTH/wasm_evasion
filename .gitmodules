@@ -1,3 +1,9 @@
 [submodule "wasm-tools"]
 	path = crates/wasm-tools
 	url = https://github.com/Jacarte/wasm-tools.git
+[submodule "reproduction/SEISMIC"]
+	path = reproduction/SEISMIC
+	url = https://github.com/wenhao1006/SEISMIC.git
+[submodule "reproduction/deepMiner"]
+	path = reproduction/deepMiner
+	url = https://github.com/deepwn/deepMiner.git
