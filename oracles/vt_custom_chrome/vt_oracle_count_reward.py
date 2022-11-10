@@ -25,7 +25,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
     # submit the file
     # submit 2 times?
-    for _ in range(4):
+    for _ in range(2):
         r = requests.post(
             f"{oracleurl}/upload_file/{session}",
             files = { 'file': open(input, 'rb') },
