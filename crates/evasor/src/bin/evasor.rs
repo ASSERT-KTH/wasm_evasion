@@ -100,7 +100,7 @@ pub fn main() -> Result<(), evasor::errors::CliError> {
                 MODE::SEQUENTIAL
             };
 
-            let mut mode = if args.is_present("reward") {
+            let mode = if args.is_present("reward") {
                 let beta  = if args.is_present("beta") {
                     value_t!(args.value_of("beta"), f32).unwrap()
                 } else {

@@ -17,7 +17,7 @@ use std::{
 use wasm_mutate::{
     WasmMutate,
 };
-
+use std::time::Instant;
 use crate::{
     errors::{AResult, CliError},
     send_signal_to_probes_socket,
@@ -483,13 +483,13 @@ pub fn get_random_mutators(
     let mutations = prob_weights.get_available_mutations();
     if uniform {
         let name = &mutations[rng.gen_range(0..mutations.len())];
-        println!("{:?}", name);
+        //println!("mut uniform {:?}", name);
         let mt = cn.get_mutators_by_feature(config, name, 1)?;
         return Ok(mt);
     } else {
         let dist2 = WeightedIndex::new(mutations.iter().map(|item| item.3)).unwrap();
         let name = &mutations[dist2.sample(rng)];
-        println!("{:?}", name);
+        //println!("mut weight {:?}", name);
         let mt = cn.get_mutators_by_feature(config, name, 1)?;
 
         return Ok(mt);
@@ -517,11 +517,12 @@ pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &
         let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
         get_random_mutators(&mut config, gn, prob_weights.clone(), true)?;
 
+        println!("Mutated {}", mutated);
         if mutated {
             count += 1;
             swap(&mut cp, mutated_bin.clone());
             mutations.push((mutator_tpe, mutator_name, mutator_param, s));
-            if count == times {
+            if count >= times {
                 // TODO, include the applied mutations
                 return Ok((mutated_bin, mutations));
             }
@@ -645,7 +646,7 @@ pub fn mutate_with_reward(
             get_random_mutators(&mut config, &mut gn2, prob_weights.clone(), use_reward)?;
         all += 1;*/
         let (mutated_bin, mutators) = mutate_several_times(step_size, tree_size, &mut gn2, &bin, prob_weights_name)?;
-
+        println!("mutator {:?}", mutators);
 
         println!(
             "{} Mutated with {:?}",
@@ -657,6 +658,7 @@ pub fn mutate_with_reward(
         if use_reward {
             number_of_oracle_calls += 1;
             println!("Calling oracle");
+            let now = Instant::now();
             let results = check_binary(
                 vec![(mutated_bin.clone(), 0, 0)],
                 command.clone(),
@@ -665,7 +667,7 @@ pub fn mutate_with_reward(
                 true,
             )?;
 
-            println!("Oracle returns");
+            log::debug!("Oracle returns in {:?}", now.elapsed().as_millis());
 
             for result in results {
                 let (r, stdout, stderr) = result;

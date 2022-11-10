@@ -154,8 +154,9 @@ def server():
             tmp.close()
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
+            
 
-            if b"Analysing (" not in content or f['engines'].values[0] >= TH:
+            if "Analysing (" not in content or f['engines'].values[0] >= TH:
                 tmpcsv = f"/tmp/{hsh}.csv"
                 f.to_csv(tmpcsv)
 
@@ -203,7 +204,7 @@ def server():
         
     def check_files():
 
-        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "12"))
+        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "5"))
 
         prev = {}
 
@@ -216,6 +217,8 @@ def server():
                 watiting_for_button_time=2,
                 button_not_clicked_times=500):
             # This should be a call to ray :)
+
+            print(f"Crazy Ivan: waiting_time_for_upload: {waiting_time_for_upload} waiting_time_for_analysis {waiting_time_for_analysis} button_not_clicked_times {button_not_clicked_times}")
 
             while True:
                 s = len(worklist)
@@ -291,7 +294,7 @@ def server():
                             print("Restarting")
                             open("name.socket", 'w').write("RESTART")
                             # Give time to restart
-                            time.sleep(30)
+                            time.sleep(5)
                         times += 1
                         time.sleep(1)
                 if not done:
@@ -353,7 +356,7 @@ def server():
 if __name__ == '__main__':
     app, startfunc = server()
     threads = startfunc()
-    app.run(host="0.0.0.0", port=4000, debug=False)
+    app.run(host="127.0.0.1", port=4000, debug=False)
 
     for th in threads:
         th.join()
