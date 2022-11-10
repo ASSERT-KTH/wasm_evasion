@@ -388,7 +388,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     while "/file-analysis/" in driver.current_url:
         times += 1
 
-        if times >= 30:
+        if times >= 300:
             raise Exception("Too many times")
 
         break_if_captcha(driver, name)
@@ -438,7 +438,6 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                 if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
                     print("Returning")
-                    time.sleep(waiting_time_to_check_final)
                 else:
                     continue
 
