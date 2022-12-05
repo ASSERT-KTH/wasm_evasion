@@ -10,7 +10,7 @@ class Storage(object):
         raise NotImplementedError("Not implemented yet")
 
 
-    def exists(self, key):
+    def exists(self, key, local_cache=None):
         raise NotImplementedError("Not implemented yet")
 
     def save(self, key, content):
@@ -38,7 +38,7 @@ class LocalWrapper(Storage):
     def __init__(self, endpoint) -> None:
         self.endpoint = endpoint
 
-    def exists(self, key):
+    def exists(self, key, local_cache=None):
         return os.path.exists(f"{self.endpoint}/{key}")
 
     def save(self, key, content):
@@ -69,16 +69,20 @@ class LocalWrapper(Storage):
 
 class MCWrapper(Storage):
 
-    def __init__(self, endpoint, bucket, subfolder = "") -> None:
+    def __init__(self, endpoint, bucket, subfolder = "", local_cache=None) -> None:
         self.bucket = bucket
         self.endpoint = endpoint
         self.subfolder = subfolder
+        self.local_cache = local_cache
 
         if self.subfolder:
             self.bucket = f"{self.bucket}/{self.subfolder}"
 
 
     def exists(self, key):
+        if self.local_cache:
+            return os.path.exists(f"{self.local_cache}/{key}")
+
         ch = subprocess.check_output(
             [ "mc", "ls", f"{self.endpoint}/{self.bucket}/{key}" ]
         )
@@ -126,6 +130,15 @@ class MCWrapper(Storage):
 
 
     def load(self, key):
+        if self.local_cache:
+            try:
+                content = open(f"{self.local_cache}/{key}", 'rb').read()
+                hsh = hashlib.sha256(content).hexdigest()
+                print("File loaded")
+                return content, hsh
+            except Exception as e:
+                print("Failed to load from local", e)
+
         tmpname = uuid.uuid4().hex
         tmpnmame = f"/tmp/{tmpname}"
 

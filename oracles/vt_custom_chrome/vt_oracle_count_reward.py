@@ -36,7 +36,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
     print(hsh)
 
     lapsed = 0
-    waitfor = 0.1
+    waitfor = 0.05
     while lapsed <= 72000: # no more than 2 hours 
 
         r = requests.get(

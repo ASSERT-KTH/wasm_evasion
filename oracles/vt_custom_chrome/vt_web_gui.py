@@ -76,7 +76,7 @@ def setUp():
     options.add_argument("--disable-dev-shm-usage"); # overcome limited resource problems
     options.add_argument("--no-sandbox"); #Bypass OS security model
     options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
-    options.add_argument('--headless')
+    # options.add_argument('--headless')
     options.add_argument("--enable-automation")
     options.add_argument("--dns-prefetch-disable")
     options.add_argument('window-size=1200x3000')
