@@ -352,6 +352,7 @@ def server():
 
 
     def copy_folder():
+        print("Copying folder locally, for better lookup")
         try:
             os.mkdir("./local_tmp")
         except Exception as e:
@@ -369,7 +370,6 @@ if __name__ == '__main__':
 
     
     app, startfunc, copy_folder = server()
-    print("Copying folder locally, for better lookup")
     copy_folder()
     print("Initializing server")
 

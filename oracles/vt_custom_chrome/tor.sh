@@ -6,6 +6,7 @@ do
     sleep 5
     ((ELAPSED+=5))
     echo "Checking tor for restart"
+    du -h ./local_tmp
     if [[ $(cat name.socket) == "RESTART" ]] 
     then
         echo "Restarting TOR"
