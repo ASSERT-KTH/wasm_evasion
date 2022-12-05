@@ -35,7 +35,8 @@ def server():
         mcwrapper = vt_mc.MCWrapper(
             os.environ.get("MC_ENDPOINT", "exp"),
             os.environ.get("MC_BUCKET", "my-bucket"),
-            os.environ.get("MC_FILES", "vt_api_files"),
+            os.environ.get("MC_FILES", "vt_api_files")
+            , local_cache="./local_tmp"
         )
     else:
         mcwrapper = vt_mc.LocalWrapper("out")
@@ -92,7 +93,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh2}")
 
-                    if b"Analysing (" not in contentlog or f['engines'].values[0] >= TH:
+                    if "Analysing (" not in contentlog or f['engines'].values[0] >= TH:
                         print("Not queued")
                     else:
                         print("Adding to queue")
@@ -156,7 +157,7 @@ def server():
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
             
 
-            if b"Analysing (" not in content or f['engines'].values[0] >= TH:
+            if "Analysing (" not in content or f['engines'].values[0] >= TH:
                 tmpcsv = f"/tmp/{hsh}.csv"
                 f.to_csv(tmpcsv)
 
@@ -204,7 +205,7 @@ def server():
         
     def check_files():
 
-        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "5"))
+        WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "1"))
 
         prev = {}
 
@@ -247,7 +248,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh}")
 
-                    if b"Analysing (" not in content or f['engines'].values[0] >= TH:
+                    if "Analysing (" not in content or f['engines'].values[0] >= TH:
                         print("Engines", f['engines'].values[0])
                         print(f"File {filename} already checked")
                         continue 
@@ -307,54 +308,71 @@ def server():
 
         # The faster
         th = threading.Thread(target=process, kwargs=dict(
-            waiting_time_for_upload=0.1,
-            waiting_time_for_analysis=2,
-            waiting_time_for_hash=0.2,
-            waiting_time_to_get_info=0.1,
-            waiting_time_to_check_final=2,
-            watiting_for_button_time=2,
+            waiting_time_for_upload=0.01,
+            waiting_time_for_analysis=0.1,
+            waiting_time_for_hash=0.05,
+            waiting_time_to_get_info=0.05,
+            waiting_time_to_check_final=0.5,
+            watiting_for_button_time=0.2,
             button_not_clicked_times=50
         ))
         th.start()
         workers.append(th)
 
-        # The patientest
-        th = threading.Thread(target=process, kwargs=dict(
-            waiting_time_for_upload=0.5,
-            waiting_time_for_analysis=6,
-            waiting_time_for_hash=0.9,
-            waiting_time_to_get_info=0.2,
-            waiting_time_to_check_final=4,
-            watiting_for_button_time=2,
-            button_not_clicked_times=1000
-        ))
-        workers.append(th)
-        th.start()
-
-        import random
-        for _ in range(WORKERS_NUMBER - 2):
+        if not LOCAL:
+            # The patientest
             th = threading.Thread(target=process, kwargs=dict(
-                    
-                waiting_time_for_upload=random.randint(1, 10)/10.0,
-                waiting_time_for_analysis=random.randint(1, 10),
-                waiting_time_for_hash=random.randint(1, 10)/10.0,
-                waiting_time_to_get_info=random.randint(1, 10)/10.0,
-                waiting_time_to_check_final=random.randint(1, 26),
-                watiting_for_button_time=random.randint(1, 5)/2,
-                button_not_clicked_times=random.randint(1, 1000)
+                waiting_time_for_upload=0.5,
+                waiting_time_for_analysis=6,
+                waiting_time_for_hash=0.9,
+                waiting_time_to_get_info=0.2,
+                waiting_time_to_check_final=4,
+                watiting_for_button_time=2,
+                button_not_clicked_times=1000
             ))
             workers.append(th)
             th.start()
-        
+
+            import random
+            for _ in range(WORKERS_NUMBER - 2):
+                th = threading.Thread(target=process, kwargs=dict(
+                        
+                    waiting_time_for_upload=random.randint(1, 10)/10.0,
+                    waiting_time_for_analysis=random.randint(1, 10),
+                    waiting_time_for_hash=random.randint(1, 10)/10.0,
+                    waiting_time_to_get_info=random.randint(1, 10)/10.0,
+                    waiting_time_to_check_final=random.randint(1, 26),
+                    watiting_for_button_time=random.randint(1, 5)/2,
+                    button_not_clicked_times=random.randint(1, 1000)
+                ))
+                workers.append(th)
+                th.start()
+            
         return workers
 
 
-    return app, check_files
+    def copy_folder():
+        try:
+            os.mkdir("./local_tmp")
+        except Exception as e:
+            print(e)
+
+        mcwrapper.loadfolder("./local_tmp/data", f"data")
+        return "./local_tmp"
+
+    return app, check_files, copy_folder
 
 # Run the workers in behind
 
+
 if __name__ == '__main__':
-    app, startfunc = server()
+
+    
+    app, startfunc, copy_folder = server()
+    print("Copying folder locally, for better lookup")
+    copy_folder()
+    print("Initializing server")
+
     threads = startfunc()
     app.run(host="127.0.0.1", port=4000, debug=False)
 
