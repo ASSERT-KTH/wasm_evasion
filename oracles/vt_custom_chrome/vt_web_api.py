@@ -314,7 +314,7 @@ def server():
             waiting_time_to_get_info=0.05,
             waiting_time_to_check_final=0.5,
             watiting_for_button_time=0.2,
-            button_not_clicked_times=50
+            button_not_clicked_times=30
         ))
         th.start()
         workers.append(th)
