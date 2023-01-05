@@ -8,7 +8,7 @@ This repo contains the tooling and the reproduction of our experiments on Wasm o
 - Clone this repo and its submodules `git clone --recursive` 
 - Install Rust in your computer
     - Set nightly as the version `rustup default nightly`
-    - Compile the analyzer tool `cd analyzer && cargo build`
+    - Compile the analyzer tool `cd crates/evasor && cargo build`
 
 - As an alternative, you can download the [ubuntu release binary](https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/analyzer) `wget -O analyzer https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/evasor_linux_64amd`
 - Run the analysis on a binary or a folder of Wasm binaries `RUST_LOG=evasor,wasm-mutate=debug ./target/debug/evasor --dbconn "datas/database" extract -d 4 --input "binary.wasm"  `
