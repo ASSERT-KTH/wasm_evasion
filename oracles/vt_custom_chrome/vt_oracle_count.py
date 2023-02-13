@@ -65,7 +65,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
         val = df['non_benign'].values[0]
         engines = df['engines'].values[0]
         # Saving the csv file
-        df.to_csv("result.csv")
+        df.to_csv("/result.csv")
         
         if val == 0 and engines >= 58:
             print("Not detected as mal")
