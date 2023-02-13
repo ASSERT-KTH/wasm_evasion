@@ -454,8 +454,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                 image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash")
 
-                #if wrapper:
-                #    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
+                if wrapper:
+                    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
 
                 print(f"Done {name}")
                 return
