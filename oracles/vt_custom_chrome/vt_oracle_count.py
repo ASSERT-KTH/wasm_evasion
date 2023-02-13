@@ -10,7 +10,7 @@ import pandas as pd
 from io import StringIO
 
 WHITELIST = ['undetected', 'timeout', 'unable_to_process_file_type', 'no_response']
-    
+
 
 def check_simple(oracleurl, checkoracle, user, pass_, session, input):
     global WHITELIST
@@ -59,14 +59,18 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
     df = pd.read_csv(DATA)
     print(df)
-    print("Non detected", df['non_benign'].values)
+    try:
+        print("Non detected", df['non_benign'].values)
 
-    val = df['non_benign'].values[0]
-    engines = df['engines'].values[0]
+        val = df['non_benign'].values[0]
+        engines = df['engines'].values[0]
 
-    if val == 0 and engines >= 58:
-        print("Not detected as mal")
-        exit(1)
+        if val == 0 and engines >= 58:
+            print("Not detected as mal")
+            exit(1)
+    except Exception as e:
+        print(e)
+        return check_simple(oracleurl, checkoracle, user, pass_, session, input)
 
 def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
     print(f"Processing {len(files)} files")
@@ -141,7 +145,7 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
             except Exception as e:
                 print(e)
                 pass
-        
+
         if complete:
             break
 
@@ -150,13 +154,13 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
 
         if lapsed >= 900:
             break
-    
+
 
 
 if __name__ == '__main__':
     oracleurl = sys.argv[1]
     checkoracle = sys.argv[2]
-    
+
     # auth to the service
     user = sys.argv[3]
     pass_ = sys.argv[4]
@@ -168,4 +172,4 @@ if __name__ == '__main__':
     else:
         check_multiple(oracleurl, checkoracle, user, pass_, session, input)
 
-    
+
