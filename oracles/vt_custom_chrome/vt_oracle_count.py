@@ -67,7 +67,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
         # Saving the csv file
         df.to_csv("/result.csv")
         
-        if val == 0 and engines >= 58:
+        if val == 0 and engines >= 52:
             print("Not detected as mal")
             exit(1)
     except Exception as e:
