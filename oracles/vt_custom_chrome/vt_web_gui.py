@@ -25,6 +25,7 @@ from datetime import datetime
 #31
 #/ 60
 engines_re = r"(\d+)\n/ (\d+)"
+TH = int(os.environ.get("TH", "58"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -436,7 +437,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
                 all = matches[0][1]
                 all = int(all)
 
-                if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
+                if (all >= TH or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
                     print("Returning")
                 else:
                     continue
