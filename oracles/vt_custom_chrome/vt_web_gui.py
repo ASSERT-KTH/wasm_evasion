@@ -431,7 +431,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
             matches = re.findall(engines_re, content_text)
             if matches:
-                print("Analysis", name, matches, times, "Analysing (" in content_text)
+                print("Analysis", name, matches, times, "Analysing (" in content_text, TH)
                 positives = matches[0][0]
                 positives = int(positives)
                 all = matches[0][1]
