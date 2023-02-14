@@ -25,6 +25,7 @@ from datetime import datetime
 #31
 #/ 60
 engines_re = r"(\d+)\n/ (\d+)"
+TH = int(os.environ.get("TH", "58"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -430,13 +431,13 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
             matches = re.findall(engines_re, content_text)
             if matches:
-                print("Analysis", name, matches, times, "Analysing (" in content_text)
+                print("Analysis", name, matches, times, "Analysing (" in content_text, TH)
                 positives = matches[0][0]
                 positives = int(positives)
                 all = matches[0][1]
                 all = int(all)
 
-                if (all >= 59 or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
+                if (all >= TH or "Security Vendors' Analysis" in content_text) and "Analysing (" not in content_text:
                     print("Returning")
                 else:
                     continue
@@ -453,8 +454,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                 image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash")
 
-                #if wrapper:
-                #    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
+                if wrapper:
+                    wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
 
                 print(f"Done {name}")
                 return

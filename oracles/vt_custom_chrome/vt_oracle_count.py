@@ -55,7 +55,8 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
     print("Collecting result")
 
 
-    DATA = StringIO(r.text)
+    try:
+        DATA = StringIO(r.text)
 
     df = pd.read_csv(DATA)
     print(df)
@@ -72,6 +73,17 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
         print(e)
         return check_simple(oracleurl, checkoracle, user, pass_, session, input)
 
+        val = df['non_benign'].values[0]
+        engines = df['engines'].values[0]
+        # Saving the csv file
+        df.to_csv("/result.csv")
+        
+        if val == 0 and engines >= 52:
+            print("Not detected as mal")
+            exit(1)
+    except Exception as e:
+        return check_simple(oracleurl, checkoracle, user, pass_, session, input)
+    
 def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
     print(f"Processing {len(files)} files")
     global WHITELIST

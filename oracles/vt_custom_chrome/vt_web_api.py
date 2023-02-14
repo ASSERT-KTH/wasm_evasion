@@ -157,7 +157,7 @@ def server():
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
             
 
-            if "Analysing (" not in content or f['engines'].values[0] >= TH:
+            if b"Analysing (" not in content or f['engines'].values[0] >= TH:
                 tmpcsv = f"/tmp/{hsh}.csv"
                 f.to_csv(tmpcsv)
 
