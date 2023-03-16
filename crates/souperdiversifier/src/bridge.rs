@@ -1,13 +1,25 @@
 use std::{ffi::CStr, sync::Mutex};
 
-use egg::{Id, EGraph, Language, Runner, RecExpr, rewrite, Rewrite, Searcher, Pattern};
+use egg::{rewrite, EGraph, Id, Language, Pattern, RecExpr, Rewrite, Runner, Searcher};
 use libc::c_char;
-use wasm_encoder::{Function, ValType, CodeSection, GlobalSection, Instruction};
-use wasm_mutate::{info::ModuleInfo, module::{PrimitiveTypeInfo, TypeInfo, map_type}, mutators::peephole::{eggsy::{analysis::PeepholeMutationAnalysis, lang::Lang, encoder::{Encoder, expr2wasm::ResourceRequest}}, dfg::DFGBuilder}, WasmMutate};
-use wasmparser::{LocalsReader, CodeSectionReader, FunctionBody, GlobalSectionReader};
-use wasmtime::Module;
-use std::ffi::CString;
 use std::collections::HashMap;
+use std::ffi::CString;
+use wasm_encoder::{CodeSection, Function, GlobalSection, Instruction, ValType};
+use wasm_mutate::{
+    info::ModuleInfo,
+    module::{map_type, PrimitiveTypeInfo, TypeInfo},
+    mutators::peephole::{
+        dfg::DFGBuilder,
+        eggsy::{
+            analysis::PeepholeMutationAnalysis,
+            encoder::{expr2wasm::ResourceRequest, Encoder},
+            lang::Lang,
+        },
+    },
+    WasmMutate,
+};
+use wasmparser::{CodeSectionReader, FunctionBody, GlobalSectionReader, LocalsReader};
+use wasmtime::Module;
 
 use crate::{parser::souper2Lang, OperatorAndByteOffset};
 
@@ -40,14 +52,11 @@ lazy_static! {
 
 }
 
-pub struct Superdiversifier {
-}
+pub struct Superdiversifier {}
 
 impl Superdiversifier {
-
     pub fn new() -> Self {
-        Superdiversifier {
-        }
+        Superdiversifier {}
     }
 
     // Collect and unfold params and locals, [x, ty, y, ty2] -> [ty....ty, ty2...ty2]
@@ -78,28 +87,29 @@ impl Superdiversifier {
         }
     }
 
-    fn generate_souper_query(&self,root: Id, egraph: EGraph<Lang, PeepholeMutationAnalysis>) -> anyhow::Result<(String, u32)> {
-        // Iterate through Lang tree and generate the Souper IR 
+    fn generate_souper_query(
+        &self,
+        root: Id,
+        egraph: EGraph<Lang, PeepholeMutationAnalysis>,
+    ) -> anyhow::Result<(String, u32)> {
+        // Iterate through Lang tree and generate the Souper IR
         enum Event {
             Enter,
-            Exit
+            Exit,
         }
 
         let mut result = String::new();
-        let mut worklist = vec![
-            (root, Event::Exit),
-            (root, Event::Enter)
-            ];
+        let mut worklist = vec![(root, Event::Exit), (root, Event::Enter)];
         let mut varidx = 0;
         let mut stack = vec![];
-        
+
         while let Some((current, event)) = worklist.pop() {
             let l = &egraph[current].nodes[0];
 
             match event {
                 Event::Enter => {
                     // Patch, in the case of the select...reverse
-                    
+
                     match l {
                         Lang::Select([then, alternative, cond]) => {
                             // Force the first operand as a fixed size
@@ -112,27 +122,23 @@ impl Superdiversifier {
                             worklist.push((*alternative, Event::Enter));
                         }
                         _ => {
-
-
                             for ch in l.children() {
                                 worklist.push((*ch, Event::Exit));
                                 worklist.push((*ch, Event::Enter));
-                            } 
+                            }
                         }
                     }
-                },
+                }
                 Event::Exit => {
                     //println!(";%{}", l);
                     let rpte = egraph.analysis.get_returning_tpe(l, &egraph);
                     let souper_width = match rpte {
-                        Ok(tpe) => {
-                            match tpe {
-                                PrimitiveTypeInfo::I32 => "i32",
-                                PrimitiveTypeInfo::I64 => "i64",
-                                _ => anyhow::bail!("Invalid type  {:?}", tpe)
-                            }
-                        }
-                        Err(e) => anyhow::bail!("Invalid type  {:?}", e)
+                        Ok(tpe) => match tpe {
+                            PrimitiveTypeInfo::I32 => "i32",
+                            PrimitiveTypeInfo::I64 => "i64",
+                            _ => anyhow::bail!("Invalid type  {:?}", tpe),
+                        },
+                        Err(e) => anyhow::bail!("Invalid type  {:?}", e),
                     };
                     let mut operators = vec![];
                     for _ in l.children() {
@@ -151,74 +157,73 @@ impl Superdiversifier {
                             result.push_str(&format!("%{}:{} = add ", varidx, souper_width));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-                        },
+                        }
                         Lang::LocalGet(idx) => {
                             if VAR_MAP.lock().unwrap().contains_key(idx) {
                                 //println!("Getting name from context {}", idx);
-                                stack.push(format!("{}", VAR_MAP.lock().unwrap().get(idx).unwrap()));
+                                stack
+                                    .push(format!("{}", VAR_MAP.lock().unwrap().get(idx).unwrap()));
                             } else {
-                                result.push_str(&format!("%{}:{} = var; local", varidx, souper_width));
+                                result.push_str(&format!(
+                                    "%{}:{} = var; local",
+                                    varidx, souper_width
+                                ));
                                 stack.push(format!("%{}", varidx));
                                 VAR_MAP.lock().unwrap().insert(*idx, format!("%{}", varidx));
-                                REVERSE_LOCAL_MAP.lock().unwrap().insert(format!("%{}", varidx), *idx);
+                                REVERSE_LOCAL_MAP
+                                    .lock()
+                                    .unwrap()
+                                    .insert(format!("%{}", varidx), *idx);
                                 varidx += 1;
                             }
                             // Swap operands
                             // check if the variant exist, if so, get the tmp var name
-                        },
+                        }
                         Lang::GlobalGet(_) => {
                             // Swap operands
                             result.push_str(&format!("%{} = var; global", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-                        },
+                        }
                         Lang::I32GeS(_) | Lang::I64GeS(_) => {
-
                             let o = operators.pop().unwrap();
                             let o2 = operators.pop().unwrap();
                             operators.push(o);
                             operators.push(o2);
-                            
+
                             result.push_str(&format!("%{} = slt ", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-
                         }
                         Lang::I32GeU(_) | Lang::I64GeU(_) => {
-
                             let o = operators.pop().unwrap();
                             let o2 = operators.pop().unwrap();
                             operators.push(o);
                             operators.push(o2);
-                            
+
                             result.push_str(&format!("%{} = ule ", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-
                         }
                         Lang::I32GtU(_) | Lang::I64GtU(_) => {
-
                             let o = operators.pop().unwrap();
                             let o2 = operators.pop().unwrap();
                             operators.push(o);
                             operators.push(o2);
-                            
+
                             result.push_str(&format!("%{} = ult ", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-
                         }
                         Lang::I32GtS(_) | Lang::I64GtS(_) => {
-
                             let o = operators.pop().unwrap();
                             let o2 = operators.pop().unwrap();
                             operators.push(o);
                             operators.push(o2);
-                            
+
                             result.push_str(&format!("%{} = sle ", varidx));
                             stack.push(format!("%{}", varidx));
                             varidx += 1;
-
                         }
                         Lang::I32And(_) | Lang::I64And(_) => {
                             result.push_str(&format!("%{} = and ", varidx));
@@ -290,11 +295,11 @@ impl Superdiversifier {
                             operators.push(o2);
                             operators.push(o);
                             varidx += 1;
-                            
+
                             result.push_str(&format!("%{} = select ", varidx));
                             stack.push(format!("%{}", varidx));
 
-                            // Get the first operator 
+                            // Get the first operator
                             varidx += 1;
                         }
                         Lang::I32Eq(_) | Lang::I64Eq(_) => {
@@ -309,10 +314,10 @@ impl Superdiversifier {
                         }
                         Lang::I32(v) => {
                             stack.push(format!("{}:i32", v));
-                        },
+                        }
                         Lang::I64(v) => {
                             stack.push(format!("{}:i64", v));
-                        },
+                        }
                         _ => {
                             anyhow::bail!("Invalid operator {}", l)
                         }
@@ -326,53 +331,61 @@ impl Superdiversifier {
                         }
                         i += 1;
                     }
-                    result.push_str(&
-                        format!("\n"));
-                },
+                    result.push_str(&format!("\n"));
+                }
             }
         }
         if varidx == 0 {
             anyhow::bail!("Invalid expression {}", root)
         }
         // set to infer last operation
-        result.push_str(&format!("infer %{}", varidx - 1 ));
+        result.push_str(&format!("infer %{}", varidx - 1));
         // Return the result and the number of operands
         Ok((result, varidx))
     }
 
-    extern "C" fn callback(lhs_ptr: *const i8 /* Original Query */, rhs_ptr: *const i8, cost: i32) -> i32 {
+    extern "C" fn callback(
+        lhs_ptr: *const i8, /* Original Query */
+        rhs_ptr: *const i8,
+        cost: i32,
+    ) -> i32 {
         let rhs = unsafe { CStr::from_ptr(rhs_ptr) };
         println!("RHS {:?}\n Cost: {}", rhs, cost);
         let lang = unsafe { CStr::from_ptr(lhs_ptr) };
         println!("LHS {:?}", lang);
 
-        let lang = souper2Lang(rhs.to_str().unwrap(), 
-            REVERSE_LOCAL_MAP.lock().unwrap().clone(), 
-            REVERSE_GLOBAL_MAP.lock().unwrap().clone()); // Save this into a global State ?
+        let lang = souper2Lang(
+            rhs.to_str().unwrap(),
+            REVERSE_LOCAL_MAP.lock().unwrap().clone(),
+            REVERSE_GLOBAL_MAP.lock().unwrap().clone(),
+        ); // Save this into a global State ?
 
         match lang {
             Ok(lang) => {
-
                 let lhs = unsafe { CStr::from_ptr(lhs_ptr) };
                 let lhs = lhs.to_str().unwrap().to_string();
                 println!("REP {}", lang.to_string());
-        
-                if !REPLACEMENT_MAP.lock().unwrap().contains_key(&lhs){
+
+                if !REPLACEMENT_MAP.lock().unwrap().contains_key(&lhs) {
                     REPLACEMENT_MAP.lock().unwrap().insert(lhs.clone(), vec![]);
                 }
-        
-                REPLACEMENT_MAP.lock().unwrap().get_mut(&lhs).unwrap().push((lang.to_string(), cost));
+
+                REPLACEMENT_MAP
+                    .lock()
+                    .unwrap()
+                    .get_mut(&lhs)
+                    .unwrap()
+                    .push((lang.to_string(), cost));
                 0
-            },
+            }
             Err(r) => {
                 println!("{}", r);
                 // Printing for now, but ideally, it should be complete, and all operations should have a 1-1 translation
-                return 0
+                return 0;
             }
         }
     }
 
- 
     fn copy_locals(&self, reader: FunctionBody) -> anyhow::Result<Function> {
         // Create the new function
         let mut localreader = reader.get_locals_reader()?;
@@ -389,25 +402,26 @@ impl Superdiversifier {
         Ok(Function::new(current_locals /*copy locals here*/))
     }
 
-    pub fn superoptimize(&self, config: &mut WasmMutate, replacement_map: HashMap<String, Vec<(String, i32)>>) -> anyhow::Result<wasm_encoder::Module> {
-
+    pub fn superoptimize(
+        &self,
+        config: &mut WasmMutate,
+        replacement_map: HashMap<String, Vec<(String, i32)>>,
+    ) -> anyhow::Result<wasm_encoder::Module> {
         println!("Superoptimizing");
-
 
         // Create the rewriting rules with the replacement maps
         let mut rules: Vec<Rewrite<Lang, PeepholeMutationAnalysis>> = vec![];
         let mut i = 0;
         for (k, v) in replacement_map.iter() {
-            
             // Get best replacement.
             let mut best: Option<String> = None;
-            let mut bestcost  = i32::MAX;
+            let mut bestcost = i32::MAX;
 
             for (rep, cost) in v.iter() {
                 if *cost < bestcost {
                     bestcost = *cost;
                     best = Some(rep.clone());
-                } 
+                }
             }
 
             if let Some(rhs) = best {
@@ -420,8 +434,9 @@ impl Superdiversifier {
                                 format!("Souper replacement {i}"),
                                 "Souper replacement",
                                 lhs.clone(),
-                                rhs.clone().parse::<Pattern<_>>().unwrap()
-                            ).unwrap()
+                                rhs.clone().parse::<Pattern<_>>().unwrap(),
+                            )
+                            .unwrap(),
                         );
                         rules.push(
                             Rewrite::new(
@@ -429,7 +444,8 @@ impl Superdiversifier {
                                 "Souper replacement",
                                 rhs.clone().parse::<Pattern<_>>().unwrap(),
                                 lhs,
-                            ).unwrap()
+                            )
+                            .unwrap(),
                         );
                         i += 1;
                     }
@@ -442,11 +458,13 @@ impl Superdiversifier {
 
         if rules.len() == 0 {
             println!("No rules to apply");
-            return Ok(config.info().replace_multiple_sections(|_,_,_| false));
+            return Ok(config.info().replace_multiple_sections(|_, _, _| false));
         }
+        // TODO, just feed the terms for rewriting, add more rules and run the smallest replacement until
+        // nothing changes
 
         // Get the first key as the init expression
-        
+
         let code_section = config.info().get_code_section();
         let mut sectionreader = CodeSectionReader::new(code_section.data, 0)?;
         let function_count = sectionreader.get_count();
@@ -456,7 +474,7 @@ impl Superdiversifier {
 
         for i in 0..function_count {
             // TODO create a new function in the new module
-            
+
             log::debug!("Visiting function {}", i);
             let reader = sectionreader.read().unwrap();
 
@@ -473,18 +491,16 @@ impl Superdiversifier {
             let locals = self.get_func_locals(
                 &config.info(),
                 i + config.info().num_imported_functions(), /* the function type is shifted
-                                                                            by the imported functions*/
+                                                            by the imported functions*/
                 &mut localsreader,
             )?;
 
             // Visit operators from back to front, for better DFG construction
 
-            for opidx in 0.. operatorscount {
-
+            for opidx in 0..operatorscount {
                 let mut dfg = DFGBuilder::new(&config);
                 let reverseidx = operatorscount - 1 - opidx;
                 let basicblock = dfg.get_bb_from_operator(reverseidx, &operators);
-
 
                 let basicblock = match basicblock {
                     None => {
@@ -506,7 +522,6 @@ impl Superdiversifier {
                     }
                     Some(minidfg) => minidfg,
                 };
-                
 
                 if !minidfg.map.contains_key(&reverseidx) {
                     continue;
@@ -516,23 +531,24 @@ impl Superdiversifier {
                     continue;
                 };
 
-                
                 let start = minidfg.get_expr(reverseidx);
                 println!("Looking for valid replacements {}", start);
 
-
                 // Create the egraph
-                let analysis = PeepholeMutationAnalysis::new(&config.info(), /* For now pass the locals empty */ locals.clone());
+                let analysis = PeepholeMutationAnalysis::new(
+                    &config.info(),
+                    /* For now pass the locals empty */ locals.clone(),
+                );
                 let runner = Runner::<Lang, PeepholeMutationAnalysis, ()>::new(analysis)
                     .with_expr(&start)
                     .run(&rules)
-                    .with_hook(|runner|{
+                    .with_hook(|runner| {
                         println!("The egraph is {} this big", runner.egraph.total_size());
                         Ok(())
                     });
 
-                let mut egraph = runner.egraph;                    
-                
+                let mut egraph = runner.egraph;
+
                 // In theory this will return the Id of the operator eterm
                 let root = egraph.add_expr(&start);
                 egraph.rebuild();
@@ -548,7 +564,6 @@ impl Superdiversifier {
 
                     let needed_resources = Encoder::build_function(
                         config,
-                        
                         reverseidx,
                         &best_expr,
                         &operators,
@@ -571,134 +586,131 @@ impl Superdiversifier {
                             println!("Replacing...{}", i);
                             codes.function(&newfunc);
                         } else {
-                            codes.raw(
-                                &code_section.data[reader.range().start..reader.range().end],
-                            );
+                            codes.raw(&code_section.data[reader.range().start..reader.range().end]);
                         }
                     }
 
                     // Here break...this will prevent unconsistent replacements
-                    
-                        // Process the outside function needed resources
-                        // Needed globals
-                        let mut new_global_section = GlobalSection::new();
-                        // Reparse and reencode global section
-                        if let Some(_) = config.info().globals {
-                            // If the global section was already there, try to copy it to the
-                            // new raw section
-                            let global_section = config.info().get_global_section();
-                            let mut globalreader =
-                                GlobalSectionReader::new(global_section.data, 0)?;
-                            let count = globalreader.get_count();
-                            let mut start = globalreader.original_position();
 
-                            for _ in 0..count {
-                                let _ = globalreader.read()?;
-                                let current_pos = globalreader.original_position();
-                                let global = &global_section.data[start..current_pos];
-                                new_global_section.raw(global);
-                                start = current_pos;
-                            }
+                    // Process the outside function needed resources
+                    // Needed globals
+                    let mut new_global_section = GlobalSection::new();
+                    // Reparse and reencode global section
+                    if let Some(_) = config.info().globals {
+                        // If the global section was already there, try to copy it to the
+                        // new raw section
+                        let global_section = config.info().get_global_section();
+                        let mut globalreader = GlobalSectionReader::new(global_section.data, 0)?;
+                        let count = globalreader.get_count();
+                        let mut start = globalreader.original_position();
+
+                        for _ in 0..count {
+                            let _ = globalreader.read()?;
+                            let current_pos = globalreader.original_position();
+                            let global = &global_section.data[start..current_pos];
+                            new_global_section.raw(global);
+                            start = current_pos;
                         }
+                    }
 
-                        if needed_resources.len() > 0 {
-                            log::trace!("Adding {} additional resources", needed_resources.len());
-                        }
+                    if needed_resources.len() > 0 {
+                        log::trace!("Adding {} additional resources", needed_resources.len());
+                    }
 
-                        for resource in &needed_resources {
-                            match resource {
-                                ResourceRequest::Global {
-                                    index: _,
-                                    tpe,
-                                    mutable,
-                                } => {
-                                    // Add to globals
-                                    new_global_section.global(
-                                        wasm_encoder::GlobalType {
-                                            mutable: *mutable,
-                                            val_type: match tpe {
-                                                PrimitiveTypeInfo::I32 => ValType::I32,
-                                                PrimitiveTypeInfo::I64 => ValType::I64,
-                                                PrimitiveTypeInfo::F32 => ValType::F32,
-                                                PrimitiveTypeInfo::F64 => ValType::F64,
-                                                PrimitiveTypeInfo::V128 => ValType::V128,
-                                                _ => {
-                                                    unreachable!("Not valid for globals")
-                                                }
-                                            },
-                                        },
-                                        match tpe {
-                                            PrimitiveTypeInfo::I32 => &Instruction::I32Const(0),
-                                            PrimitiveTypeInfo::I64 => &Instruction::I64Const(0),
-                                            PrimitiveTypeInfo::F32 => &Instruction::F32Const(0.0),
-                                            PrimitiveTypeInfo::F64 => &Instruction::F64Const(0.0),
-                                            PrimitiveTypeInfo::V128 => &Instruction::V128Const(0),
+                    for resource in &needed_resources {
+                        match resource {
+                            ResourceRequest::Global {
+                                index: _,
+                                tpe,
+                                mutable,
+                            } => {
+                                // Add to globals
+                                new_global_section.global(
+                                    wasm_encoder::GlobalType {
+                                        mutable: *mutable,
+                                        val_type: match tpe {
+                                            PrimitiveTypeInfo::I32 => ValType::I32,
+                                            PrimitiveTypeInfo::I64 => ValType::I64,
+                                            PrimitiveTypeInfo::F32 => ValType::F32,
+                                            PrimitiveTypeInfo::F64 => ValType::F64,
+                                            PrimitiveTypeInfo::V128 => ValType::V128,
                                             _ => {
                                                 unreachable!("Not valid for globals")
                                             }
                                         },
-                                    );
-                                }
+                                    },
+                                    match tpe {
+                                        PrimitiveTypeInfo::I32 => &Instruction::I32Const(0),
+                                        PrimitiveTypeInfo::I64 => &Instruction::I64Const(0),
+                                        PrimitiveTypeInfo::F32 => &Instruction::F32Const(0.0),
+                                        PrimitiveTypeInfo::F64 => &Instruction::F64Const(0.0),
+                                        PrimitiveTypeInfo::V128 => &Instruction::V128Const(0),
+                                        _ => {
+                                            unreachable!("Not valid for globals")
+                                        }
+                                    },
+                                );
                             }
                         }
+                    }
 
-                        let code_index = config.info().code;
-                        let global_index = config.info().globals;
+                    let code_index = config.info().code;
+                    let global_index = config.info().globals;
 
-                        // This conditional placing enforces to write the global
-                        // section by respecting its relative order in the Wasm module
-                        let insert_globals_before = config
-                            .info()
-                            .globals
-                            .or(config.info().exports)
-                            .or(config.info().start)
-                            .or(config.info().elements)
-                            .or(config.info().data_count)
-                            .or(code_index);
+                    // This conditional placing enforces to write the global
+                    // section by respecting its relative order in the Wasm module
+                    let insert_globals_before = config
+                        .info()
+                        .globals
+                        .or(config.info().exports)
+                        .or(config.info().start)
+                        .or(config.info().elements)
+                        .or(config.info().data_count)
+                        .or(code_index);
 
-                        // If the mutator is in this staeg, then it passes the can_mutate flter,
-                        // which checks for code section existance
-                        let insert_globals_before = insert_globals_before.unwrap();
-                        let module = config.info().replace_multiple_sections(
-                            move |index, _sectionid, module: &mut wasm_encoder::Module| {
-                                if insert_globals_before == index
+                    // If the mutator is in this staeg, then it passes the can_mutate flter,
+                    // which checks for code section existance
+                    let insert_globals_before = insert_globals_before.unwrap();
+                    let module = config.info().replace_multiple_sections(
+                        move |index, _sectionid, module: &mut wasm_encoder::Module| {
+                            if insert_globals_before == index
                             // Write if needed or if it wasm in the init Wasm
                             && (new_global_section.len() > 0 || global_index.is_some() )
-                                {
-                                    // Insert the new globals here
-                                    module.section(&new_global_section);
-                                }
-                                if index == code_index.unwrap() {
-                                    // Replace code section
-                                    module.section(&codes);
+                            {
+                                // Insert the new globals here
+                                module.section(&new_global_section);
+                            }
+                            if index == code_index.unwrap() {
+                                // Replace code section
+                                module.section(&codes);
 
-                                    return true;
-                                }
-                                if let Some(gidx) = global_index {
-                                    // return true since the global section is written by the
-                                    // conditional position writer
-                                    return gidx == index;
-                                }
-                                // False to say the underlying encoder to write the prexisting
-                                // section
-                                false
-                            },
-                        );
-                    return Ok(module)
+                                return true;
+                            }
+                            if let Some(gidx) = global_index {
+                                // return true since the global section is written by the
+                                // conditional position writer
+                                return gidx == index;
+                            }
+                            // False to say the underlying encoder to write the prexisting
+                            // section
+                            false
+                        },
+                    );
+                    return Ok(module);
                 }
                 // Check if the operator returns an integer value
                 // if so, call souper for a replacement
-                
             }
-
         }
-        Ok(config.info().replace_multiple_sections(|_,_,_| false))
+        Ok(config.info().replace_multiple_sections(|_, _, _| false))
     }
 
     /// This method calls Souperdiversifier to construct a map of operator => replacements
     /// The caller shoudl then decide what to do with the replacements, superoptimize or diversify
-    pub fn souperdiversify_peepholes(&self, info: ModuleInfo)  -> anyhow::Result<HashMap<String, Vec<(String, i32)>>>{
-
+    pub fn souperdiversify_peepholes(
+        &self,
+        info: ModuleInfo,
+    ) -> anyhow::Result<HashMap<String, Vec<(String, i32)>>> {
         let code_section = info.get_code_section();
         let mut sectionreader = CodeSectionReader::new(code_section.data, 0)?;
         let function_count = sectionreader.get_count();
@@ -708,7 +720,7 @@ impl Superdiversifier {
 
         for i in 0..function_count {
             // TODO create a new function in the new module
-            
+
             log::debug!("Visiting function {}", i);
             let reader = sectionreader.read().unwrap();
 
@@ -725,18 +737,16 @@ impl Superdiversifier {
             let locals = self.get_func_locals(
                 &info,
                 i + info.num_imported_functions(), /* the function type is shifted
-                                                                            by the imported functions*/
+                                                   by the imported functions*/
                 &mut localsreader,
             )?;
 
             // Visit operators from back to front, for better DFG construction
 
-            for opidx in 0.. operatorscount {
-
+            for opidx in 0..operatorscount {
                 let mut dfg = DFGBuilder::new(&config);
                 let reverseidx = operatorscount - 1 - opidx;
                 let basicblock = dfg.get_bb_from_operator(reverseidx, &operators);
-
 
                 let basicblock = match basicblock {
                     None => {
@@ -758,7 +768,6 @@ impl Superdiversifier {
                     }
                     Some(minidfg) => minidfg,
                 };
-                
 
                 if !minidfg.map.contains_key(&reverseidx) {
                     continue;
@@ -770,11 +779,10 @@ impl Superdiversifier {
 
                 let start = minidfg.get_expr(reverseidx);
 
-
                 let analysis = PeepholeMutationAnalysis::new(&info, locals.clone());
                 let runner = Runner::<Lang, PeepholeMutationAnalysis, ()>::new(analysis.clone())
                     .with_expr(&start);
-                    // Since no rule is provided the created egraph is lane
+                // Since no rule is provided the created egraph is lane
 
                 let mut egraph = runner.egraph;
                 // In theory this will return the Id of the operator eterm
@@ -794,10 +802,15 @@ impl Superdiversifier {
                                 let souperIRC = CString::new(souperIR).unwrap();
 
                                 if numoperands > 1 {
-                                    let startptr = CString::new(format!("({}", start.to_string())).unwrap();
+                                    let startptr =
+                                        CString::new(format!("({}", start.to_string())).unwrap();
                                     // Call Souper
                                     unsafe {
-                                        superoptimize( souperIRC.as_ptr(), startptr.as_ptr() ,Superdiversifier::callback);
+                                        superoptimize(
+                                            souperIRC.as_ptr(),
+                                            startptr.as_ptr(),
+                                            Superdiversifier::callback,
+                                        );
                                     }
                                 }
                                 // Free resource
@@ -808,8 +821,7 @@ impl Superdiversifier {
                                 continue;
                             }
                         }
-                        
-                    },
+                    }
                     _ => {
                         log::info!("Invalid return type, not integer");
                         // TODO add as it is to the new function, and jump to the
@@ -827,15 +839,12 @@ impl Superdiversifier {
         // Or, replace one by one and generate new modules
         Ok(REPLACEMENT_MAP.lock().unwrap().clone())
     }
-
-
-
 }
-
 
 pub type CBType = extern "C" fn(*const c_char, *const c_char, i32) -> i32;
 
-extern {
+extern "C" {
     pub fn hello();
     pub fn superoptimize(lhs: *const c_char, lang: *const c_char, cb: CBType) -> i32;
 }
+

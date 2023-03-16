@@ -4,7 +4,7 @@ metadata:
   generateName: reward-mutate-33-
 spec:
   entrypoint: per-file
-  parallelism: 13
+  parallelism: 5
   arguments:
     parameters:
     - name: attempts
@@ -21,6 +21,12 @@ spec:
               value: "{{ item.file }}"
         withItems: 
 
+          - { file: "a32a6f4bbd1918accf9ce8206bbf8e1346eb93c283d44e3320b24c7cd7861b41.wasm" }
+          - { file: "68ca7c0e99a5df6d36e52008df1b20c108d1821f28a40c349c1516900bc30322.wasm" }
+          - { file: "15b86a25f45761119d9819ad9eaedce5239a23d66f12b3f123230ff3e742774b.wasm" }
+          - { file: "8ebf4e44c47b6b61d313bd2580bd788a1daa029541fe210cccfa13d1bb66cc89.wasm" }
+          - { file: "0d99646229ea6010fa510333161653955eadb11acdb51c6cc886d1108e2fc626.wasm" }
+          - { file: "dc11d82d85b5745ff2c69e901b9b6b42da9e1c102ae45e856b0f23ed64de4309.wasm" }
           - { file: "9d30e7f065cd00a47d8e10e27acc443a33977176484ca11077f08fc20b1a672c.wasm" }
           - { file: "dceaf65bf86d2de5bc460eef3b3c858ccdc82f478469752555e95c749324e7e2.wasm" }
           - { file: "006b2fb61de05aa4fec89f479ce45b6295c6080d6ec4bd919059c39fa2b93b31.wasm" }
@@ -48,12 +54,6 @@ spec:
           - { file: "e09c32c505dc641e678cc4c7095315454d8d7f1094d0e39a31f1160e995f2610.wasm" }
           - { file: "119c53ebaf6077a5f445262ad91d91dfa137dac4127f73d5ced76e297d022672.wasm" }
           - { file: "fbdd1efaa585e95d802322c976e39430e6abb21de467bec87f0849afeeeaaf2e.wasm" }
-          - { file: "a32a6f4bbd1918accf9ce8206bbf8e1346eb93c283d44e3320b24c7cd7861b41.wasm" }
-          - { file: "68ca7c0e99a5df6d36e52008df1b20c108d1821f28a40c349c1516900bc30322.wasm" }
-          - { file: "15b86a25f45761119d9819ad9eaedce5239a23d66f12b3f123230ff3e742774b.wasm" }
-          - { file: "8ebf4e44c47b6b61d313bd2580bd788a1daa029541fe210cccfa13d1bb66cc89.wasm" }
-          - { file: "0d99646229ea6010fa510333161653955eadb11acdb51c6cc886d1108e2fc626.wasm" }
-          - { file: "dc11d82d85b5745ff2c69e901b9b6b42da9e1c102ae45e856b0f23ed64de4309.wasm" }
   
   - name: reward-mutate
     inputs:
@@ -122,12 +122,38 @@ spec:
         continueOn:
           failed: true
   - name: analyzer-template
+    sidecars:
+    - name: vt-oracle
+      image: jacarte/vt_selenium:483344e
+      args:
+      - web
+      env:
+      - name: WEB_USER
+        value: "vt"
+      - name: WEB_PASS
+        value: "vt123"
+      - name: NO_WORKERS
+        value: "6"
+      - name: MC_ENDPOINT
+        value: "exp"
+      - name: MC_BUCKET
+        value: "vt-bucket"
+      - name: MINIO_HOST
+        value: "http://minio-service.minio:3434"
+      - name: MINIO_PASS
+        value: "minio123"
+      - name: MINIO_USER
+        value: "minio"
+      - name: MC_FILES
+        value: "vt-reward-files-multiple-count"
+      command: ["/bin/bash", "/vt_oracle/entrypoint.sh", "web"]
+      mirrorVolumeMounts: true
     volumes:
     - name: data
       emptyDir: {}
-    activeDeadlineSeconds: 86400
+    activeDeadlineSeconds: 36000
     retryStrategy:
-      limit: 8
+      limit: 10
     inputs:
     
       parameters:
@@ -226,7 +252,7 @@ spec:
             name: argo-artifacts
             key: secretkey
     script:
-      image: jacarte/obf-image:ea6740d
+      image: jacarte/obf-image:2f150ce
       command: [bash]
       volumeMounts:
       - name: data
@@ -234,10 +260,10 @@ spec:
       resources:
         requests:
           memory: "0"
-          cpu: 2
+          cpu: 1.2
       source: |
          # Install mc client to save snapshot
-          until `curl -G 'http://oracle-service.oracle:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
+          until `curl -G 'http://127.0.0.1:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
           echo "Server working"
 
           mkdir -p $HOME/minio-binaries
@@ -296,7 +322,7 @@ spec:
 
          mkdir -p datas/{{inputs.parameters.dbconn}}
          echo "Oracle {{inputs.parameters.oracle}}"
-         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward.py http://oracle-service.oracle:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
+         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward.py http://127.0.0.1:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
          
          #kill -9 $watchID
          #kill -9 $watchID2

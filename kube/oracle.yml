@@ -58,7 +58,7 @@ spec:
         - name: WEB_PASS
           value: "vt123"
         - name: NO_WORKERS
-          value: "16"
+          value: "6"
         - name: MC_ENDPOINT
           value: "exp"
         - name: MC_BUCKET
