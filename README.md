@@ -7,14 +7,14 @@ This repo contains the tooling and the reproduction of our experiments on Wasm o
 ### Setup & requirements
 - Clone this repo and its submodules `git clone --recursive` 
 - Install Rust in your computer
-- Set nightly as the version `rustup default nightly`
-- Compile the analyzer tool `cd crates/evasor && cargo build`
+    - Set nightly as the version `rustup default nightly`
+    - Compile the analyzer tool `cd crates/evasor && cargo build`
 
 - As an alternative, you can download the [ubuntu release binary](https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/analyzer) `wget -O analyzer https://github.com/Jacarte/obfuscation_wasm/releases/download/0.1.0/evasor_linux_64amd`
 - Run the analysis on a binary or a folder of Wasm binaries `RUST_LOG=evasor,wasm-mutate=debug ./target/debug/evasor --dbconn "datas/database" extract -d 4 --input "binary.wasm"  `
 
 - Run the evasion over the MINOS oracle: `RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/minos" mutate --seed 0 -s 10 -e --attempts 1000 -p 1  --input <input.wasm> --oracle python3 ../../oracles/minos/minio.py `
-
+  ```
 
 ### Evasor CLI
 
