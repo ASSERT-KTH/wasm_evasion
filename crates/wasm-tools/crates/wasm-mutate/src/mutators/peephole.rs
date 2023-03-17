@@ -441,7 +441,7 @@ impl PeepholeMutator {
         let mut operatorreader = reader.get_operators_reader()?;
         operatorreader.allow_memarg64(true);
         let mut localsreader = reader.get_locals_reader()?;
-        
+
         let mut opcode_to_mutate = oidx; // Replace by read from map fidx
         log::trace!(
             "Selecting operator {} from function {}",
@@ -455,7 +455,7 @@ impl PeepholeMutator {
             &mut localsreader,
         )?;
         let mut count = 0;
-        
+
         let mut dfg = DFGBuilder::new(config);
         let basicblock = dfg.get_bb_from_operator(opcode_to_mutate, &operators);
 
@@ -465,7 +465,7 @@ impl PeepholeMutator {
                     "Basic block cannot be constructed for opcode {:?}",
                     &operators[opcode_to_mutate]
                 );
-                return Err(Error::no_mutations_applicable());;
+                return Err(Error::no_mutations_applicable());
             }
             Some(basicblock) => basicblock,
         };
@@ -509,7 +509,7 @@ impl PeepholeMutator {
         // In theory this will return the Id of the operator eterm
         let root = egraph.add_expr(&start);
         let startcmp = start.clone();
-        
+
         // If the number of nodes in the egraph is not large, then
         // continue the search
         if egraph.total_number_of_nodes() <= 1 {
@@ -533,7 +533,7 @@ impl PeepholeMutator {
         let iter = iter.chain(lazy_expand_aux_sequential(
             root,
             egraph.clone(),
-            self.max_tree_depth 
+            self.max_tree_depth
         ));
 
         let cp = start.clone();
@@ -651,7 +651,7 @@ impl Mutator for PeepholeMutator {
         let readers = (0..function_count)
             .map(|_| sectionreader.read().unwrap())
             .collect::<Vec<_>>();
-        
+
         let mut r = vec![];
         let mut cp = config.clone();
 
@@ -753,7 +753,7 @@ impl Mutator for PeepholeMutator {
                                                 is_indexed: true,
                                                 idx: targetid,
                                                 how: "".into(),
-                                                many: 1, 
+                                                many: 1,
                                                 meta: Some(meta),
                                                 display: Some(original),
                                             };
@@ -764,7 +764,7 @@ impl Mutator for PeepholeMutator {
                                 }
                             } else {
                                 let mut meta: HashMap<String, String> = HashMap::new();
-                                
+
                                 for (idx, first) in ite.enumerate() {
 
                                     match first {
@@ -798,7 +798,7 @@ impl Mutator for PeepholeMutator {
 
                             }
                         }
-                    }   
+                    }
                 }
             }
 
