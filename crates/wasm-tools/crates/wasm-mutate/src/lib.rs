@@ -357,6 +357,7 @@ impl<'wasm> WasmMutate<'wasm> {
         self.rng.as_mut().unwrap()
     }
 
+    /// TODO
     pub fn info(&self) -> &ModuleInfo<'wasm> {
         self.info.as_ref().unwrap()
     }
