@@ -336,4 +336,3 @@ spec:
          cat /{{inputs.parameters.dbconn}}.stats.txt 
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"
-         7z a  -tzip /{{inputs.parameters.file}}.variants.zip "/vt_oracle/data"

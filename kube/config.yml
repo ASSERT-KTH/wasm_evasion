@@ -18,4 +18,3 @@ data:
           key: accesskey
         secretKeySecret:
           name: argo-artifacts
-          key: secretkey

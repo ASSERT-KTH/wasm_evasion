@@ -89,4 +89,3 @@ spec:
       targetPort: 4000
       protocol: TCP
   selector:
-    app: oracle

@@ -51,6 +51,7 @@ crawl_data*
 data
 job*
 *.png
+<<<<<<< HEAD
 reward
 files_reward
 files_reward_beta
@@ -68,3 +69,5 @@ reward*
 logs
 rq5
 binname.txt
+=======
+>>>>>>> 916a00394d097d8fcb22ca5e0bb5da64bf9f916c
