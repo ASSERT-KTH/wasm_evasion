@@ -300,7 +300,7 @@ spec:
 
          echo "Oracle {{inputs.parameters.oracle}}"
          mkdir -p datas/{{inputs.parameters.dbconn}}
-          RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --seed {{inputs.parameters.seed}} --bulk-size 1300 -s {{workflow.parameters.treesize}} -e --attempts {{workflow.parameters.attempts}} -p {{workflow.parameters.peek}}  --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count.py http://127.0.0.1:4000 {{ inputs.parameters.oracle }} vt vt123 {{inputs.parameters.seed}}_{{ inputs.parameters.file }} 1> {{inputs.parameters.dbconn}}.stats.txt
+          RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --seed {{inputs.parameters.seed}} --bulk-size 50 -s {{workflow.parameters.treesize}} -e --attempts {{workflow.parameters.attempts}} -p {{workflow.parameters.peek}}  --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count.py http://127.0.0.1:4000 {{ inputs.parameters.oracle }} vt vt123 {{inputs.parameters.seed}}_{{ inputs.parameters.file }} 1> {{inputs.parameters.dbconn}}.stats.txt
          
          #kill -9 $watchID
          #kill -9 $watchID2
@@ -313,4 +313,3 @@ spec:
          cat /{{inputs.parameters.dbconn}}.stats.txt 
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"
-         7z a  -tzip /{{inputs.parameters.file}}.variants.zip "/vt_oracle/data"

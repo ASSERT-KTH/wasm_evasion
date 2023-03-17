@@ -1,0 +1,312 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: obfuscator-mutate-33-
+spec:
+  entrypoint: per-file
+  parallelism: 13
+  arguments:
+    parameters:
+    - name: attempts
+    - name: treesize
+    - name: peek
+  templates:
+  - name: per-file
+    steps:
+    - - name: select-file
+        template: obfuscator-mutate
+        arguments:
+          parameters:
+            - name: file
+              value: "{{ item.file }}"
+        withItems:
+          # - { file: "0d99646229ea6010fa510333161653955eadb11acdb51c6cc886d1108e2fc626.wasm" }
+          # - { file: "dc11d82d85b5745ff2c69e901b9b6b42da9e1c102ae45e856b0f23ed64de4309.wasm" }
+          # - { file: "942be4f7a78a50453f8949a0a20e1ae66a5b84a67db712fab66d3a9541087519.wasm" }
+          # - { file: "5bc5334382f650c8a7cc38d651b86db06eb755b64662eaef42c6040cf879f0ce.wasm" }
+          # - { file: "fb15929fb454d62f2dbabb306d9b73b3b1fe4526e6b4a76a7a23519273c6c519.wasm" }
+          # - { file: "f0b244090f9e4a9f599a68f42d7a89e003026202324cf86c6cd4a46ad8c98da8.wasm" }
+          #- { file: "d2141ff28b1c81a90177319d3f4ddc17ab5c493d165be73a4af7256474a4ed58.wasm" }
+          # - { file: "a27b45ef89b961b8c8ff78b6ab580ce0d866647c3ae03c4ab0f37ba15c433f8f.wasm" }
+          # - { file: "6b8c789921d0ca5531295477c7703d2f5ec619a8bbb51db41928b5c4f1c3f6e4.wasm" }
+          # - { file: "c1be4071ccc59e468803cb9b9eae25ec3aaff24f1d37ee0b81ba9126f8334572.wasm" }
+          # - { file: "089dd3123f4322e38e3130b3c051b00f66b52070a5634242f4310a4c64709eac.wasm" }
+          # - { file: "4cbdbbb1bc6880ecff2f1bc6cb66444b319cc57cf47e8a35f956c36f5bec2bbb.wasm" }
+          # - { file: "aafff58765c917b0900726ecca11c715c38c3c25b1be9e0af130e0f5b170c14e.wasm" }
+          # - { file: "046dc081076d9cea6831967619b862cc80fa8c2381346406ec639c899cda640f.wasm" }
+          # - { file: "59955b4c538d0b45961e19b70c4ab7a101968561a353186045bde628c0d72dbb.wasm" }
+          # - { file: "65debcbe8c6e64a04c9c3b75794b77644526a514d89a09f037f2cf53f2aa2f98.wasm" }
+          # - { file: "47d299593572faf8941351f3ef8e46bc18eb684f679d87f9194bb635dd8aabc0.wasm" }
+          - { file: "000415b2639c960e039299fde2a52e7e9c692c212c1fa6ca4701eec637ff6a30.wasm" }
+          - { file: "24aae13ae29d012fdf36cacc6871640f6883f07a0d42eea40cfe277950ca16c9.wasm" }
+            #- { file: "643116ff7be6f5a1e538ceeca66f7815e3e1f0c95033fe9824c83875d31d38fa.wasm" }
+            #- { file: "89a3645c1680125a0a2bcf30c33456f30a8235efbfb3c731e94244fa1f925c46.wasm" }
+            #- { file: "7c36f462eacff709b8821154424abb0386373d7d763c45998d298c1aab7921b5.wasm" }
+            #- { file: "a74a7cb854cd33442d8ef481d341b4a0632b88d8def1d22852adb10de8f7cbf3.wasm" }
+            #- { file: "e09c32c505dc641e678cc4c7095315454d8d7f1094d0e39a31f1160e995f2610.wasm" }
+            #- { file: "119c53ebaf6077a5f445262ad91d91dfa137dac4127f73d5ced76e297d022672.wasm" }
+            #- { file: "fbdd1efaa585e95d802322c976e39430e6abb21de467bec87f0849afeeeaaf2e.wasm" }
+            #- { file: "9d30e7f065cd00a47d8e10e27acc443a33977176484ca11077f08fc20b1a672c.wasm" }
+            #- { file: "dceaf65bf86d2de5bc460eef3b3c858ccdc82f478469752555e95c749324e7e2.wasm" }
+            #- { file: "006b2fb61de05aa4fec89f479ce45b6295c6080d6ec4bd919059c39fa2b93b31.wasm" }
+            #- { file: "a32a6f4bbd1918accf9ce8206bbf8e1346eb93c283d44e3320b24c7cd7861b41.wasm" }
+            #- { file: "68ca7c0e99a5df6d36e52008df1b20c108d1821f28a40c349c1516900bc30322.wasm" }
+            #- { file: "15b86a25f45761119d9819ad9eaedce5239a23d66f12b3f123230ff3e742774b.wasm" }
+            #- { file: "8ebf4e44c47b6b61d313bd2580bd788a1daa029541fe210cccfa13d1bb66cc89.wasm" }
+
+  - name: obfuscator-mutate
+    inputs:
+      parameters:
+      - name: file
+    steps:
+    - - name: select-oracle
+        template: select-oracle-template
+        arguments:
+          parameters:
+          - name: oracle
+            value: "{{ item.oracle }}"
+          - name: seed
+            value: "{{ item.seed }}"
+          - name: file
+            value: "{{inputs.parameters.file}}"
+        withItems:
+          #- { oracle: 'minos2', seed: 1 }
+          #- { oracle: 'minos3', seed: 2 }
+          #- { oracle: 'minos4', seed: 3 }
+          #- { oracle: 'minos5', seed: 4 }
+          #- { oracle: 'minos6', seed: 5 }
+          #- { oracle: 'minos7', seed: 6 }
+          #- { oracle: 'minos8', seed: 7 }
+          #- { oracle: 'minos9', seed: 8 }
+          - { oracle: 'minos1103', seed: 139 }
+          - { oracle: 'minos1113', seed: 1310 }
+          - { oracle: 'minos122', seed: 1111 }
+          - { oracle: 'minos133', seed: 1112 }
+          - { oracle: 'minos144', seed: 1113 }
+          - { oracle: 'minos155', seed: 1214 }
+          - { oracle: 'minos166', seed: 1115 }
+          - { oracle: 'minos177', seed: 1216 }
+          - { oracle: 'minos188', seed: 1317 }
+          - { oracle: 'minos1188', seed: 1417 }
+          - { oracle: 'minos1880', seed: 11317 }
+          - { oracle: 'minos1188', seed: 13017 }
+          - { oracle: 'minos1288', seed: 13170 }
+          - { oracle: 'minos1488', seed: 19317 }
+          - { oracle: 'minos1301', seed: 1301 }
+          - { oracle: 'minos1302', seed: 1302 }
+          - { oracle: 'minos1303', seed: 1303 }
+          - { oracle: 'minos1304', seed: 1304 }
+          - { oracle: 'minos1305', seed: 1305 }
+
+
+
+            #
+          #
+          #
+          #
+          # Add the others here
+
+  - name: select-oracle-template
+    inputs:
+      parameters:
+      - name: oracle
+      - name: file
+      - name: seed
+    steps:
+    - - name: execute-analyzer
+        template: analyzer-template
+        arguments:
+          parameters:
+          - name: oracle
+            value: "{{ inputs.parameters.oracle }}"
+          - name: seed
+            value: "{{ inputs.parameters.seed }}"
+          - name: features
+            value: "{{item.features}}"
+          - name: file
+            value: "{{ inputs.parameters.file }}"
+          - name: dbconn
+            value: "{{item.dbconn}}"
+        withItems:
+          - { dbconn: "all", features: "wasm-mutate/all" }
+        continueOn:
+          failed: true
+  - name: analyzer-template
+    volumes:
+    - name: data
+      emptyDir: {}
+    activeDeadlineSeconds: 36000
+    retryStrategy:
+      limit: 8
+    inputs:
+
+      parameters:
+      - name: oracle
+      - name: dbconn
+      - name: features
+      - name: file
+      - name: seed
+      artifacts:
+      - name: data
+        path: /input.wasm
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "wasms/{{inputs.parameters.file}}"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    outputs:
+      artifacts:
+      - name: variants
+        path: /{{inputs.parameters.file}}.variants.zip
+        optional: true
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/vt/v8/{{inputs.parameters.oracle}}/variants/{{inputs.parameters.seed}}/{{inputs.parameters.file}}.variants.zip"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: data
+        path: /{{inputs.parameters.dbconn}}.zip
+        optional: true
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/vt/v8/{{inputs.parameters.oracle}}/mutate_datas/{{inputs.parameters.seed}}/{{inputs.parameters.file}}/{{inputs.parameters.dbconn}}.zip"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: logs
+        path: /{{inputs.parameters.dbconn}}.logs.txt
+        optional: true
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/vt/v8/{{inputs.parameters.oracle}}/logs_mutate/{{inputs.parameters.seed}}/{{inputs.parameters.file}}/{{inputs.parameters.dbconn}}.logs.txt"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+      - name: stats
+        path: /{{inputs.parameters.dbconn}}.stats.txt
+        optional: true
+        archive:
+          none: {}
+        s3:
+          bucket: my-bucket
+          endpoint: minio-service.minio:3434
+          insecure: true
+          # Avoid to mount the full metas_filtered folder in the container
+          key: "data/vt/v8/{{inputs.parameters.oracle}}/logs_mutate/{{inputs.parameters.seed}}/{{inputs.parameters.file}}/{{inputs.parameters.dbconn}}.stats.txt"
+          accessKeySecret:
+            name: argo-artifacts
+            key: accesskey
+          secretKeySecret:
+            name: argo-artifacts
+            key: secretkey
+    script:
+      image: jacarte/obf-image:ea6740d
+      command: [bash]
+      volumeMounts:
+      - name: data
+        mountPath: /vt_oracle/data
+      resources:
+        requests:
+          memory: "0"
+          cpu: 2
+      source: |
+         # Install mc client to save snapshot
+
+          mkdir -p $HOME/minio-binaries
+          wget -O $HOME/minio-binaries/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          ls
+          echo "======"
+          chmod +x $HOME/minio-binaries/mc
+          export PATH=$PATH:$HOME/minio-binaries/
+
+          mc config host add exp http://minio-service.minio:3434 minio minio123
+
+
+          if [[  $(mc ls exp/my-bucket/data/vt/v8/{{ inputs.parameters.oracle }}/mutate_datas/{{inputs.parameters.seed}}/{{inputs.parameters.file}}/{{inputs.parameters.dbconn}}.zip | wc -l) -gt 0 ]]
+          then
+            echo "Checking if stderr is non empty"
+            mc cp exp/my-bucket/data/vt/v8/{{ inputs.parameters.oracle }}/mutate_datas/{{inputs.parameters.seed}}/{{inputs.parameters.file}}/{{inputs.parameters.dbconn}}.zip /tmp/test.zip
+            unzip -d /tmp/{{inputs.parameters.file}}_info /tmp/test.zip
+
+            if [[ $(($(find /tmp/{{inputs.parameters.file}}_info -type f -regex ".*/interesting/.*/stderr.txt" -exec cat {} \; | wc -c))) == '0' ]];
+            then
+              echo "Already exist. Skip"
+              # Check the number of oracles ?
+              exit 0
+            else
+              echo "Redoing"
+            fi
+
+          fi
+
+          # Now copy this into /wasms
+
+         # Update with latest version
+         git pull
+         git submodule update --recursive
+
+         ls -R ../oracles
+         pip3 install -r ../oracles/requirements.txt
+
+         # Ok compile the right version
+         $HOME/.cargo/bin/cargo build --release --features "{{inputs.parameters.features}}"
+
+          # launch watchdog
+          touch "{{inputs.parameters.dbconn}}.stats.txt"
+          #bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.stats.txt" 60 {{inputs.parameters.file}} &
+          #watchID=$!
+
+          touch "{{inputs.parameters.dbconn}}.logs.txt"
+          #bash watchdog_interval.sh "{{inputs.parameters.dbconn}}.logs.txt" 60 {{inputs.parameters.file}} &
+          #watchID2=$!
+
+         echo "Oracle {{inputs.parameters.oracle}}"
+         mkdir -p datas/{{inputs.parameters.dbconn}}
+          RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --seed {{inputs.parameters.seed}} -s {{workflow.parameters.treesize}} -e --attempts {{workflow.parameters.attempts}} -p {{workflow.parameters.peek}}  --input /input.wasm --oracle python3 ../../oracles/minos/minio.py 1> {{inputs.parameters.dbconn}}.stats.txt
+
+         #kill -9 $watchID
+         #kill -9 $watchID2
+
+         ls .
+         #touch /{{inputs.parameters.dbconn}}.logs.txt
+         cp probes.logs.txt /{{inputs.parameters.dbconn}}.logs.txt
+         cp {{inputs.parameters.dbconn}}.stats.txt  /{{inputs.parameters.dbconn}}.stats.txt
+         cp probes.logs.txt datas/{{inputs.parameters.dbconn}}
+         cat /{{inputs.parameters.dbconn}}.stats.txt
+         # Now save the datas folder
+         7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"
+         7z a  -tzip /{{inputs.parameters.file}}.variants.zip "/vt_oracle/data"

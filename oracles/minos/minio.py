@@ -9,10 +9,10 @@ class MINOS:
     '''
         A class for the implementation of the MINOS proposal (https://www.ndss-symposium.org/wp-content/uploads/ndss2021_4C-4_24444_paper.pdf)
         ...
-        
+
         Attributes
         ----------
-        
+
         classes: list
             Do not change this attribute, it contains the mapping from the literal CLASS value: BENIGN or MALIGN as indexes in the array
             Use this attribute to refer to the index of the correct label,
@@ -41,25 +41,25 @@ class MINOS:
         model.add(Conv2D(64, kernel_size=3, activation='relu'))
         if add_maxpool:
             model.add(MaxPooling2D(pool_size=(2, 2)))
-            
+
         model.add(Flatten())
         model.add(Dense(2, activation='softmax'))
 
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
-        
+
         # To print the summary of the CNN model, layers, parameters, etc
         model.summary()
 
         self.model = model
 
-        
-    # 
-    # 
+
+    #
+    #
     def preprocess(self, data, shape=(100,100)):
         """
         This method returns a collection of image pixels.
-        
-        Each pixel value is stored in a column with the name `<row>_<column>` 
+
+        Each pixel value is stored in a column with the name `<row>_<column>`
         for the 100x100 binary transformation. There should be a total of 100x100 columns then. To get
         the column values you can construct the following array `[f"{x}_{y}" for x in range(shape[0]) for y in range(shape[1])]`
         and then access the pandas frame.
@@ -71,7 +71,7 @@ class MINOS:
         shape: tuple
             Image tuple size (width, height), default value as (100,100)
         """
-        
+
         features = [f"{x}_{y}" for x in range(shape[0]) for y in range(shape[1])]
         # Categorize data
         labels = data['CLASS'].apply(lambda x: MINOS.classes.index(x))
@@ -81,7 +81,7 @@ class MINOS:
         return values, np.array(labels)
 
     def fit(self, model_name="minos.h5"):
-        
+
         """
         Trains the classifier
 
@@ -98,16 +98,16 @@ class MINOS:
             The model can be saved as a h5 file after training, the model will be saved with this parameter value as name
             The training will be avoided if there is a file with this name.
         """
-        
-        
-        
+
+
+
         self.model = keras.models.load_model(model_name)
-            
+
 
 
     def predict(self, data):
         """
-        Given dataframe, uses the fitted model to 
+        Given dataframe, uses the fitted model to
         predict the labels
 
         Parameters
@@ -122,11 +122,11 @@ class MINOS:
         d = pd.DataFrame(p, columns=MINOS.classes)
         return d
 
-    
+
     def predict_classes(self, pd,  predictions):
         """
          The predictions (predict method) are given using a column per label,
-         and setting the row values to the probability of the instance to be that 
+         and setting the row values to the probability of the instance to be that
          class. This method, adds a new column, 'CLASS', and sets its value to the
          name of the prediction column with higher probability.
 
@@ -140,6 +140,19 @@ class MINOS:
         cp = pd.reset_index()
         cp['CLASS'] = predictions.idxmax(axis=1)
         return cp
+
+def get(input):
+    CURRENT_DIR = os.path.dirname(__file__)
+    t = time.time()
+    minos = MINOS()
+    minos.fit(model_name=f"{CURRENT_DIR}/original23.h5")
+    print("Time loading", time.time() - t)
+    t = time.time()
+    pixels = preprocess_csv(input)
+    print("Time preprocess", time.time() - t)
+    predictions = minos.predict(pixels)
+    print(predictions)
+
 
 if __name__ == '__main__':
     CURRENT_DIR = os.path.dirname(__file__)

@@ -2,6 +2,7 @@ data:
   
   config: |
     artifactRepository:
+      archiveLogs: true
       s3:
         bucket: my-bucket
         endpoint: minio-service.minio:3434
@@ -17,4 +18,3 @@ data:
           key: accesskey
         secretKeySecret:
           name: argo-artifacts
-          key: secretkey

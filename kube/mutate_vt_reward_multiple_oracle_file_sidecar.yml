@@ -4,7 +4,7 @@ metadata:
   generateName: reward-mutate-33-
 spec:
   entrypoint: per-file
-  parallelism: 13
+  parallelism: 5
   arguments:
     parameters:
     - name: attempts
@@ -226,7 +226,7 @@ spec:
             name: argo-artifacts
             key: secretkey
     script:
-      image: jacarte/obf-image:ea6740d
+      image: jacarte/obf-image:2f150ce
       command: [bash]
       volumeMounts:
       - name: data
@@ -234,10 +234,10 @@ spec:
       resources:
         requests:
           memory: "0"
-          cpu: 2
+          cpu: 1.2
       source: |
          # Install mc client to save snapshot
-          until `curl -G 'http://oracle-service.oracle:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
+          until `curl -G 'http://127.0.0.1:4000/' >& /tmp/out`; do echo sleep && sleep 1; done
           echo "Server working"
 
           mkdir -p $HOME/minio-binaries
@@ -296,7 +296,7 @@ spec:
 
          mkdir -p datas/{{inputs.parameters.dbconn}}
          echo "Oracle {{inputs.parameters.oracle}}"
-         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward.py http://oracle-service.oracle:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
+         RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/{{inputs.parameters.dbconn}}" mutate --use-reward --seed {{inputs.parameters.seed}} --beta {{inputs.parameters.beta}} --peek_count {{inputs.parameters.peek}} -e --attempts {{workflow.parameters.attempts}} --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward.py http://127.0.0.1:4000 {{ inputs.parameters.oracle }} vt vt123 multiple_steps_{{ inputs.parameters.file }}
          
          #kill -9 $watchID
          #kill -9 $watchID2
@@ -310,4 +310,3 @@ spec:
          cat /{{inputs.parameters.dbconn}}.stats.txt 
          # Now save the datas folder
          7z a  -tzip /{{inputs.parameters.dbconn}}.zip "datas/"
-         7z a  -tzip /{{inputs.parameters.file}}.variants.zip "/vt_oracle/data"

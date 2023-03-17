@@ -13,6 +13,7 @@ on:
       - .github/**
 
 jobs:
+  # TODO Add test and format issues
   build:
     name: Build binaries
     # This job runs on Linux

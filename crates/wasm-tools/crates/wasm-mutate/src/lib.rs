@@ -11,7 +11,6 @@
 #![feature(stmt_expr_attributes)]
 #[macro_use]
 
-
 mod error;
 pub mod info;
 pub mod module;
@@ -30,7 +29,7 @@ use crate::mutators::{
 use info::ModuleInfo;
 use mutators::Mutator;
 use rand::{rngs::SmallRng, Rng, SeedableRng};
-use std::{cell::Cell, sync::Arc, path::Path, os::unix::net::UnixStream, io::Write};
+use std::{cell::Cell, io::Write, os::unix::net::UnixStream, path::Path, sync::Arc};
 
 #[cfg(feature = "clap")]
 use clap::Parser;
@@ -192,7 +191,6 @@ pub struct WasmMutate<'wasm> {
     #[cfg_attr(feature = "clap", clap(long))]
     reduce: bool,
 
-
     /// Peephole tree size
     #[cfg_attr(feature = "clap", clap(long))]
     peephole_size: u32,
@@ -223,7 +221,7 @@ impl Default for WasmMutate<'_> {
             reduce: false,
             raw_mutate_func: None,
             fuel: Cell::new(u64::MAX),
-            peephole_size:1,
+            peephole_size: 1,
             rng: None,
             info: None,
         }
@@ -246,7 +244,6 @@ impl<'wasm> WasmMutate<'wasm> {
         self.preserve_semantics = preserve_semantics;
         self
     }
-
 
     /// Set peephole size
     pub fn peephole_size(&mut self, peephole_size: u32) -> &mut Self {
@@ -360,12 +357,13 @@ impl<'wasm> WasmMutate<'wasm> {
         self.rng.as_mut().unwrap()
     }
 
-    pub(crate) fn info(&self) -> &ModuleInfo<'wasm> {
+    /// TODO
+    pub fn info(&self) -> &ModuleInfo<'wasm> {
         self.info.as_ref().unwrap()
     }
 
     ///
-    pub fn is_some(&self) -> bool { 
+    pub fn is_some(&self) -> bool {
         self.info.is_some()
     }
 
@@ -429,7 +427,6 @@ pub(crate) fn validate(bytes: &[u8]) {
     panic!("wasm failed to validate: {} (written to test.wasm)", err);
 }
 
-
 /// TODO
 pub static SOCKET_PATH: &'static str = "probes.sock";
 
@@ -449,8 +446,8 @@ pub fn send_signal_to_probes_socket(signal: String) {
     let mut stream = match UnixStream::connect(&socket) {
         Err(_) => {
             log::error!("server is not running");
-            return
-        },
+            return;
+        }
         Ok(stream) => stream,
     };
 
@@ -458,8 +455,9 @@ pub fn send_signal_to_probes_socket(signal: String) {
     match stream.write(&signal.as_bytes()) {
         Err(_) => {
             log::error!("couldn't send message");
-            return
+            return;
         }
         Ok(_) => {}
     }
 }
+
