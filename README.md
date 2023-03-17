@@ -43,7 +43,7 @@ The `evasor` bin perform the evasion of a passed oracle. The oracle can be set w
 - Run the baseline evasion over the MINOS oracle: `RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/minos" mutate --seed 0 -s 10 -e --attempts 1000 -p 1  --input <input.wasm> --oracle python3 ../../oracles/minos/minio.py `
 
 
-- Run the basesline evasion over the VirusTotal oracle. This example assumes that out VirusTotal oracle is runnin on `http://127.0.0.1:4000`. Follow the [instructions](/oracles/vt_custom_chrome) to deploy our VirusTotal wrapper: `RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/all" mutate --seed 0 --bulk-size 50 -s 10 -e --attempts 1000 -p 1  --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count.py http://127.0.0.1:4000 vt vt vt123 malware_file_1`
+- Run the basesline evasion over the VirusTotal oracle. This example assumes that our VirusTotal oracle is running on `http://127.0.0.1:4000`. Follow the [instructions](/oracles/vt_custom_chrome) to deploy our VirusTotal wrapper: `RUST_BACKTRACE=1 RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/all" mutate --seed 0 --bulk-size 1 -s 10 -e --attempts 1000 -p 1  --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count.py http://127.0.0.1:4000 vt vt vt123 malware_file_1`
 
 - Run the mcmc evasion over VirusTotal (assume the VirusTotal wrapper of the previous example): `RUST_LOG=evasor=debug ./target/release/evasor --dbconn "datas/all" mutate --use-reward --seed 0 --beta 0.3 --peek_count 2 -e --attempts 1000 --input /input.wasm --oracle python3 ../../oracles/vt_custom_chrome/vt_oracle_count_reward.py http://127.0.0.1:4000 vt vt vt123 multiple_steps_malware_file`
 
