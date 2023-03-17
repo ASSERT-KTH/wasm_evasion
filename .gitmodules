@@ -1,0 +1,3 @@
+[submodule "wasm-tools"]
+	path = crates/wasm-tools
+	url = https://github.com/Jacarte/wasm-tools.git
