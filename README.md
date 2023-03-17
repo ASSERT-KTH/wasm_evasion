@@ -36,7 +36,7 @@ archivePrefix = {arXiv},
 
 ## Evasor
 
-The `evasor` bin perform the evasion of a passed oracle. The oracle can be set with the `--oracle` option. The oracle argument should be another executable script or binary that receives a Wasm program as the first argument. The oracle binary should return exit code 0 if the binary evades, otherwise the exit code is used by the evasor as the numeric value returned by the fitness function. For example, to perform the evasion of VirusTotal, the exit code of the script is the number of bypassed vendors.
+The `evasor` bin performs the evasion over an oracle. The oracle can be set with the `--oracle` option. The oracle argument should be another executable script or binary that receives a Wasm program as the first argument. The oracle binary should return exit code 0 if the binary evades, otherwise the exit code is used by the evasor as the numeric value returned by the fitness function. For example, to perform the evasion of VirusTotal, the exit code of the script is the number of bypassed vendors.
 
 ### Examples
 
