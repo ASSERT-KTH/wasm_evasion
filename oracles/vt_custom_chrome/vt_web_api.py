@@ -53,7 +53,7 @@ def server():
             return username
 
     @app.route('/')
-    @auth.login_required    
+    @auth.login_required
     def index():
         return f'Workcount {len(worklist)}'
 
@@ -62,12 +62,18 @@ def server():
         COUNT += 1
         print("Received count", COUNT)
         # check if the post request has the file part
+        if task == 'FILE':
+            with lock:
+                worklist.append([request.hash, f"{outfolder}", task ])
+            return request.hash
+
         print(request)
         if 'file' not in request.files:
             return 'No file provided', 500
         file = request.files['file']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
+
         if file.filename == '':
             return 'No file provided', 500
         if file:
@@ -116,7 +122,7 @@ def server():
                         worklist.append([f"/tmp/{hash}.wasm", f"{outfolder}", task ])
             except Exception as e:
                 print(e)
-            return hash 
+            return hash
 
     @app.route('/upload_file/<outfolder>', methods=['GET', 'POST'])
     @auth.login_required
@@ -124,7 +130,7 @@ def server():
         global COUNT
         if request.method == 'POST':
             return upload_with_task(outfolder, request, "SUBMIT")
-            
+
         return 'Enqueue a file'
 
     @app.route('/details/<outfolder>', methods=['GET', 'POST'])
@@ -132,9 +138,38 @@ def server():
     def get_details(outfolder):
         global COUNT
         if request.method == 'POST':
+
             return upload_with_task(outfolder, request, "DETAILS")
-            
+
         return 'Enqueue a file'
+
+    @app.route('/vt/detail/<hash>', methods=['POST'])
+    @auth.login_required
+    def get_vt_on(hash):
+        # Call the web gui
+        if request.method == 'POST':
+            driver = vt_web_gui.setUp()
+
+
+
+            try:
+                mod:vt_web_gui = importlib.reload(vt_web_gui)
+                isWasm = mod.check_for_hash(driver, hash, out=f"data", wrapper=mcwrapper,                                    waiting_time_for_upload=0,
+                                    waiting_time_for_analysis=0.01,
+                                    waiting_time_for_hash=0.01,
+                                    waiting_time_to_get_info=0.01,
+                                    waiting_time_to_check_final=0.01,
+                                    watiting_for_button_time=0.01,
+                                    button_not_clicked_times=100
+                                )
+                return "1" if isWasm else "0"
+
+            except Exception as e:
+                print(e)
+                return "0"
+
+        return "0"
+
 
     @app.route('/get_result/<out>/<hash>')
     @auth.login_required
@@ -155,7 +190,7 @@ def server():
             tmp.close()
 
             f, _ = parse_result.parse_result(f"/tmp/{hsh}")
-            
+
 
             if b"Analysing (" not in content or f['engines'].values[0] >= TH:
                 tmpcsv = f"/tmp/{hsh}.csv"
@@ -173,11 +208,11 @@ def server():
                 print("Removing invalid result, asking to requeue")
                 mcwrapper.remove(f"data/{out}/{hash}.wasm.logs.txt")
                 return 'REQUEUE'
-            
+
 
         # Return none if the hash was not yet added to the queue
         return 'INVALID'
-    
+
     @app.route('/get_all_results/<out>')
     @auth.login_required
     def get_all_results(out):
@@ -191,18 +226,18 @@ def server():
 
             output = make_response(open(f"/tmp/{out}/all.csv", "r").read())
             mcwrapper.save(f"data/upload/{out}/all.csv", open(f"/tmp/{out}/all.csv", "r").read())
-            
+
             output.headers["Content-Disposition"] = f"attachment; filename=data/upload/{out}/all.csv"
             output.headers["Content-type"] = "text/csv"
             return output
         except Exception as e:
             # Empty response
-            output = make_response(f"No folder found {e}")            
+            output = make_response(f"No folder found {e}")
             output.headers["Content-Disposition"] = f"attachment; filename=data/upload/none.txt"
             output.headers["Content-type"] = "text/csv"
             return output
 
-        
+
     def check_files():
 
         WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "1"))
@@ -233,6 +268,10 @@ def server():
                 with lock:
                     filename, outfolder, task = worklist.pop(0)
 
+                print("Work count", s)
+                times = 0
+                driver = vt_web_gui.setUp()
+
                 content = open(filename, "rb").read()
                 hash = hashlib.sha256(content).hexdigest()
                 if mcwrapper.exists(f"data/{outfolder}/{hash}.wasm.logs.txt"):
@@ -251,17 +290,14 @@ def server():
                     if "Analysing (" not in content or f['engines'].values[0] >= TH:
                         print("Engines", f['engines'].values[0])
                         print(f"File {filename} already checked")
-                        continue 
-                    else: 
+                        continue
+                    else:
                         print("File existed before but was invalid")
 
                 if mcwrapper.exists(f"data/{outfolder}/{hash}.details.txt"):
                     print(f"File {filename} already checked")
-                    continue 
+                    continue
 
-                print("Work count", s)
-                times = 0        
-                driver = vt_web_gui.setUp()
 
                 done = False
                 while times < 2:
@@ -272,7 +308,7 @@ def server():
 
                         if task == 'SUBMIT':
                             mod:vt_web_gui = importlib.reload(vt_web_gui)
-                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper, 
+                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper,
                                     waiting_time_for_upload=waiting_time_for_upload,
                                     waiting_time_for_analysis=waiting_time_for_analysis,
                                     waiting_time_for_hash=waiting_time_for_hash,
@@ -280,10 +316,10 @@ def server():
                                     waiting_time_to_check_final=waiting_time_to_check_final,
                                     watiting_for_button_time=watiting_for_button_time,
                                     button_not_clicked_times=button_not_clicked_times
-                                ) 
+                                )
                         elif task == 'DETAILS':
                             mod:vt_check_hash = importlib.reload(vt_check_hash)
-                            mod.check_hash(driver, hash, wrapper=mcwrapper) 
+                            mod.check_hash(driver, hash, wrapper=mcwrapper)
 
                         done = True
                         break
@@ -336,7 +372,7 @@ def server():
             import random
             for _ in range(WORKERS_NUMBER - 2):
                 th = threading.Thread(target=process, kwargs=dict(
-                        
+
                     waiting_time_for_upload=random.randint(1, 10)/10.0,
                     waiting_time_for_analysis=random.randint(1, 10),
                     waiting_time_for_hash=random.randint(1, 10)/10.0,
@@ -347,7 +383,7 @@ def server():
                 ))
                 workers.append(th)
                 th.start()
-            
+
         return workers
 
 
@@ -358,7 +394,7 @@ def server():
         except Exception as e:
             print(e)
 
-        mcwrapper.loadfolder("./local_tmp/data", f"data")
+        # mcwrapper.loadfolder("./local_tmp/data", f"data")
         return "./local_tmp"
 
     return app, check_files, copy_folder
@@ -368,7 +404,7 @@ def server():
 
 if __name__ == '__main__':
 
-    
+
     app, startfunc, copy_folder = server()
     copy_folder()
     print("Initializing server")

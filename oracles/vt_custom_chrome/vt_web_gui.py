@@ -29,26 +29,26 @@ TH = int(os.environ.get("TH", "58"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
-    tag = element.get_attribute('tagName')    
+    tag = element.get_attribute('tagName')
     class_ = element.get_attribute('class')
 
     text = element.text
     tags_to_skip= ["TEMPLATE" , "svg" , "g" ,"path" , "STYLE" , "img" , "video"  ]
     S =""
-    
+
     if tag in tags_to_skip:
         return S
     S += f"tag: {tag}\n"
     S += f"class: {class_}\n"
     S += f"{text}\n"
-    
+
     return S
     #shadowroot = expand_shadow_element(element)
     #if shadowroot:
      #   subelements  = shadowroot.find_elements(By.XPATH, "./*")
 
     #for obj in subelements:
-    #    expand_element(obj, fd, visited)    
+    #    expand_element(obj, fd, visited)
 
 def fullpage_screenshot(driver, name, file, from_=""):
 
@@ -83,7 +83,7 @@ def setUp():
     options.add_argument('window-size=1200x3000')
     #options.add_argument("--window-size=3200x20800")
     path = os.path.join(os.path.dirname(__file__), "chromedriver")
-    
+
     driver = webdriver.Chrome(path, options=options)
 
     return driver
@@ -107,20 +107,20 @@ def check_files(files):
             filename = worklist.get()
             worklist.task_done()
             print("Work count", s)
-            times = 0        
+            times = 0
             driver = setUp()
 
             done = False
             while times < 2:
                 try:
-                    check_file(driver, filename, prev = prev)        
+                    check_file(driver, filename, prev = prev)
                     print(f"{i}/{len(files)} {filename}")
                     done = True
                     break
                 except Exception as e:
                     print(e)
                     print(traceback.format_exc())
-                    
+
                     if "net::ERR_PROXY_CONNECTION_FAILED" in traceback.format_exc():
                         print("Trying to access file")
                         with filelock.FileLock("name.socket.lock"):
@@ -151,7 +151,7 @@ def check_files(files):
         if os.path.exists(f"out/{hash}.wasm.logs.txt"):
             print(f"{C} File {filename} already checked")
             C += 1
-            continue 
+            continue
         C2 += 1
         if C2 % 100 == 99:
             print(f"{C2}/{len(files)}")
@@ -170,7 +170,7 @@ def check_files(files):
 
     #for j in jobs:
     #    j.result()
-        
+
 
 
 def expand_shadow_element(driver, element):
@@ -186,7 +186,7 @@ def break_if_captcha(driver, name):
 
     content = driver.find_element(By.TAG_NAME, 'body')
     content_text = expand_element(driver, content, {})
-        
+
     if "captcha" in driver.current_url or "RayID" in content_text or "Forbidden" in content_text:
 
         print("Trying to access file")
@@ -200,7 +200,7 @@ def break_if_captcha(driver, name):
                 f.close()
             else:
                 print("Already restarting tor")
-            raise Exception("Blocked. Restarting tor ?") 
+            raise Exception("Blocked. Restarting tor ?")
 
 def get_confirm_btn_position(driver, name, wrapper):
     image = fullpage_screenshot(driver,name, f"{name}.png")
@@ -211,7 +211,7 @@ def get_confirm_btn_position(driver, name, wrapper):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Performing OTSU threshold
     ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
-    
+
     # Specify structure shape and kernel size.
     # Kernel size increases or decreases the area
     # of the rectangle to be detected.
@@ -219,13 +219,13 @@ def get_confirm_btn_position(driver, name, wrapper):
     # each word instead of a sentence.
     rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 21))
     rect_kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-    
+
     # Erode first to remove "Choose file border"
     dilation = cv2.erode(thresh1, rect_kernel2, iterations = 1)
     cv2.imwrite(f"{name}.gray1.png", dilation)
     # Applying dilation on the threshold image
     dilation = cv2.dilate(dilation, rect_kernel, iterations = 1)
-    
+
     cv2.imwrite(f"{name}.gray2.png", dilation)
     # Finding contours
     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL,
@@ -233,10 +233,10 @@ def get_confirm_btn_position(driver, name, wrapper):
     im2 = image.copy()
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
-        
+
         # Drawing a rectangle on copied image
         rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        
+
         # Cropping the text block for giving input to OCR
         cropped = im2[y:y + h, x:x + w]
         text = pytesseract.image_to_string(cropped)
@@ -253,6 +253,83 @@ def get_submit_btn_position(driver):
     pass
 
 
+def check_for_hash(driver, hash, out="out", wrapper=None,waiting_time_for_upload=0.34,
+    waiting_time_for_analysis=4,
+    waiting_time_for_hash=0.6,
+    waiting_time_to_get_info=0.3,
+    waiting_time_to_check_final=2,
+    watiting_for_button_time=2,
+    button_not_clicked_times=500
+):
+
+    url = f"https://www.virustotal.com/gui/file/{hash}"
+    driver.delete_all_cookies()
+    #driver.maximize_window()
+    #driver.set_window_size(300, 1800)
+    actions = ActionChains(driver)
+
+
+
+    print(f"Taking {hash}")
+    driver.get(url)
+
+    times = 0
+    time.sleep(3)
+    while "/file-analysis/" or "/search/" in driver.current_url:
+        if "/file/" in driver.current_url:
+            break
+        times += 1
+
+        if times >= 300:
+            raise Exception("Too many times")
+
+        break_if_captcha(driver, hash)
+        time.sleep(1)
+        print("Yet analysing...", driver.current_url)
+        content = driver.find_element(By.TAG_NAME, 'body')
+        content_text = expand_element(driver, content, {})
+        # image = fullpage_screenshot(driver, name, f"wrong/{name}.analysis.png",from_="Waiting from analysis")
+
+
+
+    #time.sleep(2)
+    # / 54
+    if "file" in driver.current_url:
+        times = 0
+        while True:
+            time.sleep(waiting_time_to_get_info)
+            break_if_captcha(driver, hash)
+            # Done
+            content = driver.find_element(By.TAG_NAME, 'body')
+            content_text = expand_element(driver, content, {})
+            times += 1
+            if times >= 80: # 600s 10mins
+                raise Exception("Waiting too much")
+
+            matches = re.findall(engines_re, content_text)
+            if "Analysing (" in content_text:
+                continue
+            if matches:
+                print("Analysis", hash, matches, times, "Analysing (" in content_text, TH)
+                positives = matches[0][0]
+                positives = int(positives)
+                all = matches[0][1]
+                all = int(all)
+
+                if any([
+                    x in content_text for x in [ "wasm", "wasm", "webassembly", "cryptominer", "cyptojs", "wasm" ]
+                    ]):
+
+                    print("Returning")
+                    return True
+                else:
+                    return False
+
+
+
+    return True
+
+
 def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     waiting_time_for_upload=0.34,
     waiting_time_for_analysis=4,
@@ -264,18 +341,18 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 ):
     # create a debug monitor to take screenshot
     name = os.path.basename(filename)
-   
+
     url = "https://www.virustotal.com/gui/home/upload"
     driver.delete_all_cookies()
     #driver.maximize_window()
     #driver.set_window_size(300, 1800)
     actions = ActionChains(driver)
 
-   
+
 
     print(f"Taking {name}")
     driver.get(url)
-    
+
     # To avoid bot
     # . time.sleep(random.randint(1,3))
     print("Waiting for upload btn")
@@ -301,7 +378,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
         try:
             inpt = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#fileSelector')")
             break
-        except: 
+        except:
             #print(traceback.format_exc())
 
             pass
@@ -347,7 +424,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                     print("Button found", x, y, h, w)
                     #driver.set_window_size(2400, 1800)
-              
+
                     #actions.move_by_offset(x, y).click().perform()
                     # create a marker in the page to show where the mouse is
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
@@ -359,7 +436,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
                     f.write(f"{driver.current_url}")
                     f.close()
                     wrapper.savefile(f"screenshots/{name}.url.txt", f"/tmp/url{name}")
-                
+
 
                     marker = driver.find_element(By.ID, "marker")
                     # print(marker, name)
@@ -367,16 +444,16 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                     # Remove the element
                     #driver.execute_script("document.getElementById('marker').remove();")
-                    #time.sleep(1)    
+                    #time.sleep(1)
 
                     #break
             times += 1
             if times > button_not_clicked_times:
-                print("Button not clicked ?")        
+                print("Button not clicked ?")
                 raise Exception("Too many times")
                 break
         except Exception as e:
-            print(e) 
+            print(e)
             print(traceback.format_exc())
 
             pass
@@ -405,16 +482,16 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     while "/file/" not in driver.current_url:
         break_if_captcha(driver, name)
         print(driver.current_url, times)
-        # Take an screenshot and save it 
+        # Take an screenshot and save it
         #if wrapper:
         #    fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
         #    wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
 
-        time.sleep(waiting_time_for_hash)   
+        time.sleep(waiting_time_for_hash)
         times += 1
         if times >= 60: #360s
-            raise Exception("Wait too much") 
-    
+            raise Exception("Wait too much")
+
     #time.sleep(2)
     # / 54
     if "file" in driver.current_url:
@@ -459,7 +536,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                 print(f"Done {name}")
                 return
-       
+
 
     print("Wrong result")
     #time.sleep(3)
