@@ -31,3 +31,9 @@ To access the help lines of the tool, run `./evasor --help`.
 
 ### Tests
 - Run `cargo test --features <wasm-mutate features>`
+
+## Reproducing our experiments
+
+Our experiments run as an [Argo workflow](https://argoproj.github.io/), the main reason is that the evasion pipeline can escalate horizontally, i.e., how job per malware. To fully reproduce our experiments a Kubernetes cluster is needed (minikube is an option as well for local testing). Once with the kubernetes cluster set, run the [install script](/kube/deploy.sh). The later script will create the services for argo and the artifact storage in MINIO. Thus, all jobs of evasion will collect data in the same storage layer, and you can collect them later.
+
+Once the deploy script ran, submit each experiment as an argo job `argo submit <job.yml>`. Check the job scripts if you find incongruences with the docker images used by them.
