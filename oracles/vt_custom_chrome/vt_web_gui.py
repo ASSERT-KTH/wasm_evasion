@@ -35,17 +35,23 @@ def expand_element(driver, element, visited):
     text = element.text
     tags_to_skip= ["TEMPLATE" , "svg" , "g" ,"path" , "STYLE" , "img" , "video"  ]
     S =""
+
+
     if tag in tags_to_skip:
         return S
     S += f"tag: {tag}\n"
     S += f"class: {class_}\n"
     S += f"{text}\n"
+
+
     return S
     #shadowroot = expand_shadow_element(element)
     #if shadowroot:
      #   subelements  = shadowroot.find_elements(By.XPATH, "./*")
 
     #for obj in subelements:
+    #    expand_element(obj, fd, visited)
+    #    expand_element(obj, fd, visited)
 
 def fullpage_screenshot(driver, name, file, from_=""):
 
@@ -150,7 +156,6 @@ def check_files(files):
         if os.path.exists(f"out/{hash}.wasm.logs.txt"):
             print(f"{C} File {filename} already checked")
             C += 1
-            continue
         C2 += 1
         if C2 % 100 == 99:
             print(f"{C2}/{len(files)}")
@@ -169,6 +174,7 @@ def check_files(files):
 
     #for j in jobs:
     #    j.result()
+
 
 
 
@@ -211,7 +217,6 @@ def get_confirm_btn_position(driver, name, wrapper):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Performing OTSU threshold
     ret, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
-
 
     # Specify structure shape and kernel size.
     # Kernel size increases or decreases the area
@@ -256,6 +261,7 @@ def get_submit_btn_position(driver):
     pass
 
 
+
 def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     waiting_time_for_upload=0.34,
     waiting_time_for_analysis=4,
@@ -275,9 +281,18 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     #driver.set_window_size(300, 1800)
     actions = ActionChains(driver)
 
+
+
     print(f"Taking {name}")
     driver.get(url)
 
+
+
+    print(f"Taking {name}")
+    driver.get(url)
+
+    # To avoid bot
+    # . time.sleep(random.randint(1,3))
     print("Waiting for upload btn")
     break_if_captcha(driver, name)
     times = 0
@@ -348,6 +363,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
                     print("Button found", x, y, h, w)
                     #driver.set_window_size(2400, 1800)
 
+
                     #actions.move_by_offset(x, y).click().perform()
                     # create a marker in the page to show where the mouse is
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
@@ -407,10 +423,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     while "/file/" not in driver.current_url:
         break_if_captcha(driver, name)
         print(driver.current_url, times)
-        #if wrapper:
-        #    fullpage_screenshot(driver, name, f"{name}.wait.png",from_="Waiting from file hash")
-        #    wrapper.savefile(f"{out}/{name}.wait.{times}.png", f"{name}.wait.png")
-
+        # Take an screenshot and save it
         time.sleep(waiting_time_for_hash)
         times += 1
         if times >= 60: #360s
@@ -460,7 +473,6 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
                 print(f"Done {name}")
                 return
-
 
     print("Wrong result")
     #time.sleep(3)
