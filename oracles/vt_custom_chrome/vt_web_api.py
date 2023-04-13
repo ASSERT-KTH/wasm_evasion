@@ -307,7 +307,7 @@ def server():
                                     waiting_time_to_get_info=waiting_time_to_get_info,
                                     waiting_time_to_check_final=waiting_time_to_check_final,
                                     watiting_for_button_time=watiting_for_button_time,
-                                    button_not_clicked_times=button_not_clicked_times
+                                    button_not_clicked_times=button_not_clicked_times)
                         elif task == 'DETAILS':
                             mod:vt_check_hash = importlib.reload(vt_check_hash)
                             mod.check_hash(driver, hash, wrapper=mcwrapper)
