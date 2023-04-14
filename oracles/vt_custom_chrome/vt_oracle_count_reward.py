@@ -29,7 +29,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
         # submit the file
         # submit 2 times?
-        for _ in range(2):
+        for _ in range(5):
             r = requests.post(
                 f"{oracleurl}/upload_file/{session}",
                 files = { 'file': open(input, 'rb') },
@@ -55,7 +55,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
             lapsed += waitfor
             time.sleep(waitfor)
             times += 1
-            if times >= 500:
+            if times >= 200:
                 times = 0
 
                 print("Enqueuing again")
