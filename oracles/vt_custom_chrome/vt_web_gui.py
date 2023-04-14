@@ -53,13 +53,18 @@ def expand_element(driver, element, visited):
     #    expand_element(obj, fd, visited)
     #    expand_element(obj, fd, visited)
 
-def fullpage_screenshot(driver, name, file, from_=""):
+def fullpage_screenshot(driver, name, file, from_="", callback=None):
 
+        import uuid
         try:
+            uniquefile = f"/tmp/{file}{uuid.uuid4()}.png"
             driver.get_screenshot_as_file(file)
             screenshot = Image.open(file)
-            screenshot.save(file, optimize=True, quality=100)
+            screenshot.save(uniquefile, optimize=True, quality=80)
 
+            # send the screen shot to a callback
+            if callback:
+                callback(uniquefile)
             return screenshot
         except Exception as e:
             print(e)
@@ -262,7 +267,7 @@ def get_submit_btn_position(driver):
 
 
 
-def check_file(driver, filename, prev = {}, out="out", wrapper = None,
+def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback = None,
     waiting_time_for_upload=0.34,
     waiting_time_for_analysis=4,
     waiting_time_for_hash=0.6,
@@ -297,7 +302,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
     break_if_captcha(driver, name)
     times = 0
     while True:
-        fullpage_screenshot(driver, name, f"meh.init.png",from_="Waiting from file hash")
+        fullpage_screenshot(driver, name, f"meh.init.png",from_="Waiting from file hash", callback=callback)
         if "file" in driver.current_url:
             break
         time.sleep(waiting_time_for_upload)
@@ -312,7 +317,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
         #fullpage_screenshot(driver, name, f"{name}.init.png",from_="Waiting from file hash")
         #wrapper.savefile(f"screenshots/{name}.init.png", f"{name}.init.png")
 
-        # fullpage_screenshot(driver, name, f"snapshots/{name}.upload.png",from_="Waiting from upload btn")
+        fullpage_screenshot(driver, name, f"snapshots/{name}.upload.png",from_="Waiting from upload btn", callback=callback)
         try:
             inpt = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#fileSelector')")
             break
@@ -369,7 +374,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
                     driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 1}px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
 
-                    fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash")
+                    fullpage_screenshot(driver, name, f"{name}.click.png",from_="Waiting from file hash", callback=callback)
                     #wrapper.savefile(f"screenshots/{name}.click.png", f"{name}.click.png")
                     f = open(f"/tmp/url{name}",  "w")
                     f.write(f"{driver.current_url}")
@@ -441,6 +446,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
             content_text = expand_element(driver, content, {})
             times += 1
             if times >= 80: # 600s 10mins
+                image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Timeout", callback=callback)
                 raise Exception("Waiting too much")
 
             matches = re.findall(engines_re, content_text)
@@ -466,7 +472,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
                     content_text = f"DATE: {now}\n{content_text}"
                     wrapper.save(f"{out}/{name}.logs.txt", content_text)
 
-                image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash")
+                image = fullpage_screenshot(driver, name, f"{name}.recogn.png",from_="Waiting from file hash", callback=callback)
 
                 if wrapper:
                     wrapper.savefile(f"{out}/{name}.recogn.png", f"{name}.recogn.png")
@@ -476,7 +482,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None,
 
     print("Wrong result")
     #time.sleep(3)
-    image = fullpage_screenshot(driver, name, f"wrong/{name}wrong.png",from_="wrong result")
+    image = fullpage_screenshot(driver, name, f"wrong/{name}wrong.png",from_="wrong result", callback=callback)
     raise Exception("Wrong result")
 
 if __name__ == "__main__":
