@@ -169,11 +169,11 @@ def server():
 
                 # download the script file from the github repo
                 # and save it in the current directory
-                url = "https://raw.githubusercontent.com/ASSERT-KTH/wasm_evasion/main/oracles/vt_custom_chrome/vt_web_gui.py"
-                r = requests.get(url, allow_redirects=True)
+                # url = "https://raw.githubusercontent.com/ASSERT-KTH/wasm_evasion/main/oracles/vt_custom_chrome/vt_web_gui.py"
+                # r = requests.get(url, allow_redirects=True)
                 # This will allow in hot changes
-                CURRENTDIR = os.path.dirname(os.path.abspath(__file__))
-                open(os.path.join(CURRENTDIR, 'vt_web_gui.py'), 'wb').write(r.content)
+                # CURRENTDIR = os.path.dirname(os.path.abspath(__file__))
+                # open(os.path.join(CURRENTDIR, 'vt_web_gui.py'), 'wb').write(r.content)
 
                 mod:vt_web_gui = importlib.reload(vt_web_gui)
                 isWasm = mod.check_for_hash(driver, hash, out=f"data", wrapper=mcwrapper,                                    waiting_time_for_upload=0,
