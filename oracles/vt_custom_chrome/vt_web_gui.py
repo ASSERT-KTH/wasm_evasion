@@ -1,3 +1,90 @@
+from difflib import diff_bytes
+from pickletools import optimize
+import sys
+
+from selenium import webdriver
+import os
+from PIL import Image
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import random
+import queue
+import threading
+import traceback
+import re
+import filelock
+import cv2
+import pytesseract
+from selenium.webdriver.common.action_chains import ActionChains
+from datetime import datetime
+
+#31
+#/ 60
+engines_re = r"(\d+)\n/ (\d+)"
+TH = int(os.environ.get("TH", "58"))
+
+def expand_element(driver, element, visited):
+    subelements  = element.find_elements(By.XPATH, "./*")
+    tag = element.get_attribute('tagName')
+    class_ = element.get_attribute('class')
+
+    text = element.text
+    tags_to_skip= ["TEMPLATE" , "svg" , "g" ,"path" , "STYLE" , "img" , "video"  ]
+    S =""
+
+
+    if tag in tags_to_skip:
+        return S
+    S += f"tag: {tag}\n"
+    S += f"class: {class_}\n"
+    S += f"{text}\n"
+
+
+    return S
+    #shadowroot = expand_shadow_element(element)
+    #if shadowroot:
+     #   subelements  = shadowroot.find_elements(By.XPATH, "./*")
+
+    #for obj in subelements:
+    #    expand_element(obj, fd, visited)
+    #    expand_element(obj, fd, visited)
+
+def fullpage_screenshot(driver, name, file, from_="", callback=None):
+
+        import uuid
+        try:
+            # uniquefile = f"/tmp/{file}{uuid.uuid4()}.png"
+            driver.get_screenshot_as_file(file)
+            screenshot = Image.open(file)
+            screenshot.save(file, optimize=True, quality=80)
+
+            # send the screen shot to a callback
+            if callback:
+                callback(file)
+            return screenshot
+        except Exception as e:
+            print(e)
+            content = driver.find_element(By.TAG_NAME, 'body')
+
+            print(expand_element(driver, content, {}))
+            return None
+
+def setUp():
+    os.putenv('PREDEF_FILE', os.path.abspath("name.socket"))
+    os.environ['PREDEF_FILE'] = os.path.abspath("name.socket")
+    options = webdriver.ChromeOptions()
+    PROXY = "socks5://127.0.0.1:9050" # IP:PORT or HOST:PORT
+    options.add_argument('--proxy-server=%s' % PROXY)
+    options.add_argument("disable-infobars"); # disabling infobars
+    options.add_argument("--disable-extensions"); # disabling extensions
+    options.add_argument("--disable-gpu"); # applicable to windows os only
+    options.add_argument("--disable-dev-shm-usage"); # overcome limited resource problems
+    options.add_argument("--no-sandbox"); #Bypass OS security model
+    options.add_experimental_option("excludeSwitches",["ignore-certificate-errors"])
     options.add_argument('--headless')
     options.add_argument("--enable-automation")
     options.add_argument("--dns-prefetch-disable")
