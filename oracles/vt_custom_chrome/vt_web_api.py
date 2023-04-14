@@ -271,6 +271,7 @@ def server():
         def set_screenshot(idx):
             def set_screenshot_inner(filepath):
                 global SCREENSHOTS
+                print(f"Setting screenshot for {idx} {filepath}")
                 SCREENSHOTS[idx] = filepath
             return set_screenshot_inner
 
