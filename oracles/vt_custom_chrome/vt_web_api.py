@@ -161,12 +161,12 @@ def server():
     def get_vt_on(hash):
         # Call the web gui
         if request.method == 'POST':
-            driver = vt_web_gui.setUp()
 
 
 
             try:
 
+                driver = vt_web_gui.setUp()
                 # download the script file from the github repo
                 # and save it in the current directory
                 # url = "https://raw.githubusercontent.com/ASSERT-KTH/wasm_evasion/main/oracles/vt_custom_chrome/vt_web_gui.py"
@@ -271,7 +271,6 @@ def server():
         def set_screenshot(idx):
             def set_screenshot_inner(filepath):
                 global SCREENSHOTS
-                print(f"Setting screenshot for {idx} {filepath}")
                 SCREENSHOTS[idx] = filepath
             return set_screenshot_inner
 
@@ -328,18 +327,19 @@ def server():
 
                 print("Work count", s)
                 times = 0
-                driver = vt_web_gui.setUp()
 
                 done = False
-                while times < 2:
+                while times < 10:
                     try:
                         # reload module every time, this will help in Argo workflows
                         #print("Reloading module")
                         # subprocess.check_output(["/bin/bash", f"{DIRNAME}/download_module.sh"])
 
                         if task == 'SUBMIT':
-                            mod:vt_web_gui = importlib.reload(vt_web_gui)
-                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper, callback = set_screenshot(idx),
+                            try:
+                                driver = vt_web_gui.setUp()
+                                mod:vt_web_gui = importlib.reload(vt_web_gui)
+                                mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper, callback = set_screenshot(idx),
                                     waiting_time_for_upload=waiting_time_for_upload,
                                     waiting_time_for_analysis=waiting_time_for_analysis,
                                     waiting_time_for_hash=waiting_time_for_hash,
@@ -347,9 +347,21 @@ def server():
                                     waiting_time_to_check_final=waiting_time_to_check_final,
                                     watiting_for_button_time=watiting_for_button_time,
                                     button_not_clicked_times=button_not_clicked_times)
+                            except Exception as e:
+                                print(e)
+                                print(traceback.format_exc())
+                                # Try again in a while
+                                time.sleep(1)
+
                         elif task == 'DETAILS':
-                            mod:vt_check_hash = importlib.reload(vt_check_hash)
-                            mod.check_hash(driver, hash, wrapper=mcwrapper)
+                            try:
+                                driver = vt_web_gui.setUp()
+                                mod:vt_check_hash = importlib.reload(vt_check_hash)
+                                mod.check_hash(driver, hash, wrapper=mcwrapper)
+                            except Exception as e:
+                                print(e)
+                                print(traceback.format_exc())
+                                time.sleep(1)
 
                         done = True
                         break
