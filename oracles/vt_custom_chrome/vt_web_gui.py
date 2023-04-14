@@ -58,8 +58,8 @@ def fullpage_screenshot(driver, name, file, from_="", callback=None):
         import uuid
         try:
             uniquefile = f"/tmp/{file}{uuid.uuid4()}.png"
-            driver.get_screenshot_as_file(file)
-            screenshot = Image.open(file)
+            driver.get_screenshot_as_file(uniquefile)
+            screenshot = Image.open(uniquefile)
             screenshot.save(uniquefile, optimize=True, quality=80)
 
             # send the screen shot to a callback
