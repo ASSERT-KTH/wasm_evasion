@@ -63,9 +63,10 @@ def server():
         # Generate base64 image from file
         base64s = []
         for imagepath in SCREENSHOTS:
-            with open(imagepath, "rb") as image_file:
-                encoded_string = base64.b64encode(image_file.read())
-                base64s.append(encoded_string)
+            if imagepath:
+                with open(imagepath, "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+                    base64s.append(encoded_string)
 
         # Now create an html page with the images
         html = f"<html><body><h2>VT API, pending: {len(worklist)}</h2>"
