@@ -54,8 +54,10 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
             lapsed += waitfor
             time.sleep(waitfor)
+            times += 1
+            if times >= 500:
+                times = 0
 
-            if times > 100:
                 print("Enqueuing again")
                 r = requests.post(
                     f"{oracleurl}/upload_file/{session}",
