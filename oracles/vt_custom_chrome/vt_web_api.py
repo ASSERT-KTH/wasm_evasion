@@ -14,11 +14,13 @@ import threading
 import importlib
 import subprocess
 import os
+import base64
 
 COUNT = 0
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
 LOCAL = False
 TH = int(os.environ.get("TH", "58"))
+SCREENSHOTS = []
 
 def server():
     global COUNT
@@ -55,7 +57,23 @@ def server():
     @app.route('/')
     @auth.login_required
     def index():
-        return f'Workcount {len(worklist)}'
+        # Get the image for each SCREENSHOTS
+        global SCREENSHOTS
+        # It is better to transform the images to base64 for inlining in the response
+        # Generate base64 image from file
+        base64s = []
+        for imagepath in SCREENSHOTS:
+            with open(imagepath, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+                base64s.append(encoded_string)
+
+        # Now create an html page with the images
+        html = f"<html><body><h2>VT API, pending: {len(worklist)}</h2>"
+        for b64 in base64s:
+            html += f"<img src='data:image/png;base64,{b64}' />"
+        html += "</body></html>"
+        return html
+
 
     def upload_with_task(outfolder, request, task="SUBMIT"):
         global COUNT
@@ -233,11 +251,21 @@ def server():
 
     def check_files():
 
+        global SCREENSHOTS
+
         WORKERS_NUMBER = int(os.environ.get("NO_WORKERS", "1"))
+        SCREENSHOTS = [None]*WORKERS_NUMBER
 
         prev = {}
 
+        def set_screenshot(idx):
+            def set_screenshot_inner(filepath):
+                global SCREENSHOTS
+                SCREENSHOTS[idx] = filepath
+            return set_screenshot_inner
+
         def process(
+                idx,
                 waiting_time_for_upload=0.34,
                 waiting_time_for_analysis=4,
                 waiting_time_for_hash=0.6,
@@ -247,7 +275,7 @@ def server():
                 button_not_clicked_times=500):
             # This should be a call to ray :)
 
-            print(f"Crazy Ivan: waiting_time_for_upload: {waiting_time_for_upload} waiting_time_for_analysis {waiting_time_for_analysis} button_not_clicked_times {button_not_clicked_times}")
+            print(f"Crazy Ivan {idx}: waiting_time_for_upload: {waiting_time_for_upload} waiting_time_for_analysis {waiting_time_for_analysis} button_not_clicked_times {button_not_clicked_times}")
 
             while True:
                 s = len(worklist)
@@ -300,7 +328,7 @@ def server():
 
                         if task == 'SUBMIT':
                             mod:vt_web_gui = importlib.reload(vt_web_gui)
-                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper,
+                            mod.check_file(driver, filename, prev = prev, out=f"data/{outfolder}", wrapper=mcwrapper, callback = set_screenshot(idx)
                                     waiting_time_for_upload=waiting_time_for_upload,
                                     waiting_time_for_analysis=waiting_time_for_analysis,
                                     waiting_time_for_hash=waiting_time_for_hash,
@@ -334,7 +362,7 @@ def server():
         # Creating built in workers
 
         # The faster
-        th = threading.Thread(target=process, kwargs=dict(
+        th = threading.Thread(target=process,args=[0], kwargs=dict(
             waiting_time_for_upload=0.01,
             waiting_time_for_analysis=0.1,
             waiting_time_for_hash=0.05,
@@ -348,7 +376,7 @@ def server():
 
         if not LOCAL:
             # The patientest
-            th = threading.Thread(target=process, kwargs=dict(
+            th = threading.Thread(target=process, args=[1],kwargs=dict(
                 waiting_time_for_upload=0.5,
                 waiting_time_for_analysis=6,
                 waiting_time_for_hash=0.9,
@@ -361,13 +389,13 @@ def server():
             th.start()
 
             import random
-            for _ in range(WORKERS_NUMBER - 2):
-                th = threading.Thread(target=process, kwargs=dict(
+            for i in range(WORKERS_NUMBER - 2):
+                th = threading.Thread(target=process, args=[i + 2],kwargs=dict(
 
-                    waiting_time_for_upload=random.randint(1, 10)/10.0,
+                    waiting_time_for_upload=random.randint(1, 10)/5.0,
                     waiting_time_for_analysis=random.randint(1, 10),
-                    waiting_time_for_hash=random.randint(1, 10)/10.0,
-                    waiting_time_to_get_info=random.randint(1, 10)/10.0,
+                    waiting_time_for_hash=random.randint(1, 10)/5.0,
+                    waiting_time_to_get_info=random.randint(1, 10)/5.0,
                     waiting_time_to_check_final=random.randint(1, 26),
                     watiting_for_button_time=random.randint(1, 5)/2,
                     button_not_clicked_times=random.randint(1, 1000)
