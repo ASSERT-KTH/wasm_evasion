@@ -41,6 +41,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
         lapsed = 0
         waitfor = 0.05
+        times = 0
         while lapsed <= 72000: # no more than 2 hours
 
             r = requests.get(
@@ -53,6 +54,19 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
             lapsed += waitfor
             time.sleep(waitfor)
+
+            if times > 100:
+                print("Enqueuing again")
+                r = requests.post(
+                    f"{oracleurl}/upload_file/{session}",
+                    files = { 'file': open(input, 'rb') },
+                    auth = HTTPBasicAuth(user, pass_)
+                )
+
+                hsh = r.text
+                print(hsh)
+
+
 
         print("Collecting result")
 
