@@ -10,68 +10,75 @@ import pandas as pd
 from io import StringIO
 
 WHITELIST = ['undetected', 'timeout', 'unable_to_process_file_type', 'no_response']
-    
+
 
 def check_simple(oracleurl, checkoracle, user, pass_, session, input):
-    global WHITELIST
-    
-    # check count
-    r = requests.get(
-        f"{oracleurl}",
-        auth = HTTPBasicAuth(user, pass_)
-    )
 
-    print(r.text)
+    worklist = [(oracleurl, checkoracle, user, pass_, session, input)]
+    def check_simple_inner(job):
+        global WHITELIST
 
-    # submit the file
-    # submit 2 times?
-    for _ in range(2):
-        r = requests.post(
-            f"{oracleurl}/upload_file/{session}",
-            files = { 'file': open(input, 'rb') },
-            auth = HTTPBasicAuth(user, pass_)
-        )
-
-        hsh = r.text
-    print(hsh)
-
-    lapsed = 0
-    waitfor = 0.05
-    while lapsed <= 72000: # no more than 2 hours 
-
+        oracleurl, checkoracle, user, pass_, session, input = job
+        # check count
         r = requests.get(
-            f"{oracleurl}/get_result/{session}/{hsh}",
+            f"{oracleurl}",
             auth = HTTPBasicAuth(user, pass_)
         )
-        if r.text != "INVALID":
-            print(r.text)
-            break
 
-        lapsed += waitfor
-        time.sleep(waitfor)
+        print(r.text)
 
-    print("Collecting result")
+        # submit the file
+        # submit 2 times?
+        for _ in range(2):
+            r = requests.post(
+                f"{oracleurl}/upload_file/{session}",
+                files = { 'file': open(input, 'rb') },
+                auth = HTTPBasicAuth(user, pass_)
+            )
+
+            hsh = r.text
+        print(hsh)
+
+        lapsed = 0
+        waitfor = 0.05
+        while lapsed <= 72000: # no more than 2 hours
+
+            r = requests.get(
+                f"{oracleurl}/get_result/{session}/{hsh}",
+                auth = HTTPBasicAuth(user, pass_)
+            )
+            if r.text != "INVALID":
+                print(r.text)
+                break
+
+            lapsed += waitfor
+            time.sleep(waitfor)
+
+        print("Collecting result")
 
 
-    DATA = StringIO(r.text)
-    df = pd.read_csv(DATA)
-    print(df)
-    try:
-        print("Non detected", df['non_benign'].values)
+        DATA = StringIO(r.text)
+        df = pd.read_csv(DATA)
+        print(df)
+        try:
+            print("Non detected", df['non_benign'].values)
 
-        val = df['non_benign'].values[0]
+            val = df['non_benign'].values[0]
 
-        if val == 0:
-            sys.stderr.write(f"{60 - val}")
-            exit(0)
-        else:
-            sys.stderr.write(f"{60 - val}")
-            exit(1)
-    except Exception as e:
-        # This means an error on this proxy
-        # requeue
-        return check_simple(oracleurl, checkoracle, user, pass_, session, input)
-
+            if val == 0:
+                sys.stderr.write(f"{60 - val}")
+                exit(0)
+            else:
+                sys.stderr.write(f"{60 - val}")
+                exit(1)
+        except Exception as e:
+            print(e)
+            worklist.append(job)
+            # This means an error on this proxy
+            # requeue
+        #return check_simple(oracleurl, checkoracle, user, pass_, session, input)
+    while len(worklist) > 0:
+        check_simple_inner(worklist.pop())
 
 def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
     print(f"Processing {len(files)} files")
@@ -142,7 +149,7 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
             except Exception as e:
                 print(e)
                 pass
-        
+
         if complete:
             break
 
@@ -151,13 +158,13 @@ def check_multiple(oracleurl, checkoracle, user, pass_, session,files):
 
         if lapsed >= 900:
             break
-    
+
 
 
 if __name__ == '__main__':
     oracleurl = sys.argv[1]
     checkoracle = sys.argv[2]
-    
+
     # auth to the service
     user = sys.argv[3]
     pass_ = sys.argv[4]
@@ -169,4 +176,4 @@ if __name__ == '__main__':
     else:
         check_multiple(oracleurl, checkoracle, user, pass_, session, input)
 
-    
+
