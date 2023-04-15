@@ -496,9 +496,9 @@ pub fn get_random_mutators(
     }
 }
 
-pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &Vec<u8>, 
+pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &Vec<u8>,
     prob_weights_name: &'static str,) -> AResult<(Vec<u8>, Vec<(&'static str, &'static str, &'static str, u64)>)> {
-        
+
     let prob_weights = get_by_name(prob_weights_name);
 
     let mut count = 0;
@@ -613,7 +613,9 @@ pub fn mutate_with_reward(
         )?;
 
         for result in results {
-            let (_, _, stderr) = result;
+            let (_, stdout, stderr) = result;
+            let stdoutstr = String::from_utf8(stdout).unwrap()
+            println!("!stdout '{stdoutstr}'");
             //let parsed = stderr::parse::<i32>();
             let stderrstr = String::from_utf8(stderr).unwrap();
             println!("!sterr '{stderrstr}'");
@@ -631,8 +633,8 @@ pub fn mutate_with_reward(
             break;
         }
         // mutated = m
-        
-        
+
+
         /*let s = gn.gen();
         let mut config = WasmMutate::default();
         config.preserve_semantics(true);
