@@ -70,6 +70,7 @@ ENV MINIO_HOST "http://minio-service.minio:3434"
 ENV MINIO_PASS "minio123"
 ENV MINIO_USER = "minio"
 ENV MC_FILES = "vt-api-files"
+ENV USECV = "true"
 # RUN test
 RUN python3 test.py
 
