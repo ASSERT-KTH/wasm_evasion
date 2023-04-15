@@ -66,11 +66,13 @@ def server():
         msgs = []
         for imagepath in SCREENSHOTS:
             if imagepath:
-                msg, imagepath = imagepath
-                with open(imagepath, "rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read())
-                    base64s.append(encoded_string.decode('utf-8'))
-                    msgs.append(msg)
+                imagepaths = imagepath
+                for step in imagepaths:
+                    imagepath, msg = step
+                    with open(imagepath, "rb") as image_file:
+                        encoded_string = base64.b64encode(image_file.read())
+                        base64s.append(encoded_string.decode('utf-8'))
+                        msgs.append(msg)
 
         # Now create an html page with the images
         html = f"<html><body><h2>VT API, pending: {len(worklist)}</h2>"
@@ -278,7 +280,13 @@ def server():
         def set_screenshot(idx):
             def set_screenshot_inner(filepath, msg):
                 global SCREENSHOTS
-                SCREENSHOTS[idx] = (filepath, msg)
+                if not SCREENSHOTS[idx]:
+                    SCREENSHOTS[idx] = []
+                SCREENSHOTS[idx].append((filepath, msg))
+
+                if len(SCREENSHOTS[idx]) > 20:
+                    # drop the first 15
+                    SCREENSHOTS[idx] = SCREENSHOTS[idx][15:]
             return set_screenshot_inner
 
         def process(
