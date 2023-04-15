@@ -214,7 +214,7 @@ def break_if_captcha(driver, name):
                 print("Already restarting tor")
             raise Exception("Blocked. Restarting tor ?")
 
-def get_confirm_btn_position(driver, name, wrapper):
+def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "Confirm", "Confir", "Confi", "Conf"] ):
     print("Using the overkilling CV approach to detect the button")
     image = fullpage_screenshot(driver,name, f"{name}.png")
     # Detect where the button is
@@ -255,7 +255,7 @@ def get_confirm_btn_position(driver, name, wrapper):
         # Cropping the text block for giving input to OCR
         cropped = im2[y:y + h, x:x + w]
         text = pytesseract.image_to_string(cropped)
-        if text.strip() in ["Confirm upload", "Confirm", "Confir", "Confi", "Conf"]:
+        if text.strip() in texts:
             print(text)
             cv2.imwrite(f"{name}.rect.png", im2)
             # wrapper.savefile(f"screenshots/{name}.rect.png", f"{name}.rect.png")
@@ -319,10 +319,36 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
         try:
             inpt = driver.execute_script("return document.querySelector('vt-ui-shell').querySelector('#view-container home-view').shadowRoot.querySelector('vt-ui-main-upload-form').shadowRoot.querySelector('#fileSelector')")
             break
-        except:
-            #print(traceback.format_exc())
+        except Exception as e:
+            print(e, traceback.format_exc())
+            # Try again with the CV
+            buttonpos, size = get_confirm_btn_position(driver, name, wrapper, texts = ['Choose file', 'Choose', 'choose', 'Choo', 'choo'])
+            print("Position", buttonpos, name, USECV)
+            if buttonpos and size:
+                x, y = buttonpos
+                x = x/2
+                y = y/2
 
-            pass
+                h, w = size
+
+                h = h/2 - 5
+                w = w/2 - 5
+
+
+                print("Button found", x, y, h, w)
+                #driver.set_window_size(2400, 1800)
+
+
+                #actions.move_by_offset(x, y).click().perform()
+                # create a marker in the page to show where the mouse is
+                try:
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 1}px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                except Exception as e:
+                    print(e, traceback.format_exc())
+
+
+
     driver.execute_script("arguments[0].style.display = 'block';", inpt)
     #print(inpt)
     inpt.send_keys(os.path.abspath(filename))
