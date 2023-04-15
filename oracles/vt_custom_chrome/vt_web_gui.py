@@ -26,7 +26,7 @@ from datetime import datetime
 #/ 60
 engines_re = r"(\d+)\n/ (\d+)"
 TH = int(os.environ.get("TH", "58"))
-USECV = bool(os.environ.get("USECV", "true"))
+USECV =  bool(os.environ.get("USECV", "true"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -65,7 +65,7 @@ def fullpage_screenshot(driver, name, file, from_="", callback=None):
 
             # send the screen shot to a callback
             if callback:
-                callback(file)
+                callback(from_, file)
             return screenshot
         except Exception as e:
             print(e)
@@ -215,6 +215,7 @@ def break_if_captcha(driver, name):
             raise Exception("Blocked. Restarting tor ?")
 
 def get_confirm_btn_position(driver, name, wrapper):
+    print("Using the overkilling CV approach to detect the button")
     image = fullpage_screenshot(driver,name, f"{name}.png")
     # Detect where the button is
     image = cv2.imread(f"{name}.png")
@@ -293,10 +294,6 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
     driver.get(url)
 
 
-
-    print(f"Taking {name}")
-    driver.get(url)
-
     # To avoid bot
     # . time.sleep(random.randint(1,3))
     print("Waiting for upload btn")
@@ -353,7 +350,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
-                buttonpos, size = (1123, 1055),(39.0*2, 172.5*2) if not USECV else get_confirm_btn_position(driver, name, wrapper)
+                buttonpos, size = get_confirm_btn_position(driver, name, wrapper)
                 print("Position", buttonpos, name, USECV)
                 if buttonpos and size:
                     x, y = buttonpos
