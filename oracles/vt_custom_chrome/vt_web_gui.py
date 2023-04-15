@@ -336,7 +336,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
         except Exception as e:
             print(e, traceback.format_exc())
             # Try again with the CV
-            buttonpos, size = get_confirm_btn_position(driver, name, wrapper, texts = ['Choose file', 'Choose', 'choose', 'Choo', 'choo'], callback)
+            buttonpos, size = get_confirm_btn_position(driver, name, wrapper, texts = ['Choose file', 'Choose', 'choose', 'Choo', 'choo'], callback = callback)
             print("Position", buttonpos, name, USECV)
             if buttonpos and size:
                 x, y = buttonpos
