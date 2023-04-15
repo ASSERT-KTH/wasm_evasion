@@ -354,8 +354,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
                 buttonpos, size = (1123, 1055),(39.0*2, 172.5*2) if not USECV else get_confirm_btn_position(driver, name, wrapper)
-                print("Position", buttonpos, name)
-                if buttonpos:
+                print("Position", buttonpos, name, USECV)
+                if buttonpos and size:
                     x, y = buttonpos
                     x = x/2
                     y = y/2
