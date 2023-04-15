@@ -66,8 +66,8 @@ def server():
         msgs = []
         for imagepath in SCREENSHOTS:
             if imagepath:
-                imagepaths = imagepath
-                for step in imagepaths:
+                steps = imagepath
+                for step in steps:
                     imagepath, msg = step
                     with open(imagepath, "rb") as image_file:
                         encoded_string = base64.b64encode(image_file.read())
@@ -278,7 +278,7 @@ def server():
         prev = {}
 
         def set_screenshot(idx):
-            def set_screenshot_inner(filepath, msg):
+            def set_screenshot_inner(msg, filepath):
                 global SCREENSHOTS
                 if not SCREENSHOTS[idx]:
                     SCREENSHOTS[idx] = []
