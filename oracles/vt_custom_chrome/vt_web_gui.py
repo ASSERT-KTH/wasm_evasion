@@ -263,7 +263,7 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
         x, y, w, h = cv2.boundingRect(cnt)
         # Decrease size (erode)
         if REC_ERODE:
-            x, y, w, h = x + 10, y - 10, w - 10, h - 10
+            x, y, w, h = x + 15, y + 15, w - 10, h - 10
 
         # Drawing a rectangle on copied image
         rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
