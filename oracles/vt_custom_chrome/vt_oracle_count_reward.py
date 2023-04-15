@@ -29,7 +29,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
         # submit the file
         # submit 2 times?
-        for _ in range(5):
+        for _ in range(2):
             r = requests.post(
                 f"{oracleurl}/upload_file/{session}",
                 files = { 'file': open(input, 'rb') },
@@ -43,31 +43,32 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
         waitfor = 0.05
         times = 0
         while lapsed <= 72000: # no more than 2 hours
-
-            r = requests.get(
-                f"{oracleurl}/get_result/{session}/{hsh}",
-                auth = HTTPBasicAuth(user, pass_)
-            )
-            if r.text != "INVALID":
-                print(r.text)
-                break
-
-            lapsed += waitfor
-            time.sleep(waitfor)
-            times += 1
-            if times >= 200:
-                times = 0
-
-                print("Enqueuing again")
-                r = requests.post(
-                    f"{oracleurl}/upload_file/{session}",
-                    files = { 'file': open(input, 'rb') },
+            try:
+                r = requests.get(
+                    f"{oracleurl}/get_result/{session}/{hsh}",
                     auth = HTTPBasicAuth(user, pass_)
                 )
+                if r.text != "INVALID":
+                    print(r.text)
+                    break
 
-                hsh = r.text
-                print(hsh)
+                lapsed += waitfor
+                time.sleep(waitfor)
+                times += 1
+                if times >= 200:
+                    times = 0
 
+                    print("Enqueuing again")
+                    r = requests.post(
+                        f"{oracleurl}/upload_file/{session}",
+                        files = { 'file': open(input, 'rb') },
+                        auth = HTTPBasicAuth(user, pass_)
+                    )
+
+                    #hsh = r.text
+                    print(hsh)
+            except Exception as e
+                print(e)
 
 
         print("Collecting result")
