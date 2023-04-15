@@ -243,7 +243,7 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
         callback("erode", f"{name}.gray1.png")
 
     # Applying dilation on the threshold image
-    dilation = cv2.dilate(dilation, rect_kernel, iterations = 1)
+    dilation = cv2.dilate(dilation, rect_kernel, iterations = 2)
 
 
     cv2.imwrite(f"{name}.gray2.png", dilation)
