@@ -276,9 +276,9 @@ def server():
         prev = {}
 
         def set_screenshot(idx):
-            def set_screenshot_inner(filepath):
+            def set_screenshot_inner(filepath, msg):
                 global SCREENSHOTS
-                SCREENSHOTS[idx] = filepath
+                SCREENSHOTS[idx] = (filepath, msg)
             return set_screenshot_inner
 
         def process(
