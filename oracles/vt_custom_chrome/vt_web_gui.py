@@ -263,7 +263,7 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
         x, y, w, h = cv2.boundingRect(cnt)
         # Decrease size (erode)
         if REC_ERODE:
-            x, y, w, h = x + 15, y + 15, w - 10, h - 10
+            x, y, w, h = x + 10, y + 10, w - 10, h - 10
 
         # Drawing a rectangle on copied image
         rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -434,13 +434,17 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
 
 
 
-                    marker = driver.find_element(By.ID, "marker")
+                    marker = driver.find_element(By.ID, "marker2")
                     # print(marker, name)
                     actions.move_to_element_with_offset(marker, w/2, h/2).click().perform()
 
                     # Remove the element
-                    #driver.execute_script("document.getElementById('marker').remove();")
-                    #time.sleep(1)
+                    driver.execute_script("document.getElementById('marker').remove();")
+                    driver.execute_script("document.getElementById('marker2').remove();")
+
+                    time.sleep(2)
+                    fullpage_screenshot(driver, name, f"{name}2.click.png",from_="After clicking", callback=callback)
+
                     #time.sleep(1)
 
                     #break
