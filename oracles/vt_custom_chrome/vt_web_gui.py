@@ -354,6 +354,8 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
     inpt.send_keys(os.path.abspath(filename))
 
     time.sleep(watiting_for_button_time)
+    fullpage_screenshot(driver, name, f"{name}.click.png",from_="Checking if confirm button", callback=callback)
+
     # Now confirm the upload if needed
     times = 0
     print("Checking if confirm button")
@@ -362,6 +364,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
             break
         time.sleep(0.05)
         break_if_captcha(driver, name)
+        fullpage_screenshot(driver, name, f"{name}.click.png",from_="Checking if confirm button", callback=callback)
 
         try:
             try:
