@@ -26,6 +26,7 @@ from datetime import datetime
 #/ 60
 engines_re = r"(\d+)\n/ (\d+)"
 TH = int(os.environ.get("TH", "58"))
+USECV = bool(os.environ.get("USECV", "true"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -352,7 +353,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
-                buttonpos, size = (1123, 1055),(39.0*2, 172.5*2) # get_confirm_btn_position(driver, name, wrapper)
+                buttonpos, size = (1123, 1055),(39.0*2, 172.5*2) if not USECV else get_confirm_btn_position(driver, name, wrapper)
                 print("Position", buttonpos, name)
                 if buttonpos:
                     x, y = buttonpos
