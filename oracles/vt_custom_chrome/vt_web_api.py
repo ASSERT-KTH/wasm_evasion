@@ -14,6 +14,7 @@ import threading
 import importlib
 import subprocess
 import os
+import traceback
 import base64
 
 COUNT = 0
@@ -62,15 +63,19 @@ def server():
         # It is better to transform the images to base64 for inlining in the response
         # Generate base64 image from file
         base64s = []
+        msgs = []
         for imagepath in SCREENSHOTS:
             if imagepath:
+                msg, imagepath = imagepath
                 with open(imagepath, "rb") as image_file:
                     encoded_string = base64.b64encode(image_file.read())
                     base64s.append(encoded_string.decode('utf-8'))
+                    msgs.append(msg)
 
         # Now create an html page with the images
         html = f"<html><body><h2>VT API, pending: {len(worklist)}</h2>"
-        for b64 in base64s:
+        for b64, msg in zip(base64s, msgs):
+            html += f"<h3>{msg}</h3>"
             html += f"<img src='data:image/png;base64,{b64}' />"
         html += "</body></html>"
         return html
@@ -106,6 +111,7 @@ def server():
                         tmp.write(contentlog)
                     except Exception as e:
                         print(e)
+                        print(traceback.format_exc())
                         tmp.write(contentlog.encode())
 
                     tmp.close()
@@ -135,6 +141,7 @@ def server():
                         worklist.append([f"/tmp/{hash}.wasm", f"{outfolder}", task ])
             except Exception as e:
                 print(e)
+                print(traceback.format_exc())
             return hash
 
     @app.route('/upload_file/<outfolder>', methods=['GET', 'POST'])
@@ -307,7 +314,7 @@ def server():
                     try:
                         tmp.write(content)
                     except Exception as e:
-                        print(e)
+                        print(e, "But solved")
                         tmp.write(content.encode())
 
                     tmp.close()
