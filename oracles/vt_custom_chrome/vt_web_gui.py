@@ -61,7 +61,7 @@ def fullpage_screenshot(driver, name, file, from_="", callback=None):
             # uniquefile = f"/tmp/{file}{uuid.uuid4()}.png"
             driver.get_screenshot_as_file(file)
             screenshot = Image.open(file)
-            screenshot.save(file, optimize=True, quality=80)
+            screenshot.save(file, optimize=True, quality=100)
 
             # send the screen shot to a callback
             if callback:
@@ -214,10 +214,12 @@ def break_if_captcha(driver, name):
                 print("Already restarting tor")
             raise Exception("Blocked. Restarting tor ?")
 
-def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "Confirm", "Confir", "Confi", "Conf", "confirm", "confirm upload", "confi", "conf"] ):
+def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "Confirm", "Confir", "Confi", "Conf", "confirm", "confirm upload", "confi", "conf"], callback=None ):
     print("Using the overkilling CV approach to detect the button")
     image = fullpage_screenshot(driver,name, f"{name}.png")
     # Detect where the button is
+    if not image:
+        return None, None
     image = cv2.imread(f"{name}.png")
 
     # wrapper.savefile(f"screenshots/{name}.upload.png", f"{name}.png")
@@ -237,15 +239,23 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
     # Erode first to remove "Choose file border"
     dilation = cv2.erode(thresh1, rect_kernel2, iterations = 1)
     cv2.imwrite(f"{name}.gray1.png", dilation)
+    if callback:
+        callback("erode", f"{name}.gray1.png")
+
     # Applying dilation on the threshold image
     dilation = cv2.dilate(dilation, rect_kernel, iterations = 1)
 
 
     cv2.imwrite(f"{name}.gray2.png", dilation)
+    if callback:
+        callback("dilation", f"{name}.gray2.png")
+
+
     # Finding contours
     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL,
                                                     cv2.CHAIN_APPROX_NONE)
     im2 = image.copy()
+    print(f"Found {len(contours)} contours")
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
 
@@ -255,10 +265,13 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
         # Cropping the text block for giving input to OCR
         cropped = im2[y:y + h, x:x + w]
         text = pytesseract.image_to_string(cropped)
-        print(text)
         if text.strip() in texts:
             print(text)
             cv2.imwrite(f"{name}.rect.png", im2)
+            if callback:
+                callback("selected button", f"{name}.rect.png")
+
+
             # wrapper.savefile(f"screenshots/{name}.rect.png", f"{name}.rect.png")
 
 
@@ -323,7 +336,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
         except Exception as e:
             print(e, traceback.format_exc())
             # Try again with the CV
-            buttonpos, size = get_confirm_btn_position(driver, name, wrapper, texts = ['Choose file', 'Choose', 'choose', 'Choo', 'choo'])
+            buttonpos, size = get_confirm_btn_position(driver, name, wrapper, texts = ['Choose file', 'Choose', 'choose', 'Choo', 'choo'], callback)
             print("Position", buttonpos, name, USECV)
             if buttonpos and size:
                 x, y = buttonpos
@@ -380,7 +393,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
             else:
                 # Try with the screenshot...this takes time, so we try just is the button does not exist
                 #print("Doing image based detection", name)
-                buttonpos, size = get_confirm_btn_position(driver, name, wrapper)
+                buttonpos, size = get_confirm_btn_position(driver, name, wrapper, callback=callback)
                 print("Position", buttonpos, name, USECV)
                 if buttonpos and size:
                     x, y = buttonpos
