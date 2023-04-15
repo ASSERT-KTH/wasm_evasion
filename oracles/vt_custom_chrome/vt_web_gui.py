@@ -27,6 +27,8 @@ from datetime import datetime
 engines_re = r"(\d+)\n/ (\d+)"
 TH = int(os.environ.get("TH", "58"))
 USECV =  bool(os.environ.get("USECV", "true"))
+ERODE = int(os.environ.get("ERODE", "1"))
+DILATE = int(os.environ.get("DILATE", "2"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -237,13 +239,13 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
 
 
     # Erode first to remove "Choose file border"
-    dilation = cv2.erode(thresh1, rect_kernel2, iterations = 1)
+    dilation = cv2.erode(thresh1, rect_kernel2, iterations = ERODE)
     cv2.imwrite(f"{name}.gray1.png", dilation)
     if callback:
         callback("erode", f"{name}.gray1.png")
 
     # Applying dilation on the threshold image
-    dilation = cv2.dilate(dilation, rect_kernel, iterations = 2)
+    dilation = cv2.dilate(dilation, rect_kernel, iterations = DILATE)
 
 
     cv2.imwrite(f"{name}.gray2.png", dilation)
