@@ -67,7 +67,7 @@ def check_simple(oracleurl, checkoracle, user, pass_, session, input):
 
                     #hsh = r.text
                     print(hsh)
-            except Exception as e
+            except Exception as e:
                 print(e)
 
 
