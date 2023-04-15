@@ -1,7 +1,18 @@
-use rand::{
-    distributions::WeightedIndex, prelude::Distribution, rngs::SmallRng, Rng,
-    SeedableRng,
+use crate::{
+    errors::{AResult, CliError},
+    send_signal_to_probes_socket,
+    subcommands::mutate::{
+        hasting::{
+            get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size,
+            get_distance_reward_penalize_attempt, get_distance_reward_penalize_iteration,
+        },
+        mutation_factory::get_by_name,
+    },
+    State, SOCKET_PATH,
 };
+use rand::{distributions::WeightedIndex, prelude::Distribution, rngs::SmallRng, Rng, SeedableRng};
+use std::thread;
+use std::time::Instant;
 use std::{
     collections::HashSet,
     fs,
@@ -9,26 +20,14 @@ use std::{
     os::unix::net::UnixListener,
     path::Path,
     process::ExitStatus,
-    sync::{
-        Arc, Mutex,
-    },
+    sync::{Arc, Mutex},
     thread::spawn,
 };
-use wasm_mutate::{
-    WasmMutate,
-};
-use std::time::Instant;
-use crate::{
-    errors::{AResult, CliError},
-    send_signal_to_probes_socket,
-    subcommands::mutate::{mutation_factory::get_by_name, hasting::{get_acceptance_symmetric_prob, get_distance_reward, get_distance_reward_and_size, get_distance_reward_penalize_iteration, get_distance_reward_penalize_attempt}},
-    State, SOCKET_PATH,
-};
-use std::thread;
+use wasm_mutate::WasmMutate;
 
 use self::mutation_factory::{MutationFactory, MutationResult};
-pub mod mutation_factory;
 pub mod hasting;
+pub mod mutation_factory;
 
 // Patch for IPC from Peephole
 lazy_static! {
@@ -44,7 +43,7 @@ pub enum MODE {
         mutators_weights_name: &'static str,
         use_reward: bool,
         beta: f32,
-        step_size: u32
+        step_size: u32,
     },
 }
 
@@ -84,7 +83,6 @@ fn open_socket() -> AResult<String> {
                 //println!("{:?}", expr);
                 *original_peep.lock().unwrap() = expr.into();
             }
-
 
             if buff.starts_with(pref2) {
                 //println!("Replacement expression found");
@@ -392,7 +390,12 @@ pub fn mutate_sequential(
             let hash = blake3::hash(&newbin.clone());
             buffer.push((newbin.clone(), idx, seed));
 
-            log::debug!("Size of bulk {}. New hsh: {}. Seed: {}", buffer.len(), hash, seed);
+            log::debug!(
+                "Size of bulk {}. New hsh: {}. Seed: {}",
+                buffer.len(),
+                hash,
+                seed
+            );
             swap(&mut bin, newbin.clone());
             if buffer.len() >= bulk_limit {
                 let results = check_binary(
@@ -496,9 +499,16 @@ pub fn get_random_mutators(
     }
 }
 
-pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &Vec<u8>,
-    prob_weights_name: &'static str,) -> AResult<(Vec<u8>, Vec<(&'static str, &'static str, &'static str, u64)>)> {
-
+pub fn mutate_several_times(
+    times: u32,
+    tree_size: u32,
+    gn: &mut SmallRng,
+    bin: &Vec<u8>,
+    prob_weights_name: &'static str,
+) -> AResult<(
+    Vec<u8>,
+    Vec<(&'static str, &'static str, &'static str, u64)>,
+)> {
     let prob_weights = get_by_name(prob_weights_name);
 
     let mut count = 0;
@@ -506,7 +516,6 @@ pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &
     let mut cp = bin.clone();
     let mut mutations = vec![];
     loop {
-
         let s = gn.gen();
         let mut config = WasmMutate::default();
         config.preserve_semantics(true);
@@ -515,7 +524,7 @@ pub fn mutate_several_times(times: u32,tree_size: u32, gn: &mut SmallRng, bin: &
         config.setup(&cp).unwrap();
 
         let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
-        get_random_mutators(&mut config, gn, prob_weights.clone(), true)?;
+            get_random_mutators(&mut config, gn, prob_weights.clone(), true)?;
 
         println!("Mutated {}", mutated);
         if mutated {
@@ -543,7 +552,7 @@ pub fn mutate_with_reward(
     prob_weights_name: &'static str,
     use_reward: bool,
     beta: f32,
-    step_size: u32
+    step_size: u32,
 ) -> AResult<(u32, u32)> {
     log::debug!("Mutating binary {}", path);
     let prob_weights = get_by_name(prob_weights_name);
@@ -614,7 +623,7 @@ pub fn mutate_with_reward(
 
         for result in results {
             let (_, stdout, stderr) = result;
-            let stdoutstr = String::from_utf8(stdout).unwrap()
+            let stdoutstr = String::from_utf8(stdout).unwrap();
             println!("!stdout '{stdoutstr}'");
             //let parsed = stderr::parse::<i32>();
             let stderrstr = String::from_utf8(stderr).unwrap();
@@ -634,7 +643,6 @@ pub fn mutate_with_reward(
         }
         // mutated = m
 
-
         /*let s = gn.gen();
         let mut config = WasmMutate::default();
         config.preserve_semantics(true);
@@ -647,13 +655,11 @@ pub fn mutate_with_reward(
         let (mutated, mutator_tpe, mutator_name, mutator_param, mutated_bin) =
             get_random_mutators(&mut config, &mut gn2, prob_weights.clone(), use_reward)?;
         all += 1;*/
-        let (mutated_bin, mutators) = mutate_several_times(step_size, tree_size, &mut gn2, &bin, prob_weights_name)?;
+        let (mutated_bin, mutators) =
+            mutate_several_times(step_size, tree_size, &mut gn2, &bin, prob_weights_name)?;
         println!("mutator {:?}", mutators);
 
-        println!(
-            "{} Mutated with {:?}",
-            number_of_oracle_calls, mutators
-        );
+        println!("{} Mutated with {:?}", number_of_oracle_calls, mutators);
 
         let hash = blake3::hash(&mutated_bin.clone());
         // Check if this is by reward, otherwise just, random mutate based on a weight map
@@ -672,7 +678,10 @@ pub fn mutate_with_reward(
             let elapsed = now.elapsed().as_millis();
             log::debug!("Oracle returns in {:?}ms", elapsed);
             total_times += elapsed;
-            log::debug!("Avg time per query {}ms", total_times as f64/number_of_oracle_calls as f64);
+            log::debug!(
+                "Avg time per query {}ms",
+                total_times as f64 / number_of_oracle_calls as f64
+            );
 
             for result in results {
                 let (r, stdout, stderr) = result;
@@ -697,26 +706,18 @@ pub fn mutate_with_reward(
                     let fname = format!("{session_folder}/interesting");
                     fs::create_dir(fname.clone());
 
-                    let fname =
-                        format!("{fname}/e{:0width$}_i{}", elapsed, 0, width = 10);
+                    let fname = format!("{fname}/e{:0width$}_i{}", elapsed, 0, width = 10);
                     fs::create_dir(fname.clone());
                     fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
-                    let mut f =
-                        fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
+                    let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
                     //f.write_all(format!("seed: {}\n", s).as_bytes())?;
                     f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
                     f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
                     f.write_all(format!("interesting: {}\n", true).as_bytes())?;
                     //f.write_all(format!("variant_size: {}\n", mutated_bin.len()).as_bytes())?;
                     f.write_all(format!("parent: {}\n", parent).as_bytes())?;
-                    f.write_all(
-                        format!(
-                            "mutation: {:?}\n",
-                            mutators.clone()
-                        )
-                        .as_bytes(),
-                    )?;
+                    f.write_all(format!("mutation: {:?}\n", mutators.clone()).as_bytes())?;
 
                     fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
                     fs::write(format!("{}/variant.wasm", fname), &mutated_bin)?;
@@ -750,26 +751,18 @@ pub fn mutate_with_reward(
                     let fname = format!("{session_folder}/non_interesting");
                     fs::create_dir(fname.clone());
 
-                    let fname =
-                        format!("{fname}/e{:0width$}_i{}", elapsed, 0, width = 10);
+                    let fname = format!("{fname}/e{:0width$}_i{}", elapsed, 0, width = 10);
                     fs::create_dir(fname.clone());
                     fs::write(format!("{}/stderr.txt", fname.clone()), &stderr)?;
 
-                    let mut f =
-                        fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
+                    let mut f = fs::File::create(format!("{}/iteration_info.txt", fname.clone()))?;
                     //f.write_all(format!("seed: {}\n", s).as_bytes())?;
                     f.write_all(format!("attempts: {}\n", attemps).as_bytes())?;
                     f.write_all(format!("elapsed: {}\n", elapsed).as_bytes())?;
                     f.write_all(format!("interesting: {}\n", true).as_bytes())?;
                     //f.write_all(format!("variant_size: {}\n", mutated_bin.len()).as_bytes())?;
                     f.write_all(format!("parent: {}\n", parent).as_bytes())?;
-                    f.write_all(
-                        format!(
-                            "mutation: {:?}\n",
-                            mutators
-                        )
-                        .as_bytes(),
-                    )?;
+                    f.write_all(format!("mutation: {:?}\n", mutators).as_bytes())?;
 
                     fs::write(format!("{}/stdout.txt", fname.clone()), &stdout)?;
                     fs::write(format!("{}/variant.wasm", fname), &mutated_bin)?;
@@ -794,12 +787,12 @@ pub fn mutate_with_reward(
                         (binclone, opsclone.clone(), reward, last_accepted),
                         (
                             mutatedcp,
-                            vec![opsclone, vec![mutators.clone()]]
-                                .concat(),
-                            newr, number_of_oracle_calls
+                            vec![opsclone, vec![mutators.clone()]].concat(),
+                            newr,
+                            number_of_oracle_calls,
                         ),
                         probs1clone,
-                        Box::new(get_distance_reward_penalize_iteration)
+                        Box::new(get_distance_reward_penalize_iteration),
                     );
 
                     let lg = rn.log(2.7) / beta;
@@ -892,11 +885,7 @@ pub fn mutate_with_reward(
             }
         } else {
             mutationlogfile.write(
-                format!(
-                    "{}|{}| {:?}\n",
-                    all, number_of_oracle_calls, mutators
-                )
-                .as_bytes(),
+                format!("{}|{}| {:?}\n", all, number_of_oracle_calls, mutators).as_bytes(),
             )?;
             // Check the oracle as usual
             // The prob of mutating to the new binary is always 1
@@ -904,8 +893,7 @@ pub fn mutate_with_reward(
             // Always swap and advance
             swap(&mut bin, mutated_bin.clone());
             number_of_oracle_calls += 1;
-            let results =
-                check_binary(buffer.clone(), command.clone(), args.clone(), false, true)?;
+            let results = check_binary(buffer.clone(), command.clone(), args.clone(), false, true)?;
             log::debug!("Size of results {}", results.len());
             for ((newbin, idx, s), result) in buffer.iter().zip(results) {
                 let (r, stdout, stderr) = result;
@@ -936,13 +924,7 @@ pub fn mutate_with_reward(
                 f.write_all(format!("interesting: {}\n", interesting).as_bytes())?;
                 f.write_all(format!("variant_size: {}\n", newbin.len()).as_bytes())?;
                 f.write_all(format!("parent: {}\n", parent).as_bytes())?;
-                f.write_all(
-                    format!(
-                        "mutation: {:?}\n",
-                        mutators
-                    )
-                    .as_bytes(),
-                )?;
+                f.write_all(format!("mutation: {:?}\n", mutators).as_bytes())?;
                 // TODO Add Meta info of the variant ?
 
                 // Mutation applied
@@ -1020,7 +1002,7 @@ pub fn mutate(
             mutators_weights_name,
             use_reward,
             beta,
-            step_size
+            step_size,
         } => {
             mutate_with_reward(
                 state,
@@ -1035,7 +1017,7 @@ pub fn mutate(
                 mutators_weights_name,
                 use_reward,
                 beta,
-                step_size
+                step_size,
             )?;
         }
     };
@@ -1273,7 +1255,7 @@ pub mod tests {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
                 beta: 0.1,
-                step_size: 2
+                step_size: 2,
             },
             1,
         )
@@ -1323,7 +1305,7 @@ pub mod tests {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
                 beta: 0.01,
-                step_size: 1
+                step_size: 1,
             },
             1,
         )
@@ -1366,7 +1348,7 @@ pub mod tests {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
                 beta: 0.1,
-                step_size: 2
+                step_size: 2,
             },
             1,
         )
@@ -1409,7 +1391,7 @@ pub mod tests {
                 mutators_weights_name: "Uniform",
                 use_reward: true,
                 beta: 0.1,
-                step_size: 2
+                step_size: 2,
             },
             1,
         )
@@ -1452,7 +1434,7 @@ pub mod tests {
                 mutators_weights_name: "Uniform",
                 use_reward: false,
                 beta: 0.1,
-                step_size: 2
+                step_size: 2,
             },
             1,
         )
