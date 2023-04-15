@@ -214,7 +214,7 @@ def break_if_captcha(driver, name):
                 print("Already restarting tor")
             raise Exception("Blocked. Restarting tor ?")
 
-def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "Confirm", "Confir", "Confi", "Conf"] ):
+def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "Confirm", "Confir", "Confi", "Conf", "confirm", "confirm upload", "confi", "conf"] ):
     print("Using the overkilling CV approach to detect the button")
     image = fullpage_screenshot(driver,name, f"{name}.png")
     # Detect where the button is
@@ -255,6 +255,7 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
         # Cropping the text block for giving input to OCR
         cropped = im2[y:y + h, x:x + w]
         text = pytesseract.image_to_string(cropped)
+        print(text)
         if text.strip() in texts:
             print(text)
             cv2.imwrite(f"{name}.rect.png", im2)
