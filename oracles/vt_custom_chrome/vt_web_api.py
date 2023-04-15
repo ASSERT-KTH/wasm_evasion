@@ -118,7 +118,7 @@ def server():
 
                     f, _ = parse_result.parse_result(f"/tmp/{hsh2}")
 
-                    if "Analysing (" not in contentlog or f['engines'].values[0] >= TH:
+                    if b"Analysing (" not in contentlog or f['engines'].values[0] >= TH:
                         print("Not queued")
                     else:
                         print("Adding to queue")
