@@ -442,7 +442,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
                     driver.execute_script("document.getElementById('marker').remove();")
                     driver.execute_script("document.getElementById('marker2').remove();")
 
-                    time.sleep(2)
+                    time.sleep(5)
                     fullpage_screenshot(driver, name, f"{name}2.click.png",from_="After clicking", callback=callback)
 
                     #time.sleep(1)
