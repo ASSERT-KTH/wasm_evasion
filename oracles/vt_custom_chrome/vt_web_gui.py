@@ -29,6 +29,7 @@ TH = int(os.environ.get("TH", "58"))
 USECV =  bool(os.environ.get("USECV", "true"))
 ERODE = int(os.environ.get("ERODE", "1"))
 DILATE = int(os.environ.get("DILATE", "2"))
+REC_ERODE = bool(os.environ.get("REC_ERODE", "true"))
 
 def expand_element(driver, element, visited):
     subelements  = element.find_elements(By.XPATH, "./*")
@@ -260,6 +261,9 @@ def get_confirm_btn_position(driver, name, wrapper, texts = ["Confirm upload", "
     print(f"Found {len(contours)} contours")
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
+        # Decrease size (erode)
+        if REC_ERODE:
+            x, y, w, h = x + 10, y - 10, w - 10, h - 10
 
         # Drawing a rectangle on copied image
         rect = cv2.rectangle(im2, (x, y), (x + w, y + h), (0, 255, 0), 2)
@@ -328,6 +332,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
         # Detect where the button is
         # #infoIcon
         break_if_captcha(driver, name)
+
         #fullpage_screenshot(driver, name, f"{name}.init.png",from_="Waiting from file hash")
         #wrapper.savefile(f"screenshots/{name}.init.png", f"{name}.init.png")
 
@@ -342,24 +347,27 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
             print("Position", buttonpos, name, USECV)
             if buttonpos and size:
                 x, y = buttonpos
-                x = x/2
-                y = y/2
+                # x = x/2
+                # y = y/2
 
                 h, w = size
 
-                h = h/2 - 5
-                w = w/2 - 5
+                #h = h/2 - 5
+                #w = w/2 - 5
 
 
                 print("Button found", x, y, h, w)
                 #driver.set_window_size(2400, 1800)
 
 
-                #actions.move_by_offset(x, y).click().perform()
                 # create a marker in the page to show where the mouse is
                 try:
-                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
-                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker2', dot.style.position = 'absolute'; dot.style.top = '{y - 1}px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker11', dot.style.position = 'absolute'; dot.style.top = '0px'; dot.style.left = '0px'; dot.style.width = '{w}px'; dot.style.height = '{h}px'; dot.style.backgroundColor = 'red'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                    driver.execute_script(f" dot = document.createElement('div'); dot.id='marker22', dot.style.position = 'absolute'; dot.style.top = '{y - 1 }px'; dot.style.left = '{x - 1}px'; dot.style.width = '5px'; dot.style.height = '5px'; dot.style.backgroundColor = 'blue'; dot.style.opacity=0.3; document.body.appendChild(dot);")
+                    marker = driver.find_element(By.ID, "marker22")
+                    # print(marker, name)
+                    actions.move_to_element_with_offset(marker, w/2, h/2).click().perform()
+
                 except Exception as e:
                     print(e, traceback.format_exc())
 
@@ -399,13 +407,13 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
                 print("Position", buttonpos, name, USECV)
                 if buttonpos and size:
                     x, y = buttonpos
-                    x = x/2
-                    y = y/2
+                    # x = x/2
+                    # y = y/2
 
                     h, w = size
 
-                    h = h/2 - 5
-                    w = w/2 - 5
+                    # h = h/2 - 5
+                    # w = w/2 - 5
 
 
                     print("Button found", x, y, h, w)
@@ -428,7 +436,7 @@ def check_file(driver, filename, prev = {}, out="out", wrapper = None, callback 
 
                     marker = driver.find_element(By.ID, "marker")
                     # print(marker, name)
-                    actions.move_to_element_with_offset(marker, x, y).click().perform()
+                    actions.move_to_element_with_offset(marker, w/2, h/2).click().perform()
 
                     # Remove the element
                     #driver.execute_script("document.getElementById('marker').remove();")
