@@ -1,8 +1,8 @@
-## Obfuscation analysis for Wasm
+## Malware evasion for Wasm
 
 [![Build and deploy](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_and_deploy.yml) [![Build docker evasor](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_docker_image.yml/badge.svg)](https://github.com/Jacarte/obfuscation_wasm/actions/workflows/build_docker_image.yml) [![Build docker oracle](https://github.com/Jacarte/wasm_evasion/actions/workflows/build_docker_image_oracles.yml/badge.svg)](https://github.com/Jacarte/wasm_evasion/actions/workflows/build_docker_image_oracles.yml)
 
-This repo contains the tooling and the reproduction of our experiments on Wasm obfuscation.
+This repo contains the tooling and the reproduction of our experiments on Wasm malware evasion, see our paper [WebAssembly Diversification for Malware Evasion](http://arxiv.org/pdf/2212.08427).
 
 To cite this work:
 
@@ -10,18 +10,10 @@ To cite this work:
 @ARTICLE{2022arXiv221208427C,
        author = {{Cabrera-Arteaga}, Javier and {Monperrus}, Martin and {Toady}, Tim and {Baudry}, Benoit},
         title = "{WebAssembly Diversification for Malware Evasion}",
-      journal = {arXiv e-prints},
-     keywords = {Computer Science - Software Engineering},
          year = 2022,
-        month = dec,
-          eid = {arXiv:2212.08427},
-        pages = {arXiv:2212.08427},
-          doi = {10.48550/arXiv.2212.08427},
 archivePrefix = {arXiv},
        eprint = {2212.08427},
- primaryClass = {cs.SE},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2022arXiv221208427C},
-      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+       url = {http://arxiv.org/pdf/2212.08427}
 }
 
 ```
