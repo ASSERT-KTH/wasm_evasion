@@ -7,13 +7,17 @@ This repo contains the tooling and the reproduction of our experiments on Wasm m
 To cite this work:
 
 ```
-@ARTICLE{2022arXiv221208427C,
-       author = {{Cabrera-Arteaga}, Javier and {Monperrus}, Martin and {Toady}, Tim and {Baudry}, Benoit},
-        title = "{WebAssembly Diversification for Malware Evasion}",
-         year = 2022,
-archivePrefix = {arXiv},
-       eprint = {2212.08427},
-       url = {http://arxiv.org/pdf/2212.08427}
+@article{CABRERAARTEAGA2023103296,
+title = {WebAssembly Diversification for Malware Evasion},
+journal = {Computers & Security},
+pages = {103296},
+year = {2023},
+issn = {0167-4048},
+doi = {https://doi.org/10.1016/j.cose.2023.103296},
+url = {https://www.sciencedirect.com/science/article/pii/S0167404823002067},
+author = {Javier Cabrera-Arteaga and Martin Monperrus and Tim Toady and Benoit Baudry},
+keywords = {WebAssembly, cryptojacking, software diversification, malware evasion},
+abstract = {WebAssembly has become a crucial part of the modern web, offering a faster alternative to JavaScript in browsers. While boosting rich applications in browser, this technology is also very efficient to develop cryptojacking malware. This has triggered the development of several methods to detect cryptojacking malware. However, these defenses have not considered the possibility of attackers using evasion techniques. This paper explores how automatic binary diversification can support the evasion of WebAssembly cryptojacking detectors. We experiment with a dataset of 33 WebAssembly cryptojacking binaries and evaluate our evasion technique against two malware detectors: VirusTotal, a general-purpose detector, and MINOS, a WebAssembly-specific detector. Our results demonstrate that our technique can automatically generate variants of WebAssembly cryptojacking that evade the detectors in 90% of cases for VirusTotal and 100% for MINOS. Our results emphasize the importance of meta-antiviruses and diverse detection techniques and provide new insights into which WebAssembly code transformations are best suited for malware evasion. We also show that the variants introduce limited performance overhead, making binary diversification an effective technique for evasion.}
 }
 
 ```
