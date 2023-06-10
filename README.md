@@ -7,15 +7,17 @@ This repo contains the tooling and the reproduction of our experiments on Wasm m
 To cite this work:
 
 ```
-@ARTICLE{2022arXiv221208427C,
-       author = {{Cabrera-Arteaga}, Javier and {Monperrus}, Martin and {Toady}, Tim and {Baudry}, Benoit},
-        title = "{WebAssembly Diversification for Malware Evasion}",
-         year = 2022,
-archivePrefix = {arXiv},
-       eprint = {2212.08427},
-       url = {http://arxiv.org/pdf/2212.08427}
+@article{CABRERAARTEAGA2023103296,
+       title = {WebAssembly Diversification for Malware Evasion},
+       journal = {Computers & Security},
+       pages = {103296},
+       year = {2023},
+       issn = {0167-4048},
+       doi = {https://doi.org/10.1016/j.cose.2023.103296},
+       url = {https://www.sciencedirect.com/science/article/pii/S0167404823002067},
+       author = {Javier Cabrera-Arteaga and Martin Monperrus and Tim Toady and Benoit Baudry},
+       keywords = {WebAssembly, cryptojacking, software diversification, malware evasion}
 }
-
 ```
 
 ### Setup & requirements
